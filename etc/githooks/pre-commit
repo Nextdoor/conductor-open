@@ -1,0 +1,58 @@
+#!/bin/bash -e
+#
+# Runs the following pre-commit checks and aborts the commit if there
+# are any failures. Runs tests and style tests.
+
+fail=0
+
+function usage {
+    cat <<EOF
+Git pre-commit hook
+
+Runs tests and various style and correctness checks for the working directory.
+EOF
+    exit 1
+}
+
+function run_tests {
+    if [[ $SKIP =~ "tests" ]]; then
+        return
+    fi
+
+    echo -e "\nRunning Tests"
+
+    if [ -e testenv ]; then
+        mv testenv testenv.bak  # No integration tests.
+        trap "mv testenv.bak testenv" EXIT
+    fi
+
+    make test
+
+    if [[ $? != 0 ]]; then
+        fail=1
+    else
+        echo "OK"
+    fi
+}
+
+function notify {
+    if [[ $fail != 0 ]]; then
+        echo -e "\nPre-commit checks failed. Run with --no-verify (git-commit)"
+        exit 1
+    fi
+}
+
+function main {
+    if [[ $SKIP =~ "all" ]]; then
+        SKIP="tests"
+    fi
+
+    echo "Running pre-commit checks"
+    [[ -n $SKIP ]] && echo "Skipping checks: $SKIP"
+
+    run_tests
+
+    notify
+}
+
+main $*

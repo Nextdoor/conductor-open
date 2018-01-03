@@ -1,0 +1,433 @@
+swagger: '2.0'
+info:
+  title: Conductor API
+  description: Continuous Deployment Train Management API
+  version: '1.0.0'
+schemes:
+  - https
+produces:
+  - application/json
+paths:
+  /api/trains:
+    get:
+      summary: Get all the trains.
+      description: |
+        This gets all the trains. Uses a pagination system by id.
+      parameters:
+        - name: page_size
+          in: query
+          description: Number of train objects to return per page. Max 100.
+          type: number
+          format: integer
+          default: 50
+        - name: start_id
+          in: query
+          description: Last id to start result at.
+          type: string
+          default: null
+      responses:
+        200:
+          description: An array of trains.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Train'
+        default:
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+      tags:
+        - Trains
+    post:
+      summary: Try to create a train.
+      description: |
+        Try to create a new train. There must be no active train, and Conductor must be in manual mode.
+        If there is an active train, it is returned.
+      responses:
+        409:
+          description: An active train already exists. Existing train object is returned in response body.
+          schema:
+            $ref: '#/definitions/Train'
+        200:
+          description: A new active train has been successfully created.
+          schema:
+            $ref: '#/definitions/Train'
+      tags:
+        - Trains
+
+  /api/trains/active:
+    get:
+      summary: Get the active train.
+      responses:
+        200:
+          description: The active train.
+          schema:
+            $ref: '#/definitions/Train'
+        500:
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+      tags:
+        - Trains
+
+  /api/trains/{id}:
+    get:
+      summary: Get a specific train.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the train to get.
+          required: true
+          type: number
+          format: integer
+      responses:
+        200:
+          description: The specified train.
+          schema:
+            $ref: '#/definitions/Train'
+        404:
+          description: The specified train could not be found.
+          $ref: '#/definition/Error'
+        500:
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+      tags:
+        - Trains
+
+  /api/build:
+    get:
+      summary: Get all the builds.
+      description: |
+        This gets all the builds. Uses a pagination system by id.
+      parameters:
+        - name: page_size
+          in: query
+          description: Number of builds to return per page. Max 100.
+          type: number
+          format: integer
+          default: 50
+        - name: start_id
+          in: query
+          description: Largest id to start result at.
+          type: string
+          default: null
+      responses:
+        200:
+          description: An array of builds.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Build'
+        500:
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+      tags:
+        - Builds
+    post:
+      summary: Create a new build for a given train.
+      description: |
+        Create a new build. Returns a build object, which will have a number of blank fields initially as
+        build action is asynchronous. Fields will only be fully populated when build has complete.
+        Builds may fail, in which case they will have an error URL property set. Failed builds may be retried,
+        which will reset various parameters.
+      parameters:
+        - name: train_id
+          in: query
+          description: ID of train to build.
+          type: string
+          required: true
+      responses:
+        200:
+          description: The created build.
+          schema:
+            $ref: '#/definitions/Build'
+        400:
+          description: Train does not exist, or there is an existing build, or there is already a successful build (?)
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+      tags:
+        - Builds
+
+  /api/build/{id}:
+    get:
+      summary: Get a specific build.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the build to get.
+          required: true
+          type: string
+      responses:
+        200:
+          description: The specified build.
+          schema:
+            $ref: '#/definitions/Build'
+        404:
+          description: Build not found.
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+      tags:
+        - Builds
+
+  /api/deploy:
+    get:
+      summary: Get all the deploys.
+      description: |
+        List deploy objects.
+      parameters:
+        - name: page_size
+          in: query
+          description: Number of deploys to return per page. Max 100.
+          type: number
+          format: integer
+          default: 50
+        - name: start_id
+          in: query
+          description: Largest id to start results at.
+          type: string
+          default: null
+      responses:
+        200:
+          description: An array of deploys.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Deploy'
+        500:
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+      tags:
+        - Deploys
+    post:
+      summary: Create a new deploy for a train.
+      parameters:
+        - name: train_id
+          in: query
+          required: true
+          type: string
+      responses:
+        200:
+          description: The created deploy.
+          schema:
+            $ref: '#/definitions/Deploy'
+        400:
+          description: Train does not exist, or there is an existing deploy, or there is no successful build (?)
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+      tags:
+        - Deploys
+
+  /api/deploy/{id}:
+    get:
+      summary: Get a specific deploy.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the deploy to get.
+          required: true
+          type: string
+      responses:
+        200:
+          description: The specified deploy.
+          schema:
+            $ref: '#/definitions/Deploy'
+        404:
+          description: Deploy not found.
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+      tags:
+        - Deploys
+        
+definitions:
+  Build:
+    type: object
+    properties:
+      id:
+        type: string
+        description: ID for this build.
+      train_id:
+        type: string
+        description: ID of train this build is associated with.
+      started_at:
+        type: string
+        description: RFC3339 timestamp representing the time at which the build
+          was started.
+      finished_at:
+        type: string
+        description: RFC3339 timestamp representing the time at which the build
+          was completed. Null if not yet completed.
+      url:
+        type: string
+        description: URL of the job output.
+      result:
+        type: string
+        description: Result code of the build job.
+      docker_image:
+        type: string
+        description: URL at which the docker image corresponding to this build
+          can be located.
+      deploy:
+        type: object
+        description: If a deploy has been started from this build, embed it here for the convenience of the client. This means they don't have to make a separate request to the deploy API.
+        properties:
+          id:
+            type: string
+            description: ID for this deploy.
+          url:
+            type: string
+            description: URL to deploy job with output.
+          started_at:
+            type: string
+            description: RFC3339 timestamp representing the time at which the deploy was started.
+          completed_at:
+            type: string
+            description: RFC3339 timestamp representing the time at which the deploy was completed. Null if not yet completed.
+          result:
+            type: string
+            description: Result code of the deploy job.
+
+  Deploy:
+    type: object
+    properties:
+      id:
+        type: string
+        description: ID for this deploy.
+      build_id:
+        type: string
+        description: ID of build that this deploy is using.
+      train_id:
+        type: string
+        description: ID of train that this deploy was for.
+      url:
+        type: string
+        description: URL of deploy job where output can be found.
+      result:
+        type: string
+        description: Result code of the deploy job.
+      started_at:
+        type: string
+        description: RFC3339 timestamp representing the time at which the deploy
+          was started.
+      finished_at:
+        type: string
+        description: RFC3339 timestamp representing the time at which the deploy
+          was completed. Null if not yet completed.
+
+  Train:
+    type: object
+    properties:
+      id:
+        type: string
+        description: ID of this train.
+      created_at:
+        type: string
+        description: RFC3339 timestamp representing the creation time of the train object.
+      deployed_at:
+        type: string
+        description: RFC3339 timestamp representing the destruction time of the train object. null if active.
+      branch:
+        type: string
+        description: Name of the git branch that this train is operating on.
+      head_sha:
+        type: string
+        description: SHA of the head commit on the train.
+      changes:
+        type: array
+        items:
+          type: object
+          properties:
+            author:
+              type: string
+              description: Git author string for this commit.
+            shortlog:
+              type: string
+              description: Git shortlog entry for this commit.
+            sha:
+              type: string
+              description: Git SHA for this commit on the release branch.
+            verification_ticket:
+              type: string
+              description: URL of JIRA ticket. (should probably be ticket id / ticket embedded here).
+            verified_at:
+              type: string
+              description: RFC3339 timestamp. Set if ticket has been verified, null if not verified.
+      build:
+        type: array
+        items:
+          type: object
+          description: This will be an empty array if there have been no builds.
+          properties:
+            id:
+              type: string
+              description: ID for this build.
+            started_at:
+              type: string
+              description: RFC3339 timestamp representing the time at which the build
+                was started.
+            completed_at:
+              type: string
+              description: RFC3339 timestamp representing the time at which the build
+                was completed. Null if not yet completed.
+            url:
+              type: string
+              description: If the build failed, this will point to the URL of the error
+                output. If build succeeded, this will be null.
+            result:
+              type: string
+              description: Result code of the build job.
+            docker_image:
+              type: string
+              description: URL at which the docker image corresponding to this build
+                can be located.
+      deploy:
+        type: object
+        description: This will be null if there has been no deploy.
+        properties:
+          id:
+            type: string
+            description: ID for this deploy.
+          build_id:
+            type: string
+            description: ID for the build.
+          url:
+            type: string
+            description: URL to deploy job with output etc.
+          started_at:
+            type: string
+            description: RFC3339 timestamp representing the time at which the deploy was started.
+          completed_at:
+            type: string
+            description: RFC3339 timestamp representing the time at which the deploy was completed. Null if not yet completed.
+          result:
+            type: string
+            description: Result code of the deploy job.
+
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string
