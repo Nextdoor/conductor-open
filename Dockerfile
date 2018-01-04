@@ -1,4 +1,6 @@
 FROM golang:1.9.2-stretch
+ENTRYPOINT [ "/app/entrypoint.sh" ]
+EXPOSE 80 443
 
 # Install packages.
 RUN curl -sL https://deb.nodesource.com/setup_9.x | bash - && \
@@ -21,7 +23,5 @@ RUN pretty-swag -c /app/swagger/config.json
 ADD .build /go/src/github.com/Nextdoor/conductor/
 RUN go build -o /app/conductor /go/src/github.com/Nextdoor/conductor/cmd/conductor/conductor.go
 
+# Add static resources.
 ADD resources/ /app
-
-EXPOSE 80 443
-ENTRYPOINT [ "/app/entrypoint.sh" ]
