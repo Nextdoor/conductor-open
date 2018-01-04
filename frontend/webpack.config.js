@@ -17,7 +17,7 @@ const REQUIRED_ENV_VARS = [
   'OAUTH_PAYLOAD'
 ];
 const DEFAULT_ENV_VARS = {
-  'AUTH_COOKIE_NAME': 'conductor-auth',
+  'AUTH_COOKIE_NAME': 'conductor-auth'
 };
 
 // Look for missing env vars.

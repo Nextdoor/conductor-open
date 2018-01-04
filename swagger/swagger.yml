@@ -37,7 +37,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
       tags:
-        - Trains
+        - Train
     post:
       summary: Try to create a train.
       description: |
@@ -53,7 +53,7 @@ paths:
           schema:
             $ref: '#/definitions/Train'
       tags:
-        - Trains
+        - Train
 
   /api/trains/active:
     get:
@@ -68,7 +68,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
       tags:
-        - Trains
+        - Train
 
   /api/trains/{id}:
     get:
@@ -87,13 +87,13 @@ paths:
             $ref: '#/definitions/Train'
         404:
           description: The specified train could not be found.
-          $ref: '#/definition/Error'
+          $ref: '#/definitions/Error'
         500:
           description: Unexpected error.
           schema:
             $ref: '#/definitions/Error'
       tags:
-        - Trains
+        - Train
 
   /api/build:
     get:
@@ -124,7 +124,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
       tags:
-        - Builds
+        - Build
     post:
       summary: Create a new build for a given train.
       description: |
@@ -152,7 +152,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
       tags:
-        - Builds
+        - Build
 
   /api/build/{id}:
     get:
@@ -177,7 +177,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
       tags:
-        - Builds
+        - Build
 
   /api/deploy:
     get:
@@ -208,7 +208,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
       tags:
-        - Deploys
+        - Deploy
     post:
       summary: Create a new deploy for a train.
       parameters:
@@ -230,7 +230,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
       tags:
-        - Deploys
+        - Deploy
 
   /api/deploy/{id}:
     get:
@@ -255,7 +255,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
       tags:
-        - Deploys
+        - Deploy
         
 definitions:
   Build:

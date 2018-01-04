@@ -1,0 +1,23 @@
+{
+  "input": "/app/swagger/swagger.yml",
+  "output": "/app/swagger/index.html",
+  "format": "singlefile",
+  "markdown": true,
+  "theme": {
+    "default": "light-blue",
+    "GET": "light-blue",
+    "POST": "orange"
+  },
+  "fixedNav": true,
+  "autoTags": false,
+  "collapse": {
+    "path": true,
+    "method": true,
+    "tool": true
+  },
+  "home": {
+    "URL": "https://github.com/Nextdoor/conductor",
+    "location": "RR",
+    "text": "GitHub"
+  }
+}
