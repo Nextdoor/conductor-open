@@ -8,6 +8,7 @@ import (
 	"github.com/Nextdoor/conductor/services/messaging"
 	"github.com/Nextdoor/conductor/services/phase"
 	"github.com/Nextdoor/conductor/services/ticket"
+	"github.com/Nextdoor/conductor/shared/flags"
 	"github.com/Nextdoor/conductor/shared/logger"
 )
 
@@ -15,7 +16,15 @@ const SyncTicketsInterval = time.Second * 10
 const CheckJobsInterval = time.Second * 5
 const CheckTrainLockInterval = time.Second * 5
 
+// How long to wait until starting background tasks after boot, in seconds.
+// This is useful when upgrading Conductor, to avoid race conditions when two instances are polling at once.
+var backgroundTaskStartDelay = flags.EnvInt("BACKGROUND_TASK_START_DELAY", 0)
+
 func backgroundTaskLoop() {
+	logger.Info("Waiting %d seconds to start background jobs.", backgroundTaskStartDelay)
+	time.Sleep(time.Second * time.Duration(backgroundTaskStartDelay))
+	logger.Info("Starting background jobs.")
+
 	// This loop handles restarting the background task loop if it ever panics.
 	killed := make(chan bool)
 	for {
