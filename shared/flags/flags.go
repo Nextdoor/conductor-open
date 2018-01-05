@@ -3,7 +3,7 @@ package flags
 import (
 	"fmt"
 	"os"
-	"strings"
+	"strconv"
 )
 
 func EnvString(name string, defaultValue string) string {
@@ -28,9 +28,10 @@ func EnvBool(name string, defaultValue bool) bool {
 		return defaultValue
 	}
 
-	result, valid := parseBoolString(value)
-	if !valid {
-		panic(fmt.Sprintf("Env bool %s can be either true or false, not %s", name, value))
+	result, err := strconv.ParseBool(value)
+	if err != nil {
+		panic(fmt.Sprintf(
+			"Env bool %s must be /[0-1]|t(rue)?|f(alse)?/i, not %s", name, value))
 	}
 	return result
 }
@@ -41,21 +42,36 @@ func RequiredEnvBool(name string) bool {
 		panic(fmt.Sprintf("Env bool %s must be set", name))
 	}
 
-	result, valid := parseBoolString(value)
-	if !valid {
-		panic(fmt.Sprintf("Env bool %s must be either true or false, not %s", name, value))
+	result, err := strconv.ParseBool(value)
+	if err != nil {
+		panic(fmt.Sprintf(
+			"Env bool %s must be /[0-1]|t(rue)?|f(alse)?/i, not %s", name, value))
 	}
 	return result
 }
 
-// Returns two bools: the parsed bool value, and whether the string was a valid bool.
-// Can be "true" or "false", case insensitive.
-func parseBoolString(value string) (bool, bool) {
-	value = strings.ToLower(value)
-	if value == "true" {
-		return true, true
-	} else if value == "false" {
-		return false, true
+func EnvInt(name string, defaultValue int) int {
+	value, present := os.LookupEnv(name)
+	if !present {
+		return defaultValue
 	}
-	return false, false
+
+	result, err := strconv.ParseInt(value, 10, 32)
+	if err != nil || result < 0 {
+		panic(fmt.Sprintf("Env int %s must be a valid positive integer, not %s", name, value))
+	}
+	return int(result)
+}
+
+func RequiredEnvInt(name string) int {
+	value, present := os.LookupEnv(name)
+	if !present {
+		panic(fmt.Sprintf("Env int %s must be set", name))
+	}
+
+	result, err := strconv.ParseInt(value, 10, 32)
+	if err != nil || result < 0 {
+		panic(fmt.Sprintf("Env int %s must be a valid positive integer, not %s", name, value))
+	}
+	return int(result)
 }
