@@ -41,8 +41,7 @@ jobs:
     steps:
       - checkout
       - *setup-environment
-      - setup_remote_docker:
-          reusable: true
+      - setup_remote_docker
       - *build
       - *test
 
