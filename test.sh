@@ -79,8 +79,8 @@ test_unit() {
 }
 
 test_integration() {
-    if [[ -e testenv ]]; then
-        set -a; source testenv; set +a
+    if [[ ! -e testenv ]]; then
+        touch testenv
     fi
 
     test_types=()
