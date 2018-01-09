@@ -1,5 +1,7 @@
 # Conductor
 
+[![CircleCI](https://circleci.com/gh/Nextdoor/conductor/tree/master.svg?style=svg)](https://circleci.com/gh/Nextdoor/conductor/tree/master)
+
 **Table of Contents**
 
 - [Diagrams](#diagrams)
