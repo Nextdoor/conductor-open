@@ -50,7 +50,7 @@ endif
 .PHONY: docker-build docker-run docker-stop docker-logs docker-tag docker-push docker-login docker-populate-cache
 
 docker-build:
-	echo "Building Conductor Docker image"
+	@echo "Building Conductor Docker image"
 	docker build $(DOCKER_BUILD_ARGS) .
 
 docker-run: docker-stop
