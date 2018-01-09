@@ -30,6 +30,7 @@ step_library:
       command: |
         echo "Trying to pull upstream image for cache."
         docker pull $CACHE_FROM || true
+        make postgres
         make docker-build
 
   - &test
