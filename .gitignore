@@ -1,7 +1,5 @@
-.idea
 /vendor
 resources/frontend/gen
 frontend/node_modules
 envfile
 testenv
-.build

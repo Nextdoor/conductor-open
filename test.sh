@@ -44,8 +44,13 @@ run_tests() {
         parallelism="-p 1"
     fi
 
-    local cmd="go test $parallelism $test_dirs $tags"
-    echo "$cmd"
+    local cmd="docker run -t \
+            --entrypoint sh \
+            --env-file testenv \
+            --link conductor-postgres \
+            conductor \
+            -c 'cd /go/src/github.com/Nextdoor/conductor &&
+                go test $parallelism $test_dirs $tags'"
     eval "$cmd"
 }
 
@@ -122,11 +127,19 @@ test_integration() {
 }
 
 test_frontend_unit() {
-    cd frontend && yarn run test
+    docker run -t \
+        --entrypoint sh \
+        --env-file testenv \
+        conductor \
+        -c 'cd /app/frontend && yarn run test'
 }
 
 test_frontend_style() {
-    cd frontend && yarn run lint
+    docker run -t \
+        --entrypoint sh \
+        --env-file testenv \
+        conductor \
+        -c 'cd /app/frontend && yarn run lint'
 }
 
 reset_postgres() {

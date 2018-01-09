@@ -1,5 +1,3 @@
-# Ignore everything except what the Docker container needs.
-*
-!.build
-!resources
-!swagger
+.git
+vendor
+frontend/node_modules

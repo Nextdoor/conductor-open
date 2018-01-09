@@ -20,22 +20,7 @@ const DEFAULT_ENV_VARS = {
   'AUTH_COOKIE_NAME': 'conductor-auth'
 };
 
-// Look for missing env vars.
-let missing_env = false;
-REQUIRED_ENV_VARS.forEach(function(env_var) {
-  if (!(env_var in process.env)) {
-    console.error(
-        'Environmental variable ' + env_var +
-        ' must be set for Webpack build.');
-    missing_env = true;
-  } else {
-    console.log(env_var + ':');
-    console.log(process.env[env_var]);
-  }
-});
-if (missing_env) {
-  process.exit(1);
-}
+// TODO: Do the env var stuff at runtime somehow.
 
 for (const env_var in DEFAULT_ENV_VARS) {
   if (!(env_var in process.env)) {

@@ -24,42 +24,44 @@ glide:
 	@which glide || curl https://glide.sh/get | sh
 	glide install
 
-define ARGS
+DOCKER_BUILD_ARGS := -t $(DOCKER_IMAGE)
+
+ifdef CACHE_FROM
+DOCKER_BUILD_ARGS := --cache-from $(CACHE_FROM) $(DOCKER_BUILD_ARGS)
+endif
+
+define DOCKER_RUN_ARGS
 --name $(DOCKER_IMAGE) \
 --env LOGLEVEL=DEBUG \
 --env-file envfile \
 --volume $(shell pwd)/resources/frontend:/app/frontend \
 --publish 80:80 \
 --publish 443:443 \
---link conductor-postgres
+--link conductor-postgres \
 --hostname conductor-dev
 endef
 
 # Check if interactive shell.
 INTERACTIVE = $(shell [ "`tty`" != "not a tty" ] && echo true || echo false)
 ifeq ($(INTERACTIVE),true)
-INTERACTIVE_ARGS = -it
+DOCKER_RUN_INTERACTIVE_ARGS = -it
 endif
-
-export ARGS
-export INTERACTIVE_ARGS
 
 .PHONY: docker-build docker-run docker-stop docker-logs docker-tag docker-push docker-login docker-populate-cache
 
 docker-build:
-	rm -rf .build && mkdir .build && cp -rf  cmd core services shared vendor .build
-	echo "Building Conductor Docker image..."
-	docker build -t $(DOCKER_IMAGE) .; result=$$?; rm -rf .build; exit $$result
+	echo "Building Conductor Docker image"
+	docker build $(DOCKER_BUILD_ARGS) .
 
 docker-run: docker-stop
 	@echo "Running $(DOCKER_IMAGE)"
 	[ -e envfile ] || touch envfile
-	docker run $$ARGS $$INTERACTIVE_ARGS $(DOCKER_IMAGE)
+	docker run $(DOCKER_RUN_ARGS) $(DOCKER_RUN_INTERACTIVE_ARGS) $(DOCKER_IMAGE)
 
 docker-stop:
 	@echo "Stopping $(DOCKER_IMAGE)"
-	@docker rm -f $(DOCKER_IMAGE) \
-		|| echo "No existing container running."
+	@docker rm -f $(DOCKER_IMAGE) 2>/dev/null \
+		|| echo "No existing container running"
 
 docker-logs:
 	@echo "Running $(DOCKER_IMAGE)"
@@ -76,7 +78,6 @@ docker-push: docker-tag
 docker-login:
 	@echo "Logging into $(DOCKER_REGISTRY)"
 	@docker login \
-		-e $(DOCKER_EMAIL) \
 		-u $(DOCKER_USER) \
 		-p "$(value DOCKER_PASS)" $(DOCKER_REGISTRY)
 
@@ -107,17 +108,15 @@ define PG_ARGS
 --detach
 endef
 
-export PG_ARGS
-
 .PHONY: postgres postgres-perm psql postgres-wipe test-data
 
 postgres:
 	docker rm -f conductor-postgres || true
-	docker run $$PG_ARGS postgres
+	docker run $(PG_ARGS) postgres
 
 postgres-perm:
 	docker rm -f conductor-postgres || true
-	docker run $$PG_ARGS -v $$HOME/data/conductor:$(PGDATA) postgres
+	docker run $(PG_ARGS) -v $$HOME/data/conductor:$(PGDATA) postgres
 
 postgres-wipe:
 	PGPASSWORD=conductor dropdb -h localhost -U conductor conductor || true
