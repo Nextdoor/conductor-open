@@ -22,6 +22,7 @@ step_library:
         echo "export SHA1=$SHA1" >> $BASH_ENV
         echo "export DOCKER_TAG=$DOCKER_TAG" >> $BASH_ENV
         echo "export CACHE_FROM=$CACHE_FROM" >> $BASH_ENV
+    run: go get golang.org/x/tools/cmd/goimports
 
   - &build
     run:
