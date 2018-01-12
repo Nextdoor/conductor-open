@@ -32,17 +32,17 @@ Built using [Gravizool](https://github.com/swaggy/gravizool).
 
 1. Normally, trains are auto-created. Upon creation, a train will include all the queued commits on the branch.
 2. If a problem is found with a commit:
-  1. The commit is reverted and the revert is put on the queue
-  2. The train is derailed
-  3. A new train is created as the addition of the old train and the queue. Tickets transfer.
+   1. The commit is reverted and the revert is put on the queue
+   2. The train is derailed
+   3. A new train is created as the addition of the old train and the queue. Tickets transfer.
 3. Trains will not be auto-created outside of configured auto-time or when `conductor` is in manual mode.
 4. Trains can be manually created only when `conductor` is in manual mode.
 5. When an emergency fix needs to be done:
-  1. `conductor` is put into manual mode
-  2. The current train, if any, is derailed
-  3. The branch is reset to before the old train, removing the queue as well
-  4. The emergency commits are pushed
-  5. A new train is created manually
+   1. `conductor` is put into manual mode
+   2. The current train, if any, is derailed
+   3. The branch is reset to before the old train, removing the queue as well
+   4. The emergency commits are pushed
+   5. A new train is created manually
 
 ---
 
