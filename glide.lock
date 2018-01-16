@@ -2,7 +2,7 @@ hash: e156fb66b0ce4d2dff764f9b2bd1e8d38f605a7d68a17c95a6279e23a28cde54
 updated: 2017-12-14T15:28:07.067273263-08:00
 imports:
 - name: github.com/astaxie/beego
-  version: 90999717dda6193c6f970eec52e289b0a9e74998
+  version: f16688817aa428d10361394015b40d096b680542
   subpackages:
   - orm
 - name: github.com/fatih/structs
