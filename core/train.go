@@ -130,7 +130,7 @@ func handleNewCommitsForBranch(
 	}
 
 	if train != nil {
-		go StartTrain(dataClient, codeService, messagingService, phaseService, ticketService, train)
+		go StartTrain(data.NewClient(), codeService, messagingService, phaseService, ticketService, train)
 	}
 }
 
@@ -664,7 +664,7 @@ func cancelTrain(r *http.Request) response {
 
 		// Now that this train is cancelled,
 		// check if the latest train can be deployed.
-		go deployIfReady(dataClient, messagingService, latestTrain)
+		go deployIfReady(data.NewClient(), messagingService, latestTrain)
 	}
 
 	clearLatestTrainCache()
