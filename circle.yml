@@ -38,7 +38,9 @@ step_library:
   - &test
     run:
       name: Run all tests
-      command: make test
+      command: |
+        echo "DATA_IMPL=postgres" > testenv
+        make test
 
 jobs:
   build-test:

@@ -83,6 +83,10 @@ test_integration() {
         touch testenv
     fi
 
+    set -a
+    source testenv
+    set +a
+
     test_types=()
     test_typed_formatted=()
 
