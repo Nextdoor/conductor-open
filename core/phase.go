@@ -85,7 +85,7 @@ func triggerPhaseRestart(r *http.Request) response {
 	messagingService := messaging.GetService()
 	phaseService := phase.GetService()
 	ticketService := ticket.GetService()
-	go startPhase(dataClient, codeService, messagingService, phaseService, ticketService, replacedPhase, authedUser)
+	go startPhase(data.NewClient(), codeService, messagingService, phaseService, ticketService, replacedPhase, authedUser)
 
 	return emptyResponse()
 }
@@ -276,7 +276,7 @@ func checkPhaseCompletion(
 			// Otherwise, the train isn't fully verified yet.
 			messagingService.TrainVerified(train)
 		}
-		go deployIfReady(dataClient, messagingService, train)
+		go deployIfReady(data.NewClient(), messagingService, train)
 	case types.Deploy:
 		err = dataClient.DeployTrain(train)
 		if err != nil {
@@ -299,7 +299,7 @@ func checkPhaseCompletion(
 
 			// Now that this train's deploy is finished,
 			// check if the latest train can be deployed.
-			go deployIfReady(dataClient, messagingService, latestTrain)
+			go deployIfReady(data.NewClient(), messagingService, latestTrain)
 		}
 	}
 }
