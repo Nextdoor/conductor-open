@@ -176,7 +176,10 @@ func phaseGroupDelivered(
 		if err != nil {
 			return err
 		}
-		train.Tickets = tickets
+
+		// Add these tickets to the train for anything that'll immediate check them.
+		// There might be existing tickets, so append first.
+		train.Tickets = append(train.Tickets, tickets...)
 	}
 
 	var newCommits []*types.Commit
@@ -218,7 +221,7 @@ func checkPhaseCompletion(
 		targetPhase.Type, targetPhase.Jobs.CompletedNames(), extraChecks...)
 
 	logger.Info("Checking phase completion for phase %v, train %v (%v). "+
-		"It has %v tickets, which will trigger %v extra completion checks.\n\nTrain: %+v",
+		"It has %d tickets, which will trigger %d extra completion checks.\n\nTrain: %+v",
 		targetPhase.Type, train.ID, train.HeadSHA, len(train.Tickets), len(extraChecks), train)
 
 	if phaseCompletedPreviously && phaseCurrentlyCompleted {
@@ -261,14 +264,14 @@ func checkPhaseCompletion(
 	}
 
 	logger.Info("Phase %s was completed for train %v (%s). "+
-		"It had %s tickets causing %s extra checks.\n\n%+v",
+		"It had %d tickets causing %d extra checks.\n\n%+v",
 		targetPhase.Type, train.ID, train.HeadSHA, len(train.Tickets), len(extraChecks), train)
 
 	// Post-phase actions
 	switch targetPhase.Type {
 	case types.Delivery:
 		go startPhase(
-			dataClient, codeService, messagingService, phaseService, ticketService,
+			data.NewClient(), codeService, messagingService, phaseService, ticketService,
 			targetPhase.PhaseGroup.Verification, nil)
 	case types.Verification:
 		if targetPhase.IsInActivePhaseGroup() {

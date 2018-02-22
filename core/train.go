@@ -545,7 +545,7 @@ func extendTrain(r *http.Request) response {
 	err = dataClient.CloseTrain(train, scheduleOverride)
 	if err != nil {
 		return errorResponse(
-			fmt.Sprintf("Error locking train: %v", err),
+			fmt.Sprintf("Error closing train: %v", err),
 			http.StatusInternalServerError)
 	}
 

@@ -259,13 +259,13 @@ func TestDeliveryFinishedMessaging(t *testing.T) {
 	}
 	phaseService := &phase.PhaseServiceMock{}
 	codeService := &code.CodeServiceMock{}
+	assert.Equal(t, 2, len(train.Tickets))
 	startPhase(
 		dataClient, codeService, messagingService, phaseService, ticketService,
 		train.ActivePhases.Verification, user)
 	assert.Equal(t, 1, len(createTicketsCalls))
 	assert.Equal(t, createTicketsCalls[0].train, train)
-	assert.Equal(t, 1, len(createTicketsCalls))
-	assert.Equal(t, createTicketsCalls[0].train, train)
+	assert.Equal(t, 3, len(train.Tickets))
 
 	// Ensure tickets are created for the right commits - no-verify commits,
 	// and commits with pre-existing tickets - are excluded.

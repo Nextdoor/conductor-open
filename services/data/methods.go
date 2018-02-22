@@ -996,7 +996,6 @@ func (d *dataClient) WriteTickets(tickets []*types.Ticket) error {
 		for _, commit := range ticketCommits {
 			_, err = m2m.Add(commit)
 			if err != nil {
-				d.Client.Rollback()
 				return err
 			}
 		}
