@@ -86,9 +86,9 @@ func (m Messenger) TrainCreation(train *types.Train, commits []*types.Commit) {
 
 func (m Messenger) TrainExtension(train *types.Train, commits []*types.Commit, user *types.User) {
 	commitSets := m.commitSetsFromCommits(commits, true)
-	if len(commitSets) == 0 {
-		return
-	}
+	// Note: We used to abort early if there are no commit sets to notify for.
+	// Even if no commit sets, send train extension message for manual extensions.
+	// If all the changes are no-verify, we still want to notify the staging room.
 
 	trainLink := m.formatTrainLink(train, "Train extended")
 	if user != nil {
