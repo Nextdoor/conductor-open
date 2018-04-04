@@ -227,7 +227,7 @@ func DoesCommitNeedTicket(commit *Commit, commitsOnTickets map[string]struct{}) 
 	}
 	// Exclude users in the no staging pilot program, unless they manually
 	// requested staging.
-	if commit.IsInNoStagingWhitelist() && !commit.IsNeedsStaging() {
+	if commit.IsNoStagingVerification() && !commit.IsNeedsStaging() {
 		return false
 	}
 	return true
@@ -235,7 +235,7 @@ func DoesCommitNeedTicket(commit *Commit, commitsOnTickets map[string]struct{}) 
 
 // Should this commit trigger slack notifications to its author regarding staging.
 func (commit *Commit) DoesCommitNeedStagingNotification() bool {
-	return !commit.IsInNoStagingWhitelist() || commit.IsNeedsStaging()
+	return !commit.IsNoStagingVerification() || commit.IsNeedsStaging()
 }
 
 func (commit *Commit) IsNoVerify() bool {
@@ -246,8 +246,12 @@ func (commit *Commit) IsNeedsStaging() bool {
 	return strings.Contains(commit.Message, "[needs-staging]")
 }
 
-func (commit *Commit) IsInNoStagingWhitelist() bool {
-	return settings.IsNoStagingUser(commit.AuthorEmail)
+func (commit *Commit) IsNoStagingVerification() bool {
+	if settings.NoStagingVerification {
+		return true
+	} else {
+		return settings.IsNoStagingVerificationUser(commit.AuthorEmail)
+	}
 }
 
 // Return includes head.

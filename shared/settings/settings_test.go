@@ -8,7 +8,7 @@ import (
 
 func TestParseFlags(t *testing.T) {
 	adminUserFlag = "admin-1, admin-2,admin-3"
-	noStagingUsersFlag = "no-staging-1,    no-staging-2"
+	noStagingVerificationUsersFlag = "no-staging-1,    no-staging-2"
 	robotUserFlag = "robot-1,robot-2"
 	deliveryJobsFlag = "delivery-1"
 	verificationJobsFlag = "verification-1, verification-2"
@@ -22,8 +22,8 @@ func TestParseFlags(t *testing.T) {
 	assert.Equal(t, "admin-2", AdminUsers[1])
 	assert.Equal(t, "admin-3", AdminUsers[2])
 
-	assert.Equal(t, "no-staging-1", NoStagingUsers[0])
-	assert.Equal(t, "no-staging-2", NoStagingUsers[1])
+	assert.Equal(t, "no-staging-1", NoStagingVerificationUsers[0])
+	assert.Equal(t, "no-staging-2", NoStagingVerificationUsers[1])
 
 	assert.Equal(t, "robot-1", RobotUsers[0])
 	assert.Equal(t, "robot-2", RobotUsers[1])
@@ -38,7 +38,7 @@ func TestParseFlags(t *testing.T) {
 
 func clearFlags() {
 	adminUserFlag = ""
-	noStagingUsersFlag = ""
+	noStagingVerificationUsersFlag = ""
 	robotUserFlag = ""
 	deliveryJobsFlag = ""
 	verificationJobsFlag = ""

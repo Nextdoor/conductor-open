@@ -12,24 +12,29 @@ var (
 
 	JenkinsRollbackJob = flags.EnvString("JENKINS_ROLLBACK_JOB", "")
 
+	// Whether to not require staging verification for a commit by default.
+	// If set, staging verification will only be required if the commit message has [needs-staging].
+	NoStagingVerification = flags.EnvBool("NO_STAGING_VERIFICATION", false)
+
 	// Comma-separated list of admin user emails that can deploy and change mode.
 	adminUserFlag = flags.EnvString("ADMIN_USERS", "")
 
 	// Comma-separated list of user emails who don't use staging by default.
-	noStagingUsersFlag = flags.EnvString("NO_STAGING_USERS", "")
+	// This list is ignored if noStagingVerification is set.
+	noStagingVerificationUsersFlag = flags.EnvString("NO_STAGING_VERIFICATION_USERS", "")
 
 	// Comma-separated list of robot user emails that push commits.
 	// Tickets will be assigned to the default user, they won't get notifications,
 	// and they won't get engineer status.
 	robotUserFlag = flags.EnvString("ROBOT_USERS", "")
 
-	AdminUsers     []string
-	RobotUsers     []string
-	NoStagingUsers []string
+	AdminUsers                 []string
+	RobotUsers                 []string
+	NoStagingVerificationUsers []string
 
-	CustomAdminUsers     []string
-	CustomRobotUsers     []string
-	CustomNoStagingUsers []string
+	CustomAdminUsers                 []string
+	CustomRobotUsers                 []string
+	CustomNoStagingVerificationUsers []string
 )
 
 // Settings for job names to accept for delivery, verification, and deploy phases.
@@ -62,7 +67,7 @@ func init() {
 func parseFlags() {
 	AdminUsers = parseListString(adminUserFlag)
 	RobotUsers = parseListString(robotUserFlag)
-	NoStagingUsers = parseListString(noStagingUsersFlag)
+	NoStagingVerificationUsers = parseListString(noStagingVerificationUsersFlag)
 
 	DeliveryJobs = parseListString(deliveryJobsFlag)
 	VerificationJobs = parseListString(verificationJobsFlag)
@@ -93,16 +98,16 @@ func StringInList(text string, list []string) bool {
 	return false
 }
 
-func IsNoStagingUser(email string) bool {
-	if CustomNoStagingUsers != nil {
-		return StringInList(email, CustomNoStagingUsers)
+func IsNoStagingVerificationUser(email string) bool {
+	if CustomNoStagingVerificationUsers != nil {
+		return StringInList(email, CustomNoStagingVerificationUsers)
 	}
-	return StringInList(email, NoStagingUsers)
+	return StringInList(email, NoStagingVerificationUsers)
 }
 
 // Should only be used for tests.
-func CustomizeNoStagingUsers(noStagingUsers []string) {
-	CustomNoStagingUsers = noStagingUsers
+func CustomizeNoStagingVerificationUsers(noStagingVerificationUsers []string) {
+	CustomNoStagingVerificationUsers = noStagingVerificationUsers
 }
 
 // Should only be used for tests.
