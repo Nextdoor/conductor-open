@@ -301,8 +301,8 @@ func TestDeliveryFinishedMessaging(t *testing.T) {
 		SHAsInDirectMessages)
 }
 
-// Tests messaging logic for users in the no-staging whitelist.
-func TestDeliveryFinishedMessagingForNoStagingUser(t *testing.T) {
+// Tests messaging logic for users in the no-staging verifications whitelist.
+func TestDeliveryFinishedMessagingForNoStagingVerificationUser(t *testing.T) {
 	vanillaCommit := &types.Commit{
 		Message:     "no staging whitelist commit",
 		AuthorName:  "Author Name",
@@ -327,8 +327,8 @@ func TestDeliveryFinishedMessagingForNoStagingUser(t *testing.T) {
 
 	allCommits := []*types.Commit{noVerifyCommit, vanillaCommit, needsStagingOverrideCommit}
 
-	// Put the commit author on the no staging whitelist.
-	settings.CustomizeNoStagingUsers([]string{"no-staging@email.com"})
+	// Put the commit author on the no staging verification whitelist.
+	settings.CustomizeNoStagingVerificationUsers([]string{"no-staging@email.com"})
 
 	dataClient := data.NewClient()
 	train, _ := dataClient.CreateTrain("my_branch", testData.User, allCommits)
@@ -394,6 +394,106 @@ func TestDeliveryFinishedMessagingForNoStagingUser(t *testing.T) {
 		}
 	}
 	// People on the no-staging whitelist don't get notified about their commit going to staging
+	// unless it is marked [needs-staging].
+	assert.Equal(
+		t,
+		map[string]struct{}{needsStagingOverrideCommit.SHA: struct{}{}},
+		SHAsInDirectMessages)
+}
+
+// Tests messaging logic when no-staging verification is turned on globally.
+func TestDeliveryFinishedMessagingForNoStagingVerificationByDefault(t *testing.T) {
+	vanillaCommit := &types.Commit{
+		Message:     "no staging commit",
+		AuthorName:  "Author Name",
+		AuthorEmail: "person-1@email.com",
+		URL:         "https://github.com",
+		SHA:         "aaa",
+	}
+	needsStagingOverrideCommit := &types.Commit{
+		Message:     "manual override commit [needs-staging]",
+		AuthorName:  "Author Name",
+		AuthorEmail: "person-2@email.com",
+		URL:         "https://github.com",
+		SHA:         "bbb",
+	}
+	noVerifyCommit := &types.Commit{
+		Message:     "no verify commit [no-verify]",
+		AuthorName:  "Author Name",
+		AuthorEmail: "person-3@email.com",
+		URL:         "https://github.com",
+		SHA:         "ccc",
+	}
+
+	allCommits := []*types.Commit{noVerifyCommit, vanillaCommit, needsStagingOverrideCommit}
+
+	// Enable global no staging verification.
+	settings.NoStagingVerification = true
+
+	dataClient := data.NewClient()
+	train, _ := dataClient.CreateTrain("my_branch", testData.User, allCommits)
+
+	user, err := dataClient.ReadOrCreateUser("test_user", "test_email")
+	assert.NoError(t, err)
+
+	var sendCalls []SendCall
+	var sendDirectCalls []SendDirectCall
+	messagingService := &messaging.Messenger{
+		Engine: &messaging.EngineMock{
+			SendMock: func(text string) {
+				sendCalls = append(sendCalls, SendCall{text})
+			},
+			SendDirectMock: func(name string, email string, text string) {
+				sendDirectCalls = append(sendDirectCalls, SendDirectCall{name, email, text})
+			},
+		},
+	}
+
+	var needsStagingOverrideCommitTicket = &types.Ticket{
+		Commits: []*types.Commit{needsStagingOverrideCommit}, Train: train}
+	type CreateTicketsCall struct {
+		train   *types.Train
+		commits []*types.Commit
+	}
+
+	var createTicketsCalls []CreateTicketsCall
+	ticketService := &ticket.TicketServiceMock{
+		CreateTicketsMock: func(train *types.Train, commits []*types.Commit) ([]*types.Ticket, error) {
+			createTicketsCalls = append(
+				createTicketsCalls, CreateTicketsCall{train, commits})
+			return []*types.Ticket{needsStagingOverrideCommitTicket}, nil
+		},
+	}
+	phaseService := &phase.PhaseServiceMock{}
+	codeService := &code.CodeServiceMock{}
+	startPhase(
+		dataClient, codeService, messagingService, phaseService, ticketService,
+		train.ActivePhases.Verification, user)
+
+	// People don't get tickets unless their commit is marked [needs-staging].
+	SHAsForTickets := make(map[string]struct{})
+	for _, commit := range createTicketsCalls[0].commits {
+		SHAsForTickets[commit.SHA] = struct{}{}
+	}
+	assert.Equal(t, map[string]struct{}{
+		needsStagingOverrideCommit.SHA: struct{}{}}, SHAsForTickets)
+
+	stagingChannelMessage := sendCalls[1].text
+
+	// Staging channel won't mention no staging verification commits, unless it is marked [needs-staging].
+	assert.True(t, strings.Contains(stagingChannelMessage, needsStagingOverrideCommit.SHA))
+	assert.False(t, strings.Contains(stagingChannelMessage, vanillaCommit.SHA))
+	assert.False(t, strings.Contains(stagingChannelMessage, noVerifyCommit.SHA))
+
+	SHAsInDirectMessages := make(map[string]struct{})
+	for _, sendDirectCall := range sendDirectCalls {
+		for _, commit := range allCommits {
+			if strings.Contains(sendDirectCall.text, commit.SHA) {
+				SHAsInDirectMessages[commit.SHA] = struct{}{}
+			}
+		}
+	}
+	// People don't get notified about their commit going to staging
 	// unless it is marked [needs-staging].
 	assert.Equal(
 		t,
