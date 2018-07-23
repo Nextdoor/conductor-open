@@ -52,9 +52,9 @@ func triggerPhaseRestart(r *http.Request) response {
 			http.StatusInternalServerError)
 	}
 
-	if trainID != latestTrain.ID && trainID + 1 != latestTrain.ID {
+	if trainID != latestTrain.ID && trainID+1 != latestTrain.ID {
 		return errorResponse(
-			fmt.Sprintf("Cannot restart phase %s on train %d - the active train is %d. " +
+			fmt.Sprintf("Cannot restart phase %s on train %d - the active train is %d. "+
 				"Phases can only be restarted on the latest train or the previous train.",
 				phaseType, trainID, latestTrain.ID),
 			http.StatusBadRequest)
