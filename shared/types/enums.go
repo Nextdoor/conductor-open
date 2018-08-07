@@ -18,7 +18,7 @@ func (m Mode) String() string {
 	case Manual:
 		return "manual"
 	default:
-		panic(fmt.Errorf("Unknown mode: %f", m))
+		panic(fmt.Errorf("Unknown mode: %d", m))
 	}
 }
 

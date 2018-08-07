@@ -43,7 +43,7 @@ func (method httpMethod) String() string {
 	case del:
 		return "DELETE"
 	default:
-		panic(fmt.Errorf("Unknown httpMethod %s", method))
+		panic(fmt.Errorf("Unknown httpMethod %s", string(method)))
 	}
 }
 
