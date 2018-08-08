@@ -27,7 +27,7 @@ fi
 # running on the container host machine.  Sniff the routing tables and find the
 # ip of that machine.  Ideally this would be pushed into the environment
 # somehow.  We currently lack that infrastructure, so we get this hack.
-export STATSD_HOST=$(/bin/netstat -nr | grep '^0\.0\.0\.0' | awk '{print $2}')
+export STATSD_HOST=$(ip route show | awk '/default/ {print $3}')
 echo "STATSD_HOST: $STATSD_HOST"
 
 /usr/sbin/nginx -c /app/nginx.conf -p /app/ &
