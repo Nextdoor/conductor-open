@@ -19,12 +19,6 @@ RUN mkdir -p /app/ssl && cd /app/ssl && \
 ADD swagger/swagger.yml swagger/config.json /app/swagger/
 RUN pretty-swag -c /app/swagger/config.json
 
-# Install nettools
-RUN apt-get update \
-  && DEBIAN_FRONTEND=noninteractive apt-get install -y \
-    net-tools \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/*
 
 # Set up Go app.
 ADD .build /go/src/github.com/Nextdoor/conductor/
