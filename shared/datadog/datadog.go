@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	C *statsd.Client
+	C   *statsd.Client
 	Err error
 )
 
