@@ -7,8 +7,8 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/Nextdoor/conductor/shared/datadog"
 	"github.com/Nextdoor/conductor/shared/flags"
-	"github.com/Nextdoor/conductor/shared/logger"
 )
 
 var (
@@ -75,7 +75,7 @@ func (j jenkins) TestAuth() error {
 }
 
 func (j jenkins) TriggerJob(jobName string, params map[string]string) error {
-	logger.Info("Triggering Jenkins Job \"%s\", Params: %s", jobName, params)
+	datadog.Info("Triggering Jenkins Job \"%s\", Params: %s", jobName, params)
 	buildUrl, err := url.Parse(fmt.Sprintf("%s/job/%s/buildWithParameters", j.URL, jobName))
 	if err != nil {
 		return err
