@@ -8,7 +8,7 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/Nextdoor/conductor/shared/logger"
+	"github.com/Nextdoor/conductor/shared/datadog"
 )
 
 func Endpoints() []endpoint {
@@ -152,7 +152,7 @@ func (resp response) Write(w http.ResponseWriter, r *http.Request) {
 	err := encoder.Encode(resp)
 	if err != nil {
 		logMsg := fmt.Sprintf("Could not marshal response (%+v): %v", r, err)
-		logger.Error("%s", logMsg)
+		datadog.Error("%s", logMsg)
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintln(w, logMsg)
 		return
@@ -168,10 +168,10 @@ func logResponse(r *http.Request, resp response) {
 	if resp.Code != http.StatusOK && resp.Code >= http.StatusInternalServerError {
 		// Log on any server error code.
 		if resp.Error != nil {
-			logger.Error("URL: %s. Responding with http error, code %d. Error message: %s",
+			datadog.Error("URL: %s. Responding with http error, code %d. Error message: %s",
 				r.RequestURI, resp.Code, resp.Error)
 		} else {
-			logger.Error("URL: %s. Responding with empty http error, code %d.",
+			datadog.Error("URL: %s. Responding with empty http error, code %d.",
 				r.RequestURI, resp.Code)
 		}
 	}
