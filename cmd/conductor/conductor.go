@@ -11,6 +11,8 @@ import (
 )
 
 func main() {
+	datadog.Initstatsd()
+
 	flag.Parse()
 
 	core.Preload()
