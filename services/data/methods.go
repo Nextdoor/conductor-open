@@ -903,7 +903,9 @@ func (d *dataClient) WriteCommits(commits []*types.Commit) ([]*types.Commit, err
 			newCommits = append(newCommits, commit)
 		}
 	}
-	datadog.Info("Wrote commits %v", newCommits)
+	if len(newCommits) > 0 {
+		datadog.Info("Wrote commits %v", newCommits)
+	}
 	return newCommits, nil
 }
 
@@ -1052,7 +1054,9 @@ func (d *dataClient) WriteTickets(tickets []*types.Ticket) error {
 			return err
 		}
 	}
-	datadog.Info("Wrote tickets %v", tickets)
+	if len(tickets) > 0 {
+		datadog.Info("Wrote tickets %v", tickets)
+	}
 	return nil
 }
 
@@ -1063,7 +1067,9 @@ func (d *dataClient) UpdateTickets(tickets []*types.Ticket) error {
 			return err
 		}
 	}
-	datadog.Info("Updated tickets %v", tickets)
+	if len(tickets) > 0 {
+		datadog.Info("Updated tickets %v", tickets)
+	}
 	return nil
 }
 
