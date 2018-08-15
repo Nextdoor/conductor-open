@@ -9,7 +9,14 @@ import (
 	"github.com/Nextdoor/conductor/shared/logger"
 )
 
-var c, _ = statsd.New(fmt.Sprintf("%v:%v", os.Getenv("STATSD_HOST"), 8125))
+var c = func() *statsd.Client {
+	c, err := statsd.New(fmt.Sprintf("%v:%v", os.Getenv("STATSD_HOST"), 8125))
+	if err != nil {
+		logger.Error("Could not create statsd client: %s", err)
+		return nil
+	}
+	return c
+}()
 
 func log(alertType statsd.EventAlertType, format string, args ...interface{}) {
 	// Send event to statsd and log it too!
@@ -18,7 +25,7 @@ func log(alertType statsd.EventAlertType, format string, args ...interface{}) {
 		e.AlertType = alertType
 		err := c.Event(e)
 		if err != nil {
-			logger.Error("could not create datadog event: %v", err)
+			logger.Error("Could not create datadog event: %v", err)
 		}
 	}
 	switch alertType {

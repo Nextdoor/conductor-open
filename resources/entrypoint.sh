@@ -23,12 +23,10 @@ if [ "$EXIT" -eq 1 ]; then
     exit 1
 fi
 
-# We need a host to send our stats. I happen to know that our collector is
-# running on the container host machine.  Sniff the routing tables and find the
-# ip of that machine.  Ideally this would be pushed into the environment
-# somehow.  We currently lack that infrastructure, so we get this hack.
-export STATSD_HOST=$(ip route show | awk '/default/ {print $3}')
-echo "STATSD_HOST: $STATSD_HOST"
+# Set CONTAINER_HOST_IP to the container's host ip or the
+# value of the STATSD_HOST environment variable
+CONTAINER_HOST_IP=$(ip route show | awk '/default/ {print $3}')
+export STATSD_HOST=${STATSD_HOST:-$CONTAINER_HOST_IP}
 
 /usr/sbin/nginx -c /app/nginx.conf -p /app/ &
 exec /app/conductor
