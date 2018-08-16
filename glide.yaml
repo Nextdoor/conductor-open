@@ -13,6 +13,10 @@ import:
 - package: github.com/satori/go.uuid
 - package: github.com/xeipuuv/gojsonschema
 - package: golang.org/x/oauth2
+- package: github.com/DataDog/datadog-go
+  version: 2.1.0
+  subpackages:
+  - statsd
 testImport:
 - package: github.com/stretchr/testify
   subpackages:

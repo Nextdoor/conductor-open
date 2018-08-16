@@ -1,10 +1,14 @@
-hash: e156fb66b0ce4d2dff764f9b2bd1e8d38f605a7d68a17c95a6279e23a28cde54
-updated: 2017-12-14T15:28:07.067273263-08:00
+hash: ad9ae9a0e3fabbb4f19ed7815d60801cc21ac499bc97e92677a70c5bc73fdf6c
+updated: 2018-08-07T11:32:41.553503-07:00
 imports:
 - name: github.com/astaxie/beego
   version: f16688817aa428d10361394015b40d096b680542
   subpackages:
   - orm
+- name: github.com/DataDog/datadog-go
+  version: e67964b4021ad3a334e748e8811eb3cd6becbc6e
+  subpackages:
+  - statsd
 - name: github.com/fatih/structs
   version: a720dfa8df582c51dee1b36feabb906bde1588bd
 - name: github.com/golang/protobuf

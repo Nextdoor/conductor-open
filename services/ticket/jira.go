@@ -8,6 +8,7 @@ import (
 
 	jira "github.com/niallo/go-jira"
 
+	"github.com/Nextdoor/conductor/shared/datadog"
 	"github.com/Nextdoor/conductor/shared/flags"
 	"github.com/Nextdoor/conductor/shared/logger"
 	"github.com/Nextdoor/conductor/shared/settings"
@@ -83,6 +84,7 @@ func (t *JIRA) CreateTickets(train *types.Train, commits []*types.Commit) ([]*ty
 	if err != nil {
 		return nil, err
 	}
+	datadog.Info("Created tickets %v", tickets)
 	return tickets, nil
 }
 
@@ -91,7 +93,11 @@ func (t *JIRA) CloseTickets(tickets []*types.Ticket) error {
 	for i := range tickets {
 		keys[i] = tickets[i].Key
 	}
-	return t.closeIssuesByKeys(keys)
+	err := t.closeIssuesByKeys(keys)
+	if err == nil {
+		datadog.Info("Closed tickets %v", tickets)
+	}
+	return err
 }
 
 func (t *JIRA) DeleteTickets(train *types.Train) error {
@@ -311,6 +317,7 @@ func createParentIssue(train *types.Train) (*jira.Issue, error) {
 	if err != nil {
 		return nil, parseBodyError(resp, err)
 	}
+	datadog.Info("Created parent issue %v", parentIssue)
 	return parentIssue, nil
 }
 
@@ -367,6 +374,7 @@ func createSubIssue(parentIssue *jira.Issue, username string, commits []*types.C
 	if err != nil {
 		return nil, parseBodyError(resp, err)
 	}
+	datadog.Info("Created sub issue %v", issue)
 	return issue, nil
 }
 
