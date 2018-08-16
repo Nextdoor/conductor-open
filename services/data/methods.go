@@ -9,6 +9,7 @@ import (
 
 	"github.com/astaxie/beego/orm"
 
+	"github.com/Nextdoor/conductor/shared/datadog"
 	"github.com/Nextdoor/conductor/shared/logger"
 	"github.com/Nextdoor/conductor/shared/settings"
 	"github.com/Nextdoor/conductor/shared/types"
@@ -336,7 +337,7 @@ func (d *dataClient) CreateTrain(branch string, engineer *types.User, commits []
 		d.Client.Rollback()
 		return nil, err
 	}
-
+	datadog.Info("Created train %v", train)
 	return train, nil
 }
 
@@ -410,7 +411,7 @@ func (d *dataClient) ExtendTrain(train *types.Train, engineer *types.User, newCo
 		d.Client.Rollback()
 		return err
 	}
-
+	datadog.Info("Extended train %v", train)
 	return nil
 }
 
@@ -521,13 +522,16 @@ func (d *dataClient) DuplicateTrain(oldTrain *types.Train, newCommits []*types.C
 		d.Client.Rollback()
 		return nil, err
 	}
-
+	datadog.Info("Duplicated train %v", newTrain)
 	return newTrain, nil
 }
 
 func (d *dataClient) ChangeTrainEngineer(train *types.Train, engineer *types.User) error {
 	train.Engineer = engineer
 	_, err := d.Client.Update(train, "Engineer")
+	if err == nil {
+		datadog.Info("Changed train %v engineer to %v", train, engineer)
+	}
 	return err
 }
 
@@ -535,6 +539,9 @@ func (d *dataClient) CloseTrain(train *types.Train, override bool) error {
 	train.Closed = true
 	train.ScheduleOverride = override
 	_, err := d.Client.Update(train, "Closed", "ScheduleOverride")
+	if err == nil {
+		datadog.Info("Closed train %v", train)
+	}
 	return err
 }
 
@@ -542,6 +549,9 @@ func (d *dataClient) OpenTrain(train *types.Train, override bool) error {
 	train.Closed = false
 	train.ScheduleOverride = override
 	_, err := d.Client.Update(train, "Closed", "ScheduleOverride")
+	if err == nil {
+		datadog.Info("Opened train %v", train)
+	}
 	return err
 }
 
@@ -549,24 +559,36 @@ func (d *dataClient) BlockTrain(train *types.Train, reason *string) error {
 	train.Blocked = true
 	train.BlockedReason = reason
 	_, err := d.Client.Update(train, "Blocked", "BlockedReason")
+	if err == nil {
+		datadog.Info("Blocked train %v", train)
+	}
 	return err
 }
 
 func (d *dataClient) UnblockTrain(train *types.Train) error {
 	train.Blocked = false
 	_, err := d.Client.Update(train, "Blocked")
+	if err == nil {
+		datadog.Info("Unblocked train %v", train)
+	}
 	return err
 }
 
 func (d *dataClient) DeployTrain(train *types.Train) error {
 	train.DeployedAt = types.Time{time.Now()}
 	_, err := d.Client.Update(train, "DeployedAt")
+	if err == nil {
+		datadog.Info("Deployed train %v", train)
+	}
 	return err
 }
 
 func (d *dataClient) CancelTrain(train *types.Train) error {
 	train.CancelledAt = types.Time{time.Now()}
 	_, err := d.Client.Update(train, "CancelledAt")
+	if err == nil {
+		datadog.Info("Cancelled train %v", train)
+	}
 	return err
 }
 
@@ -712,24 +734,36 @@ func (d *dataClient) StartPhase(phase *types.Phase) error {
 	phase.StartedAt = types.Time{time.Now()}
 	_, err := d.Client.Update(phase, "StartedAt")
 	phase.Train.SetActivePhase()
+	if err == nil {
+		datadog.Info("Started phase %v", phase)
+	}
 	return err
 }
 
 func (d *dataClient) ErrorPhase(phase *types.Phase, phaseErr error) error {
 	phase.Error = phaseErr.Error()
 	_, err := d.Client.Update(phase, "Error")
+	if err == nil {
+		datadog.Error("Phase %v error", phase)
+	}
 	return err
 }
 
 func (d *dataClient) UncompletePhase(phase *types.Phase) error {
 	phase.CompletedAt = types.Time{}
 	_, err := d.Client.Update(phase, "CompletedAt")
+	if err == nil {
+		datadog.Error("Phase %v uncomplete", phase)
+	}
 	return err
 }
 
 func (d *dataClient) CompletePhase(phase *types.Phase) error {
 	phase.CompletedAt = types.Time{time.Now()}
 	_, err := d.Client.Update(phase, "CompletedAt")
+	if err == nil {
+		datadog.Info("Completed phase %v", phase)
+	}
 	return err
 }
 
@@ -747,6 +781,7 @@ func (d *dataClient) ReplacePhase(phase *types.Phase) (*types.Phase, error) {
 	if err != nil {
 		return nil, err
 	}
+	datadog.Info("Replaced phase %v", phase)
 	return newPhase, nil
 }
 
@@ -790,6 +825,7 @@ func (d *dataClient) createPhaseGroup(train *types.Train) (*types.PhaseGroup, er
 	if err != nil {
 		return nil, err
 	}
+	datadog.Info("Created phase group %v", phaseGroup)
 	return phaseGroup, nil
 }
 
@@ -800,7 +836,7 @@ func (d *dataClient) CreateJob(phase *types.Phase, name string) (*types.Job, err
 	if err != nil {
 		return nil, err
 	}
-
+	datadog.Info("Created job %v in phase %v", job, phase)
 	return &job, nil
 }
 
@@ -808,6 +844,9 @@ func (d *dataClient) StartJob(job *types.Job, url string) error {
 	job.StartedAt = types.Time{time.Now()}
 	job.URL = &url
 	_, err := d.Client.Update(job, "StartedAt", "URL")
+	if err == nil {
+		datadog.Info("Started job %v", job)
+	}
 	return err
 }
 
@@ -817,6 +856,9 @@ func (d *dataClient) CompleteJob(job *types.Job, result types.JobResult, metadat
 	job.Result = result
 	job.Metadata = metadata
 	_, err := d.Client.Update(job, "CompletedAt", "Result", "Metadata")
+	if err == nil {
+		datadog.Info("Completed job %v", job)
+	}
 	return err
 }
 
@@ -829,6 +871,9 @@ func (d *dataClient) RestartJob(job *types.Job, url string) error {
 	_, err := d.Client.Update(job,
 		"StartedAt", "URL",
 		"CompletedAt", "Result", "Metadata")
+	if err == nil {
+		datadog.Info("Restarted job %v", job)
+	}
 	return err
 }
 
@@ -857,6 +902,9 @@ func (d *dataClient) WriteCommits(commits []*types.Commit) ([]*types.Commit, err
 		if created {
 			newCommits = append(newCommits, commit)
 		}
+	}
+	if len(newCommits) > 0 {
+		datadog.Info("Wrote commits %v", newCommits)
 	}
 	return newCommits, nil
 }
@@ -927,6 +975,7 @@ func (d *dataClient) WriteToken(newToken, name, email, avatar, codeToken string)
 	if err != nil {
 		return err
 	}
+	datadog.Info("Wrote token %v", auth)
 	return nil
 }
 
@@ -951,6 +1000,7 @@ func (d *dataClient) RevokeToken(oldToken, email string) error {
 
 	// Delete.
 	_, err = d.Client.Delete(&auth)
+	datadog.Info("Revoked token %v", auth)
 	return err
 }
 
@@ -962,7 +1012,7 @@ func (d *dataClient) ReadOrCreateUser(name, email string) (*types.User, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	datadog.Info("Read/Created user %v", user)
 	return &user, nil
 }
 
@@ -1004,6 +1054,9 @@ func (d *dataClient) WriteTickets(tickets []*types.Ticket) error {
 			return err
 		}
 	}
+	if len(tickets) > 0 {
+		datadog.Info("Wrote tickets %v", tickets)
+	}
 	return nil
 }
 
@@ -1013,6 +1066,9 @@ func (d *dataClient) UpdateTickets(tickets []*types.Ticket) error {
 		if err != nil {
 			return err
 		}
+	}
+	if len(tickets) > 0 {
+		datadog.Info("Updated tickets %v", tickets)
 	}
 	return nil
 }

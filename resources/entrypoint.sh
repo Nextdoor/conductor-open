@@ -23,5 +23,10 @@ if [ "$EXIT" -eq 1 ]; then
     exit 1
 fi
 
+# Set CONTAINER_HOST_IP to the container's host ip or the
+# value of the STATSD_HOST environment variable
+CONTAINER_HOST_IP=$(ip route show | awk '/default/ {print $3}')
+export STATSD_HOST=${STATSD_HOST:-$CONTAINER_HOST_IP}
+
 /usr/sbin/nginx -c /app/nginx.conf -p /app/ &
 exec /app/conductor

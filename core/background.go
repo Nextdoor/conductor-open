@@ -8,8 +8,8 @@ import (
 	"github.com/Nextdoor/conductor/services/messaging"
 	"github.com/Nextdoor/conductor/services/phase"
 	"github.com/Nextdoor/conductor/services/ticket"
+	"github.com/Nextdoor/conductor/shared/datadog"
 	"github.com/Nextdoor/conductor/shared/flags"
-	"github.com/Nextdoor/conductor/shared/logger"
 )
 
 const SyncTicketsInterval = time.Second * 10
@@ -21,9 +21,9 @@ const CheckTrainLockInterval = time.Second * 5
 var backgroundTaskStartDelay = flags.EnvInt("BACKGROUND_TASK_START_DELAY", 0)
 
 func backgroundTaskLoop() {
-	logger.Info("Waiting %d seconds to start background jobs.", backgroundTaskStartDelay)
+	datadog.Info("Waiting %d seconds to start background jobs.", backgroundTaskStartDelay)
 	time.Sleep(time.Second * time.Duration(backgroundTaskStartDelay))
-	logger.Info("Starting background jobs.")
+	datadog.Info("Starting background jobs.")
 
 	// This loop handles restarting the background task loop if it ever panics.
 	killed := make(chan bool)
@@ -41,7 +41,7 @@ func backgroundTaskLoop() {
 			defer func() {
 				err, stack := parsePanic(recover())
 				if err != nil {
-					logger.Error("Panic in background task: %v. Stack trace: %v", err, stack)
+					datadog.Error("Panic in background task: %v. Stack trace: %v", err, stack)
 				}
 				killed <- true
 			}()
