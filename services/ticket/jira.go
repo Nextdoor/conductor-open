@@ -84,7 +84,6 @@ func (t *JIRA) CreateTickets(train *types.Train, commits []*types.Commit) ([]*ty
 	if err != nil {
 		return nil, err
 	}
-	datadog.Info("Created tickets %v", tickets)
 	return tickets, nil
 }
 
@@ -94,9 +93,6 @@ func (t *JIRA) CloseTickets(tickets []*types.Ticket) error {
 		keys[i] = tickets[i].Key
 	}
 	err := t.closeIssuesByKeys(keys)
-	if err == nil {
-		datadog.Info("Closed tickets %v", tickets)
-	}
 	return err
 }
 
@@ -264,12 +260,14 @@ func (t *JIRA) closeIssuesByKeys(keys []string) error {
 		if err != nil {
 			return parseBodyError(resp, err)
 		}
+		datadog.Info("Closed issue %v", keys[i])
 	}
 
 	return nil
 }
 
 func createTicket(train *types.Train, key, summary, assigneeEmail, assigneeName string, commits []*types.Commit) *types.Ticket {
+	datadog.Info("Created ticket (Key, Summary, AssigneeName) %v", key, summary, assigneeName)
 	return &types.Ticket{
 		Key:           key,
 		Summary:       summary,
@@ -317,7 +315,7 @@ func createParentIssue(train *types.Train) (*jira.Issue, error) {
 	if err != nil {
 		return nil, parseBodyError(resp, err)
 	}
-	datadog.Info("Created parent issue %v", parentIssue)
+	datadog.Info("Created parent issue %v", parentIssue.ID)
 	return parentIssue, nil
 }
 
@@ -374,7 +372,7 @@ func createSubIssue(parentIssue *jira.Issue, username string, commits []*types.C
 	if err != nil {
 		return nil, parseBodyError(resp, err)
 	}
-	datadog.Info("Created sub issue %v", issue)
+	datadog.Info("Created sub issue %v", issue.ID)
 	return issue, nil
 }
 

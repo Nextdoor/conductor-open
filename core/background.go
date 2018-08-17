@@ -23,7 +23,7 @@ var backgroundTaskStartDelay = flags.EnvInt("BACKGROUND_TASK_START_DELAY", 0)
 func backgroundTaskLoop() {
 	datadog.Info("Waiting %d seconds to start background jobs.", backgroundTaskStartDelay)
 	time.Sleep(time.Second * time.Duration(backgroundTaskStartDelay))
-	datadog.Info("Starting background jobs.")
+	datadog.Info("Starting background jobs. %s", "")
 
 	// This loop handles restarting the background task loop if it ever panics.
 	killed := make(chan bool)
