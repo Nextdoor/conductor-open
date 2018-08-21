@@ -29,12 +29,3 @@ func TestLogError(t *testing.T) {
 	rlen, _, _ := sock.ReadFromUDP(buf)
 	assert.Contains(t, string(buf[0:rlen]), "conductor testing")
 }
-
-func TestLogError(t *testing.T) {
-	os.Setenv("STATSD_HOST", "localhost")
-	assert.NotNil(t, c)
-	log(statsd.Error, "%s testing", "conductor")
-	buf := make([]byte, 1024)
-	rlen, _, _ := sock.ReadFromUDP(buf)
-	assert.Contains(t, string(buf[0:rlen]), "conductor testing")
-}
