@@ -19,7 +19,6 @@ RUN mkdir -p /app/ssl && cd /app/ssl && \
 ADD swagger/swagger.yml swagger/config.json /app/swagger/
 RUN pretty-swag -c /app/swagger/config.json
 
-
 # Set up Go app.
 ADD .build /go/src/github.com/Nextdoor/conductor/
 RUN go build -o /app/conductor /go/src/github.com/Nextdoor/conductor/cmd/conductor/conductor.go
