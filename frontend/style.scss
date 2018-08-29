@@ -222,6 +222,18 @@ button + button {
   float: right;
 }
 
+.header-search {
+    margin: 0 20px;
+    float: right;
+    width: 35%;
+}
+
+.header-search input {
+    padding: 5px;
+    font-size: 14px;
+    width: 100%;
+}
+
 // Train
 
 .grid {

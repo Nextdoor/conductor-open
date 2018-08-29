@@ -21,6 +21,13 @@ class Header extends React.Component {
     );
   }
 
+  search(event) {
+      // Call search with the commit id
+      console.log(event.target.value);
+      // we call the api, which will return the trains that contain this commit,
+      // you need to have some sort of filter functionality
+  }
+
   getComponent() {
     const {self, request, logout} = this.props;
 
@@ -48,6 +55,9 @@ class Header extends React.Component {
             {self.name}
           </div>
           <img className="header-avatar" src={self.avatar_url}/>
+          <span className="header-search">
+              <input type="text" placeholder="Search" onChange={(event) => this.search(event)}/>
+          </span>
         </span>
       );
     }
