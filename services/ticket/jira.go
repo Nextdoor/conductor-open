@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"strings"
 	"time"
 
 	jira "github.com/niallo/go-jira"
@@ -255,19 +256,20 @@ func (t *JIRA) closeIssuesByKeys(keys []string) error {
 		return fmt.Errorf("Could not find JIRA transition ID for transition named %s",
 			doneTransition)
 	}
+	closed := make([]string, 0)
 	for i := range keys {
 		resp, err := jiraClient.Issue.DoTransition(keys[i], doneTransitionID)
 		if err != nil {
 			return parseBodyError(resp, err)
 		}
-		datadog.Info("Closed issue %v", keys[i])
+		closed = append(closed, fmt.Sprintf("%v", keys[i]))
 	}
-
+	datadog.Info("Closed issues by keys: %v", strings.Join(closed, "\n"))
 	return nil
 }
 
 func createTicket(train *types.Train, key, summary, assigneeEmail, assigneeName string, commits []*types.Commit) *types.Ticket {
-	datadog.Info("Created ticket (Key, Summary, AssigneeName) %v", key, summary, assigneeName)
+	datadog.Info("Created ticket (Key, Summary, AssigneeName) %v, %v, %v", key, summary, assigneeName)
 	return &types.Ticket{
 		Key:           key,
 		Summary:       summary,
