@@ -1,4 +1,5 @@
 import React from 'react';
+import {withRouter} from 'react-router';
 import PropTypes from 'prop-types';
 
 import {trainProps, requestProps} from 'types/proptypes';
@@ -7,7 +8,6 @@ import Error from 'components/Error';
 class Header extends React.Component {
   componentWillMount() {
     const {request, load} = this.props;
-
     if (request.fetching !== true && request.receivedAt === null) {
       load();
     }
@@ -22,10 +22,13 @@ class Header extends React.Component {
   }
 
   search(event) {
-      // Call search with the commit id
-      console.log(event.target.value);
-      // we call the api, which will return the trains that contain this commit,
-      // you need to have some sort of filter functionality
+    let commit = event.target.value.trim();
+    this.props.onSearchCommit && this.props.onSearchCommit(commit);
+    if (commit.length > 0) {
+        this.props.router.push('/search/commit/' + commit);
+    } else {
+        this.props.router.push('/');
+    }
   }
 
   getComponent() {
@@ -56,7 +59,11 @@ class Header extends React.Component {
           </div>
           <img className="header-avatar" src={self.avatar_url}/>
           <span className="header-search">
-              <input type="text" placeholder="Search" onChange={(event) => this.search(event)}/>
+              <input type="text"
+                          placeholder="Search trains by commit id"
+                          autoFocus={true}
+                          value={this.props.params.commit}
+                          onChange={(event) => this.search(event)}/>
           </span>
         </span>
       );
@@ -85,4 +92,5 @@ Header.propTypes = {
   logout: PropTypes.func.isRequired
 };
 
-export default Header;
+// export default Header;
+export default withRouter(Header);

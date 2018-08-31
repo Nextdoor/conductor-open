@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 
 import {searchProps, requestProps} from 'types/proptypes';
 
@@ -8,12 +9,22 @@ import Error from 'components/Error';
 import Loading from 'components/Loading';
 
 class Search extends React.Component {
+  constructor(props) {
+      super(props);
+      this.searchDebounced = _.debounce(this.props.search, 300);
+  }
+
   componentWillMount() {
     const {request, search, params} = this.props;
-
     if (request.fetching !== true && request.receivedAt === null) {
       search(params);
     }
+  }
+
+  componentWillReceiveProps(nextProps) {
+      if (nextProps.params.commit !== this.props.params.commit) {
+          this.searchDebounced(nextProps.params);
+      }
   }
 
   render() {
@@ -22,7 +33,6 @@ class Search extends React.Component {
     if (request.fetching !== true && request.receivedAt === null) {
       return null;
     }
-
     if (request.error !== null) {
       return <Error message={request.error}/>;
     }
@@ -40,7 +50,6 @@ class Search extends React.Component {
 
   getComponent() {
     const {details, params} = this.props;
-
     const trains = [];
     details.results.forEach(function(train) {
       trains.push(<TrainLink key={train.id} id={train.id}/>);
@@ -61,7 +70,8 @@ Search.propTypes = {
   details: searchProps,
   params: PropTypes.shape().isRequired,
   request: requestProps.isRequired,
-  search: PropTypes.func.isRequired
+  search: PropTypes.func.isRequired,
+  commit: PropTypes.string,
 };
 
 class TrainLink extends React.Component {

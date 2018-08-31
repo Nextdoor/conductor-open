@@ -7,6 +7,13 @@ import Train from 'containers/Train';
 import Search from 'containers/Search';
 
 class App extends React.Component {
+  constructor(props) {
+      super(props);
+      this.state = {
+          commit: null
+      };
+  }
+
   componentWillMount() {
     const {needToken, promptLogin, getToken} = this.props;
     if (needToken === true && promptLogin !== true) {
@@ -43,7 +50,7 @@ class App extends React.Component {
   getSearch(params) {
     return (
       <div>
-        <Header/>
+        <Header onSearchCommit={(commit) => this.setState({commit})}/>
         <Search params={params}/>
       </div>
     );
