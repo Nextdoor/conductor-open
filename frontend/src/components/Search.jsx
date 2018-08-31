@@ -10,8 +10,8 @@ import Loading from 'components/Loading';
 
 class Search extends React.Component {
   constructor(props) {
-      super(props);
-      this.searchDebounced = _.debounce(this.props.search, 300);
+    super(props);
+    this.searchDebounced = _.debounce(this.props.search, 300);
   }
 
   componentWillMount() {
@@ -22,9 +22,9 @@ class Search extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-      if (nextProps.params.commit !== this.props.params.commit) {
-          this.searchDebounced(nextProps.params);
-      }
+    if (nextProps.params.commit !== this.props.params.commit) {
+      this.searchDebounced(nextProps.params);
+    }
   }
 
   render() {

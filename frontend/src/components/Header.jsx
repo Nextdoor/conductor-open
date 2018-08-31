@@ -22,12 +22,12 @@ class Header extends React.Component {
   }
 
   search(event) {
-    let commit = event.target.value.trim();
+    const commit = event.target.value.trim();
     this.props.onSearchCommit && this.props.onSearchCommit(commit);
     if (commit.length > 0) {
-        this.props.router.push('/search/commit/' + commit);
+      this.props.router.push('/search/commit/' + commit);
     } else {
-        this.props.router.push('/');
+      this.props.router.push('/');
     }
   }
 
@@ -61,7 +61,7 @@ class Header extends React.Component {
           <span className="header-search">
               <input type="text"
                           placeholder="Search trains by commit id"
-                          autoFocus={true}
+                          autoFocus="true"
                           value={this.props.params.commit}
                           onChange={(event) => this.search(event)}/>
           </span>
@@ -89,8 +89,10 @@ Header.propTypes = {
   request: requestProps.isRequired,
   train: trainProps,
   load: PropTypes.func.isRequired,
-  logout: PropTypes.func.isRequired
+  logout: PropTypes.func.isRequired,
+  onSearchCommit: PropTypes.func,
+  router: PropTypes.element,
+  params: PropTypes.element,
 };
 
-// export default Header;
 export default withRouter(Header);
