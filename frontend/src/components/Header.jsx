@@ -23,7 +23,7 @@ class Header extends React.Component {
 
   search(event) {
     const commit = event.target.value.trim();
-    this.props.onSearchCommit && this.props.onSearchCommit(commit);
+    this.props.setSearchQuery && this.props.setSearchQuery(commit);
     if (commit.length > 0) {
       this.props.router.push('/search/commit/' + commit);
     } else {
@@ -90,7 +90,7 @@ Header.propTypes = {
   train: trainProps,
   load: PropTypes.func.isRequired,
   logout: PropTypes.func.isRequired,
-  onSearchCommit: PropTypes.func,
+  setSearchQuery: PropTypes.func,
   router: PropTypes.element,
   params: PropTypes.element,
 };

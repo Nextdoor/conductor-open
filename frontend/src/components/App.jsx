@@ -50,7 +50,7 @@ class App extends React.Component {
   getSearch(params) {
     return (
       <div>
-        <Header onSearchCommit={(commit) => this.setState({commit})}/>
+        <Header setSearchQuery={(searchQuery) => this.setState({searchQuery})}/>
         <Search params={params}/>
       </div>
     );
