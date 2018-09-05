@@ -90,7 +90,7 @@ Header.propTypes = {
   train: trainProps,
   load: PropTypes.func.isRequired,
   logout: PropTypes.func.isRequired,
-  setSearchQuery: PropTypes.func.isRequired,
+  setSearchQuery: PropTypes.func,
   router: PropTypes.element,
   params: PropTypes.element,
 };
