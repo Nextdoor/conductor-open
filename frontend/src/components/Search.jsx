@@ -11,6 +11,7 @@ import Loading from 'components/Loading';
 class Search extends React.Component {
   constructor(props) {
     super(props);
+    // Debounce search to avoid throttling the api
     this.searchDebounced = _.debounce(this.props.search, 300);
   }
 

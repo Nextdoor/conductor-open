@@ -9,9 +9,6 @@ import Search from 'containers/Search';
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      commit: null
-    };
   }
 
   componentWillMount() {

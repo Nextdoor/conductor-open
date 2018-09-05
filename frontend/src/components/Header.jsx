@@ -60,7 +60,7 @@ class Header extends React.Component {
           <img className="header-avatar" src={self.avatar_url}/>
           <span className="header-search">
               <input type="text"
-                          placeholder="Search trains by commit id"
+                          placeholder="Search trains by commit sha"
                           autoFocus="true"
                           value={this.props.params.commit}
                           onChange={(event) => this.search(event)}/>
@@ -90,7 +90,7 @@ Header.propTypes = {
   train: trainProps,
   load: PropTypes.func.isRequired,
   logout: PropTypes.func.isRequired,
-  setSearchQuery: PropTypes.func,
+  setSearchQuery: PropTypes.func.isRequired,
   router: PropTypes.element,
   params: PropTypes.element,
 };
