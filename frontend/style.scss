@@ -228,9 +228,20 @@ button + button {
     width: 35%;
 }
 
+.header-search {
+    display: inline;
+    margin-left: 20px;
+    overflow: hidden;
+    position: absolute;
+    top: 12px;
+    white-space: nowrap;
+    width: 10%;
+}
+
 .header-search input {
-    padding: 5px;
     font-size: 14px;
+    padding: 5px;
+    text-overflow: ellipsis;
     width: 100%;
 }
 
