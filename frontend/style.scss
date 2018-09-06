@@ -198,6 +198,10 @@ button + button {
   margin-right: 15px;
   max-width: 300px;
   float: right;
+
+  @media (max-width: 600px) {
+    display: none;
+  }
 }
 
 .header-name.header-name-long {
@@ -223,19 +227,13 @@ button + button {
 }
 
 .header-search {
-    margin: 0 20px;
-    float: right;
-    width: 35%;
-}
-
-.header-search {
     display: inline;
     margin-left: 20px;
     overflow: hidden;
     position: absolute;
-    top: 12px;
+    top: 14px;
     white-space: nowrap;
-    width: 10%;
+    width: 20%;
 }
 
 .header-search input {

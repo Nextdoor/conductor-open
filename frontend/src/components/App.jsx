@@ -47,7 +47,7 @@ class App extends React.Component {
   getSearch(params) {
     return (
       <div>
-        <Header setSearchQuery={(searchQuery) => this.setState({searchQuery})}/>
+        <Header/>
         <Search params={params}/>
       </div>
     );

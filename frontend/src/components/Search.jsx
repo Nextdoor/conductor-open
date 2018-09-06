@@ -30,11 +30,23 @@ class Search extends React.Component {
   }
 
   render() {
-    const {request, details} = this.props;
+    const {request, details, params} = this.props;
 
-    if (request.fetching !== true && request.receivedAt === null) {
+    // Request is still being fetched; render nothing
+    if (request.fetching === true) {
       return null;
     }
+
+    // Request might be fetched, but for some reason receivedAt is null; render nothing
+    if (request.receivedAt === null) {
+      return null;
+    }
+
+    // Don't render for previous commit
+    if (request.searchQuery && (request.searchQuery !== params.commit)) {
+      return null;
+    }
+
     if (request.error !== null) {
       return <Error message={request.error}/>;
     }

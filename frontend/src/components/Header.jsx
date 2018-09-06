@@ -23,7 +23,6 @@ class Header extends React.Component {
 
   search(event) {
     const commit = event.target.value.trim();
-    this.props.setSearchQuery && this.props.setSearchQuery(commit);
     if (commit.length > 0) {
       this.props.router.push('/search/commit/' + commit);
     } else {
@@ -60,10 +59,10 @@ class Header extends React.Component {
           <img className="header-avatar" src={self.avatar_url}/>
           <div className="header-search">
               <input type="text"
-                          placeholder="Search trains by commit sha"
-                          autoFocus="true"
-                          value={this.props.params.commit}
-                          onChange={(event) => this.search(event)}/>
+                    placeholder="Search trains by commit sha"
+                    autoFocus="true"
+                    value={this.props.params.commit ? this.props.params.commit : ""}
+                    onChange={(event) => this.search(event)}/>
           </div>
         </span>
       );
@@ -90,9 +89,8 @@ Header.propTypes = {
   train: trainProps,
   load: PropTypes.func.isRequired,
   logout: PropTypes.func.isRequired,
-  setSearchQuery: PropTypes.func,
-  router: PropTypes.element,
-  params: PropTypes.element,
+  router: PropTypes.object.isRequired,
+  params: PropTypes.object.isRequired,
 };
 
 export default withRouter(Header);
