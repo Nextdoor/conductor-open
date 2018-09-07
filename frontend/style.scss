@@ -198,6 +198,10 @@ button + button {
   margin-right: 15px;
   max-width: 300px;
   float: right;
+
+  @media (max-width: 600px) {
+    display: none;
+  }
 }
 
 .header-name.header-name-long {
@@ -220,6 +224,23 @@ button + button {
   margin-top: 5px;
   height: 25px;
   float: right;
+}
+
+.header-search {
+    display: inline;
+    margin-left: 20px;
+    overflow: hidden;
+    position: absolute;
+    top: 14px;
+    white-space: nowrap;
+    width: 20%;
+}
+
+.header-search input {
+    font-size: 14px;
+    padding: 5px;
+    text-overflow: ellipsis;
+    width: 100%;
 }
 
 // Train

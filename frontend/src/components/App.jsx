@@ -7,6 +7,10 @@ import Train from 'containers/Train';
 import Search from 'containers/Search';
 
 class App extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
   componentWillMount() {
     const {needToken, promptLogin, getToken} = this.props;
     if (needToken === true && promptLogin !== true) {

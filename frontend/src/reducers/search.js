@@ -18,7 +18,8 @@ const search = (state = null, action) => {
         request: {
           fetching: false,
           error: null,
-          receivedAt: action.receivedAt
+          receivedAt: action.receivedAt,
+          searchQuery: action.searchQuery
         }
       });
       break;
