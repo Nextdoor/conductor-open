@@ -903,7 +903,7 @@ func (d *dataClient) WriteCommits(commits []*types.Commit) ([]*types.Commit, err
 		}
 		if created {
 			newCommits = append(newCommits, commit)
-			wrote = append(wrote, fmt.Sprintf("ID, SHA, Branch, AuthorName %v, %v, %v, %v", commit.ID, commit.SHA, commit.Branch, commit.AuthorName))
+			wrote = append(wrote, fmt.Sprintf("(ID, SHA, Branch, AuthorName) %v, %v, %v, %v", commit.ID, commit.SHA, commit.Branch, commit.AuthorName))
 		}
 	}
 	datadog.Info("Wrote commits: %v", strings.Join(wrote, "\n"))
@@ -1055,7 +1055,7 @@ func (d *dataClient) WriteTickets(tickets []*types.Ticket) error {
 		if err != nil {
 			return err
 		}
-		wrote = append(wrote, fmt.Sprintf("ID, Summary, AssigneeName %v, %v, %v", ticket.ID, ticket.Summary, ticket.AssigneeName))
+		wrote = append(wrote, fmt.Sprintf("(ID, Summary, AssigneeName) %v, %v, %v", ticket.ID, ticket.Summary, ticket.AssigneeName))
 	}
 	datadog.Info("Wrote tickets: %v", strings.Join(wrote, "\n"))
 	return nil
@@ -1069,7 +1069,7 @@ func (d *dataClient) UpdateTickets(tickets []*types.Ticket) error {
 		if err != nil {
 			return err
 		}
-		updated = append(updated, fmt.Sprintf("ID, Summary, AssigneeName %v %v %v", ticket.ID, ticket.Summary, ticket.AssigneeName))
+		updated = append(updated, fmt.Sprintf("(ID, Summary, AssigneeName) %v %v %v", ticket.ID, ticket.Summary, ticket.AssigneeName))
 	}
 	datadog.Info("Updated tickets: %v", strings.Join(updated, "\n"))
 	return nil
