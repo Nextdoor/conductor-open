@@ -11,7 +11,8 @@ const receive = (search) => {
   return {
     type: Actions.ReceiveSearch,
     search: search,
-    receivedAt: Date.now()
+    receivedAt: Date.now(),
+    searchQuery: search.params.commit
   };
 };
 
