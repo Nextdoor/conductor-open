@@ -30,16 +30,16 @@ func log(alertType statsd.EventAlertType, format string, args ...interface{}) {
 	}
 	switch alertType {
 	case statsd.Info:
-		logger.Info(format, args)
+		logger.Info(format, args...)
 	default:
-		logger.Error(format, args)
+		logger.Error(format, args...)
 	}
 }
 
 func Info(format string, args ...interface{}) {
-	log(statsd.Info, format, args)
+	log(statsd.Info, format, args...)
 }
 
 func Error(format string, args ...interface{}) {
-	log(statsd.Error, format, args)
+	log(statsd.Error, format, args...)
 }
