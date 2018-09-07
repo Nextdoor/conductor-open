@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/astaxie/beego/orm"
@@ -337,7 +338,7 @@ func (d *dataClient) CreateTrain(branch string, engineer *types.User, commits []
 		d.Client.Rollback()
 		return nil, err
 	}
-	datadog.Info("Created train %v", train)
+	datadog.Info("Created train (ID, Branch, HeadSHA, TailSHA) %v, %v, %v, %v", train.ID, train.Branch, train.HeadSHA, train.TailSHA)
 	return train, nil
 }
 
@@ -411,7 +412,7 @@ func (d *dataClient) ExtendTrain(train *types.Train, engineer *types.User, newCo
 		d.Client.Rollback()
 		return err
 	}
-	datadog.Info("Extended train %v", train)
+	datadog.Info("Extended train (ID, HeadSHA, TailSHA): %v, %v, %v", train.ID, train.HeadSHA, train.TailSHA)
 	return nil
 }
 
@@ -522,7 +523,7 @@ func (d *dataClient) DuplicateTrain(oldTrain *types.Train, newCommits []*types.C
 		d.Client.Rollback()
 		return nil, err
 	}
-	datadog.Info("Duplicated train %v", newTrain)
+	datadog.Info("Duplicated train (ID, HeadSHA, TailSHA) %v, %v, %v", newTrain.ID, newTrain.HeadSHA, newTrain.TailSHA)
 	return newTrain, nil
 }
 
@@ -530,7 +531,7 @@ func (d *dataClient) ChangeTrainEngineer(train *types.Train, engineer *types.Use
 	train.Engineer = engineer
 	_, err := d.Client.Update(train, "Engineer")
 	if err == nil {
-		datadog.Info("Changed train %v engineer to %v", train, engineer)
+		datadog.Info("Changed train engineer to %v", engineer.Name)
 	}
 	return err
 }
@@ -540,7 +541,7 @@ func (d *dataClient) CloseTrain(train *types.Train, override bool) error {
 	train.ScheduleOverride = override
 	_, err := d.Client.Update(train, "Closed", "ScheduleOverride")
 	if err == nil {
-		datadog.Info("Closed train %v", train)
+		datadog.Info("Closed train (ID, HeadSHA, TailSHA) %v, %v, %v", train.ID, train.HeadSHA, train.TailSHA)
 	}
 	return err
 }
@@ -550,7 +551,7 @@ func (d *dataClient) OpenTrain(train *types.Train, override bool) error {
 	train.ScheduleOverride = override
 	_, err := d.Client.Update(train, "Closed", "ScheduleOverride")
 	if err == nil {
-		datadog.Info("Opened train %v", train)
+		datadog.Info("Opened train (ID, HeadSHA, TailSHA) %v, %v, %v", train.ID, train.HeadSHA, train.TailSHA)
 	}
 	return err
 }
@@ -560,7 +561,7 @@ func (d *dataClient) BlockTrain(train *types.Train, reason *string) error {
 	train.BlockedReason = reason
 	_, err := d.Client.Update(train, "Blocked", "BlockedReason")
 	if err == nil {
-		datadog.Info("Blocked train %v", train)
+		datadog.Info("Blocked train (ID, HeadSHA, TailSHA) %v, %v, %v", train.ID, train.HeadSHA, train.TailSHA)
 	}
 	return err
 }
@@ -569,7 +570,7 @@ func (d *dataClient) UnblockTrain(train *types.Train) error {
 	train.Blocked = false
 	_, err := d.Client.Update(train, "Blocked")
 	if err == nil {
-		datadog.Info("Unblocked train %v", train)
+		datadog.Info("Unblocked train (ID, HeadSHA, TailSHA) %v, %v, %v", train.ID, train.HeadSHA, train.TailSHA)
 	}
 	return err
 }
@@ -578,7 +579,7 @@ func (d *dataClient) DeployTrain(train *types.Train) error {
 	train.DeployedAt = types.Time{time.Now()}
 	_, err := d.Client.Update(train, "DeployedAt")
 	if err == nil {
-		datadog.Info("Deployed train %v", train)
+		datadog.Info("Deployed train (ID, HeadSHA, TailSHA) %v, %v, %v", train.ID, train.HeadSHA, train.TailSHA)
 	}
 	return err
 }
@@ -587,7 +588,7 @@ func (d *dataClient) CancelTrain(train *types.Train) error {
 	train.CancelledAt = types.Time{time.Now()}
 	_, err := d.Client.Update(train, "CancelledAt")
 	if err == nil {
-		datadog.Info("Cancelled train %v", train)
+		datadog.Info("Cancelled train (ID, HeadSHA, TailSHA) %v, %v, %v", train.ID, train.HeadSHA, train.TailSHA)
 	}
 	return err
 }
@@ -735,7 +736,7 @@ func (d *dataClient) StartPhase(phase *types.Phase) error {
 	_, err := d.Client.Update(phase, "StartedAt")
 	phase.Train.SetActivePhase()
 	if err == nil {
-		datadog.Info("Started phase %v", phase)
+		datadog.Info("Started phase %v", phase.ID)
 	}
 	return err
 }
@@ -753,7 +754,7 @@ func (d *dataClient) UncompletePhase(phase *types.Phase) error {
 	phase.CompletedAt = types.Time{}
 	_, err := d.Client.Update(phase, "CompletedAt")
 	if err == nil {
-		datadog.Error("Phase %v uncomplete", phase)
+		datadog.Error("Phase %v uncomplete", phase.ID)
 	}
 	return err
 }
@@ -762,7 +763,7 @@ func (d *dataClient) CompletePhase(phase *types.Phase) error {
 	phase.CompletedAt = types.Time{time.Now()}
 	_, err := d.Client.Update(phase, "CompletedAt")
 	if err == nil {
-		datadog.Info("Completed phase %v", phase)
+		datadog.Info("Completed phase %v", phase.ID)
 	}
 	return err
 }
@@ -781,7 +782,7 @@ func (d *dataClient) ReplacePhase(phase *types.Phase) (*types.Phase, error) {
 	if err != nil {
 		return nil, err
 	}
-	datadog.Info("Replaced phase %v", phase)
+	datadog.Info("Replaced phase %v", phase.ID)
 	return newPhase, nil
 }
 
@@ -825,7 +826,7 @@ func (d *dataClient) createPhaseGroup(train *types.Train) (*types.PhaseGroup, er
 	if err != nil {
 		return nil, err
 	}
-	datadog.Info("Created phase group %v", phaseGroup)
+	datadog.Info("Created phase group (ID, HeadSHA) %v, %v", phaseGroup.ID, phaseGroup.HeadSHA)
 	return phaseGroup, nil
 }
 
@@ -836,7 +837,7 @@ func (d *dataClient) CreateJob(phase *types.Phase, name string) (*types.Job, err
 	if err != nil {
 		return nil, err
 	}
-	datadog.Info("Created job %v in phase %v", job, phase)
+	datadog.Info("Created job (ID, Name) %v, %v", job.ID, job.Name)
 	return &job, nil
 }
 
@@ -845,7 +846,7 @@ func (d *dataClient) StartJob(job *types.Job, url string) error {
 	job.URL = &url
 	_, err := d.Client.Update(job, "StartedAt", "URL")
 	if err == nil {
-		datadog.Info("Started job %v", job)
+		datadog.Info("Started job (ID, Name) %v, %v", job.ID, job.Name)
 	}
 	return err
 }
@@ -857,7 +858,7 @@ func (d *dataClient) CompleteJob(job *types.Job, result types.JobResult, metadat
 	job.Metadata = metadata
 	_, err := d.Client.Update(job, "CompletedAt", "Result", "Metadata")
 	if err == nil {
-		datadog.Info("Completed job %v", job)
+		datadog.Info("Completed job (ID, Name) %v, %v", job.ID, job.Name)
 	}
 	return err
 }
@@ -872,7 +873,7 @@ func (d *dataClient) RestartJob(job *types.Job, url string) error {
 		"StartedAt", "URL",
 		"CompletedAt", "Result", "Metadata")
 	if err == nil {
-		datadog.Info("Restarted job %v", job)
+		datadog.Info("Restarted job (ID, Name) %v, %v", job.ID, job.Name)
 	}
 	return err
 }
@@ -890,6 +891,7 @@ func (d *dataClient) createPhaseJobs(phase *types.Phase) error {
 /* Commit */
 func (d *dataClient) WriteCommits(commits []*types.Commit) ([]*types.Commit, error) {
 	newCommits := make([]*types.Commit, 0)
+	wrote := make([]string, 0)
 	for _, commit := range commits {
 		if commit.ID > 0 {
 			// Already written.
@@ -901,11 +903,10 @@ func (d *dataClient) WriteCommits(commits []*types.Commit) ([]*types.Commit, err
 		}
 		if created {
 			newCommits = append(newCommits, commit)
+			wrote = append(wrote, fmt.Sprintf("(ID, SHA, Branch, AuthorName) %v, %v, %v, %v", commit.ID, commit.SHA, commit.Branch, commit.AuthorName))
 		}
 	}
-	if len(newCommits) > 0 {
-		datadog.Info("Wrote commits %v", newCommits)
-	}
+	datadog.Info("Wrote commits: %v", strings.Join(wrote, "\n"))
 	return newCommits, nil
 }
 
@@ -975,7 +976,7 @@ func (d *dataClient) WriteToken(newToken, name, email, avatar, codeToken string)
 	if err != nil {
 		return err
 	}
-	datadog.Info("Wrote token %v", auth)
+	datadog.Info("Wrote token %v", auth.Token)
 	return nil
 }
 
@@ -1000,7 +1001,7 @@ func (d *dataClient) RevokeToken(oldToken, email string) error {
 
 	// Delete.
 	_, err = d.Client.Delete(&auth)
-	datadog.Info("Revoked token %v", auth)
+	datadog.Info("Revoked token %v", auth.Token)
 	return err
 }
 
@@ -1012,7 +1013,7 @@ func (d *dataClient) ReadOrCreateUser(name, email string) (*types.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	datadog.Info("Read/Created user %v", user)
+	datadog.Info("Read/Created user (ID, Name) %v, %v", user.ID, user.Name)
 	return &user, nil
 }
 
@@ -1034,6 +1035,7 @@ func (d *dataClient) UserByToken(token string) (*types.User, error) {
 
 /* Ticket */
 func (d *dataClient) WriteTickets(tickets []*types.Ticket) error {
+	wrote := make([]string, 0)
 	for i := range tickets {
 		ticket := tickets[i]
 		_, err := d.Client.Insert(ticket)
@@ -1053,23 +1055,23 @@ func (d *dataClient) WriteTickets(tickets []*types.Ticket) error {
 		if err != nil {
 			return err
 		}
+		wrote = append(wrote, fmt.Sprintf("(ID, Summary, AssigneeName) %v, %v, %v", ticket.ID, ticket.Summary, ticket.AssigneeName))
 	}
-	if len(tickets) > 0 {
-		datadog.Info("Wrote tickets %v", tickets)
-	}
+	datadog.Info("Wrote tickets: %v", strings.Join(wrote, "\n"))
 	return nil
 }
 
 func (d *dataClient) UpdateTickets(tickets []*types.Ticket) error {
+	updated := make([]string, 0)
 	for i := range tickets {
-		_, err := d.Client.Update(tickets[i])
+		ticket := tickets[i]
+		_, err := d.Client.Update(ticket)
 		if err != nil {
 			return err
 		}
+		updated = append(updated, fmt.Sprintf("(ID, Summary, AssigneeName) %v %v %v", ticket.ID, ticket.Summary, ticket.AssigneeName))
 	}
-	if len(tickets) > 0 {
-		datadog.Info("Updated tickets %v", tickets)
-	}
+	datadog.Info("Updated tickets: %v", strings.Join(updated, "\n"))
 	return nil
 }
 
