@@ -61,7 +61,7 @@ class Header extends React.Component {
               <input type="text"
                     placeholder="Search trains by commit sha"
                     autoFocus="true"
-                    value={this.props.params.commit ? this.props.params.commit : ""}
+                    value={this.props.params.commit || ""}
                     onChange={(event) => this.search(event)}/>
           </div>
         </span>
