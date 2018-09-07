@@ -1,4 +1,5 @@
 import React from 'react';
+import {withRouter} from 'react-router';
 import PropTypes from 'prop-types';
 
 import {trainProps, requestProps} from 'types/proptypes';
@@ -7,7 +8,6 @@ import Error from 'components/Error';
 class Header extends React.Component {
   componentWillMount() {
     const {request, load} = this.props;
-
     if (request.fetching !== true && request.receivedAt === null) {
       load();
     }
@@ -19,6 +19,15 @@ class Header extends React.Component {
         {this.getComponent()}
       </div>
     );
+  }
+
+  search(event) {
+    const commit = event.target.value.trim();
+    if (commit.length > 0) {
+      this.props.router.push('/search/commit/' + commit);
+    } else {
+      this.props.router.push('/');
+    }
   }
 
   getComponent() {
@@ -48,6 +57,13 @@ class Header extends React.Component {
             {self.name}
           </div>
           <img className="header-avatar" src={self.avatar_url}/>
+          <div className="header-search">
+              <input type="text"
+                    placeholder="Search trains by commit sha"
+                    autoFocus="true"
+                    value={this.props.params.commit || ""}
+                    onChange={(event) => this.search(event)}/>
+          </div>
         </span>
       );
     }
@@ -72,7 +88,9 @@ Header.propTypes = {
   request: requestProps.isRequired,
   train: trainProps,
   load: PropTypes.func.isRequired,
-  logout: PropTypes.func.isRequired
+  logout: PropTypes.func.isRequired,
+  router: PropTypes.object.isRequired,
+  params: PropTypes.object.isRequired,
 };
 
-export default Header;
+export default withRouter(Header);

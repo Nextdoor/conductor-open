@@ -114,7 +114,8 @@ export const configProps = PropTypes.shape({
 export const requestProps = PropTypes.shape({
   fetching: PropTypes.bool.isRequired,
   error: PropTypes.string,
-  receivedAt: PropTypes.number
+  receivedAt: PropTypes.number,
+  searchQuery: PropTypes.string
 });
 
 export const searchProps = PropTypes.shape({
