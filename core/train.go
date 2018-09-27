@@ -401,6 +401,16 @@ func fetchTrain(r *http.Request) response {
 		return *resp
 	}
 
+	if train != nil {
+		// The client uses LastDeliveredSha.
+		err := dataClient.LoadLastDeliveredSHA(train)
+		if err != nil {
+			return errorResponse(
+				fmt.Sprintf("Error fetching train: %v", err),
+				http.StatusInternalServerError)
+		}
+	}
+
 	return dataResponse(train)
 }
 

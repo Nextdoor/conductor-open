@@ -626,24 +626,6 @@ func (d *dataClient) loadTrainRelated(train *types.Train) error {
 		return err
 	}
 
-	_, err = d.Client.LoadRelated(train, "AllPhaseGroups", 2)
-	if err != nil {
-		return err
-	}
-
-	// Find LastDeliveredSHA based on phase groups.
-	if len(train.AllPhaseGroups) <= 1 {
-		train.LastDeliveredSHA = nil
-	} else {
-		for i := len(train.AllPhaseGroups) - 2; i >= 0; i-- {
-			previousPhaseGroup := train.AllPhaseGroups[i]
-			if previousPhaseGroup.Delivery.CompletedAt.HasValue() {
-				train.LastDeliveredSHA = &previousPhaseGroup.HeadSHA
-				break
-			}
-		}
-	}
-
 	for _, phase := range train.ActivePhases.Phases() {
 		_, err = d.Client.LoadRelated(phase, "Jobs")
 		sort.Sort(types.JobsByID(phase.Jobs))
@@ -652,22 +634,7 @@ func (d *dataClient) loadTrainRelated(train *types.Train) error {
 		}
 	}
 
-	for _, phaseGroup := range train.AllPhaseGroups {
-		for _, phase := range phaseGroup.Phases() {
-			_, err = d.Client.LoadRelated(phase, "Jobs")
-			sort.Sort(types.JobsByID(phase.Jobs))
-			if err != nil {
-				return err
-			}
-		}
-	}
-
 	train.ActivePhases.SetReferences(train)
-
-	for i := range train.AllPhaseGroups {
-		phaseGroup := train.AllPhaseGroups[i]
-		phaseGroup.SetReferences(train)
-	}
 
 	train.SetActivePhase()
 
@@ -696,9 +663,64 @@ func (d *dataClient) loadTrainRelated(train *types.Train) error {
 	return nil
 }
 
+func (d *dataClient) loadAllTrainPhaseGroups(train *types.Train) error {
+	if train.AllPhaseGroups != nil {
+		// Already loaded.
+		return nil
+	}
+
+	_, err := d.Client.LoadRelated(train, "AllPhaseGroups", 2)
+	if err != nil {
+		return err
+	}
+
+	for _, phaseGroup := range train.AllPhaseGroups {
+		for _, phase := range phaseGroup.Phases() {
+			sort.Sort(types.JobsByID(phase.Jobs))
+		}
+		phaseGroup.SetReferences(train)
+	}
+
+	return nil
+}
+
+func (d *dataClient) LoadLastDeliveredSHA(train *types.Train) error {
+	if train.LastDeliveredSHA != nil {
+		// Already loaded.
+		return nil
+	}
+
+	if train.AllPhaseGroups == nil {
+		err := d.loadAllTrainPhaseGroups(train)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Find LastDeliveredSHA based on phase groups.
+	if len(train.AllPhaseGroups) <= 1 {
+		train.LastDeliveredSHA = nil
+	} else {
+		for i := len(train.AllPhaseGroups) - 2; i >= 0; i-- {
+			previousPhaseGroup := train.AllPhaseGroups[i]
+			if previousPhaseGroup.Delivery.CompletedAt.HasValue() {
+				train.LastDeliveredSHA = &previousPhaseGroup.HeadSHA
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
 /* Phase */
 
 func (d *dataClient) Phase(phaseID uint64, train *types.Train) (*types.Phase, error) {
+	err := d.loadAllTrainPhaseGroups(train)
+	if err != nil {
+		return nil, err
+	}
+
 	phaseGroups := make([]*types.PhaseGroup, 1+len(train.AllPhaseGroups))
 	phaseGroups[0] = train.ActivePhases
 	for i, phaseGroup := range train.AllPhaseGroups {
