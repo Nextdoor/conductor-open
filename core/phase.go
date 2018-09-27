@@ -183,6 +183,11 @@ func phaseGroupDelivered(
 		train.Tickets = append(train.Tickets, tickets...)
 	}
 
+	err = dataClient.LoadLastDeliveredSHA(train)
+	if err != nil {
+		return err
+	}
+
 	var newCommits []*types.Commit
 	if train.LastDeliveredSHA == nil {
 		newCommits = train.CommitsSince(phaseGroup.HeadSHA)

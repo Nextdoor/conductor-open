@@ -44,6 +44,7 @@ type Client interface {
 	UnblockTrain(*types.Train) error
 	DeployTrain(*types.Train) error
 	CancelTrain(*types.Train) error
+	LoadLastDeliveredSHA(*types.Train) error
 
 	Phase(uint64, *types.Train) (*types.Phase, error)
 	StartPhase(*types.Phase) error
