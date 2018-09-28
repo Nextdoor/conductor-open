@@ -676,6 +676,10 @@ func (d *dataClient) loadAllTrainPhaseGroups(train *types.Train) error {
 
 	for _, phaseGroup := range train.AllPhaseGroups {
 		for _, phase := range phaseGroup.Phases() {
+			_, err = d.Client.LoadRelated(phase, "Jobs")
+			if err != nil {
+				return err
+			}
 			sort.Sort(types.JobsByID(phase.Jobs))
 		}
 		phaseGroup.SetReferences(train)
