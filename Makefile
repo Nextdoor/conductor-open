@@ -14,7 +14,7 @@ GO_DIRS=core cmd services shared
 all: imports docker-build docker-run
 
 imports:
-	@goimports -local github.com -w $(GO_DIRS)
+	@goimports -local github.com/Nextdoor/conductor -w $(GO_DIRS)
 
 test:
 	@./test.sh

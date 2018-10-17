@@ -5,9 +5,8 @@ import (
 	"fmt"
 	"net/url"
 
-	"golang.org/x/oauth2"
-
 	"github.com/google/go-github/github"
+	"golang.org/x/oauth2"
 
 	"github.com/Nextdoor/conductor/shared/flags"
 )
