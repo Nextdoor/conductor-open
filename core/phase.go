@@ -44,7 +44,6 @@ func triggerPhaseRestart(r *http.Request) response {
 			http.StatusBadRequest)
 	}
 
-	// TODO: Race condition if active train changes while this is executing?
 	latestTrain, err := dataClient.LatestTrain()
 	if err != nil {
 		return errorResponse(
@@ -60,13 +59,14 @@ func triggerPhaseRestart(r *http.Request) response {
 			http.StatusBadRequest)
 	}
 
-	if latestTrain.Blocked {
+	targetTrain, err := dataClient.Train(trainID)
+	if err != nil {
 		return errorResponse(
-			"Cannot deploy a blocked train.",
-			http.StatusBadRequest)
+			fmt.Sprintf("Problem getting the train: %v", err),
+			http.StatusInternalServerError)
 	}
 
-	phaseToRestart := latestTrain.Phase(phaseType)
+	phaseToRestart := targetTrain.Phase(phaseType)
 	if phaseToRestart.IsComplete() {
 		return errorResponse(
 			"This phase has already completed.",
