@@ -1083,7 +1083,9 @@ func (d *dataClient) WriteTickets(tickets []*types.Ticket) error {
 		}
 		wrote = append(wrote, fmt.Sprintf("(ID, Summary, AssigneeName) %v, %v, %v", ticket.ID, ticket.Summary, ticket.AssigneeName))
 	}
-	datadog.Info("Wrote tickets: %v", strings.Join(wrote, "\n"))
+	if len(wrote) > 0 {
+		datadog.Info("Wrote tickets: %v", strings.Join(wrote, "\n"))
+	}
 	return nil
 }
 
@@ -1097,7 +1099,9 @@ func (d *dataClient) UpdateTickets(tickets []*types.Ticket) error {
 		}
 		updated = append(updated, fmt.Sprintf("(ID, Summary, AssigneeName) %v %v %v", ticket.ID, ticket.Summary, ticket.AssigneeName))
 	}
-	datadog.Info("Updated tickets: %v", strings.Join(updated, "\n"))
+	if len(updated) > 0 {
+		datadog.Info("Updated tickets: %v", strings.Join(updated, "\n"))
+	}
 	return nil
 }
 
