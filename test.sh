@@ -58,7 +58,7 @@ test_style() {
 
     fail=false
     for file in $files; do
-        RESULT=$(goimports -local github.com -l $file)
+        RESULT=$(goimports -local github.com/Nextdoor/conductor -l $file)
         if [[ $RESULT != "" ]]; then
             fail=true
             echo "run 'make imports': $file"
