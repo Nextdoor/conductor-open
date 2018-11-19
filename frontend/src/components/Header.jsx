@@ -3,7 +3,6 @@ import {withRouter} from 'react-router';
 import PropTypes from 'prop-types';
 
 import {trainProps, requestProps} from 'types/proptypes';
-import Error from 'components/Error';
 
 class Header extends React.Component {
   componentWillMount() {
@@ -31,7 +30,7 @@ class Header extends React.Component {
   }
 
   getComponent() {
-    const {self, request, logout} = this.props;
+    const {self, request} = this.props;
 
     if (request.fetching !== true && request.receivedAt === null) {
       return null;
@@ -43,20 +42,16 @@ class Header extends React.Component {
 
     let content = null;
     if (request.error !== null) {
-      content = <Error message={request.error}/>;
+      content = null;
     } else {
       content = (
         <span>
-          <button className="header-logout-button" onClick={logout}>
-            Logout
-          </button>
           <div className="header-name header-name-long">
             Logged in as {self.name}
           </div>
           <div className="header-name header-name-short">
             {self.name}
           </div>
-          <img className="header-avatar" src={self.avatar_url}/>
           <div className="header-search">
               <input type="text"
                     placeholder="Search trains by commit sha"
@@ -83,12 +78,10 @@ Header.propTypes = {
   self: PropTypes.shape({
     name: PropTypes.string.isRequired,
     email: PropTypes.string.isRequired,
-    avatar_url: PropTypes.string.isRequired,
   }),
   request: requestProps.isRequired,
   train: trainProps,
   load: PropTypes.func.isRequired,
-  logout: PropTypes.func.isRequired,
   router: PropTypes.object.isRequired,
   params: PropTypes.object.isRequired,
 };

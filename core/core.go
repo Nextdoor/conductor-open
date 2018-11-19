@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/Nextdoor/conductor/services/auth"
 	"github.com/Nextdoor/conductor/services/code"
 	"github.com/Nextdoor/conductor/services/data"
 	"github.com/Nextdoor/conductor/services/messaging"
@@ -26,12 +25,8 @@ func Preload() {
 	logger.Info("Preloading services in the background.")
 
 	var waitGroup sync.WaitGroup
-	waitGroup.Add(6) // One for each service
 
 	funcs := []func(){
-		func() {
-			auth.GetService()
-		},
 		func() {
 			code.GetService()
 		},
@@ -48,6 +43,9 @@ func Preload() {
 			ticket.GetService()
 		},
 	}
+
+	waitGroup.Add(len(funcs))
+
 	for i := range funcs {
 		f := funcs[i]
 		go func() {

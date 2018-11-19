@@ -114,16 +114,9 @@ type User struct {
 	CreatedAt Time   `orm:"auto_now_add" json:"created_at"`
 	Name      string `json:"name"`
 	Email     string `orm:"unique" json:"email"`
-	AvatarURL string `orm:"column(avatar_url)" json:"avatar_url"`
-	Token     string `orm:"-" json:"-"`
+	IsViewer  bool   `orm:"-" json:"is_viewer"`
+	IsUser    bool   `orm:"-" json:"is_user"`
 	IsAdmin   bool   `orm:"-" json:"is_admin"`
-}
-
-type Auth struct {
-	Token     string `orm:"pk;size(36)" json:"token"` // Internal token token.
-	CreatedAt Time   `orm:"auto_now_add" json:"created_at"`
-	User      *User  `orm:"rel(fk)" json:"user"`
-	CodeToken string `orm:"null;size(40)" json:"code_token"` // API Token for Code Service. Can be null if auth doesn't support it.
 }
 
 type Search struct {

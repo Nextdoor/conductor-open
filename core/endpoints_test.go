@@ -71,7 +71,8 @@ func TestAuthEndpointAuthorized(t *testing.T) {
 
 	// Create a request to hit the handler.
 	req, err := http.NewRequest("GET", "/test-auth", nil)
-	req.AddCookie(testData.TokenCookie)
+	req.Header.Add("X-Conductor-User", testData.User.Name)
+	req.Header.Add("X-Conductor-Email", testData.User.Email)
 	assert.NoError(t, err)
 	res := httptest.NewRecorder()
 

@@ -39,7 +39,8 @@ func TestGetConfig(t *testing.T) {
 	// Get config from endpoint and compare against config from dataClient.
 	path := "/api/config"
 	req, err := http.NewRequest("GET", path, nil)
-	req.AddCookie(testData.TokenCookie)
+	req.Header.Add("X-Conductor-User", testData.User.Name)
+	req.Header.Add("X-Conductor-Email", testData.User.Email)
 	assert.NoError(t, err)
 	res := httptest.NewRecorder()
 	server.ServeHTTP(res, req)
@@ -77,7 +78,8 @@ func TestGetAndSetMode(t *testing.T) {
 	// Get mode from endpoint and ensure schedule.
 	path := "/api/mode"
 	req, err := http.NewRequest("GET", path, nil)
-	req.AddCookie(testData.TokenCookie)
+	req.Header.Add("X-Conductor-User", testData.User.Name)
+	req.Header.Add("X-Conductor-Email", testData.User.Email)
 	assert.NoError(t, err)
 	res := httptest.NewRecorder()
 	server.ServeHTTP(res, req)
@@ -97,10 +99,11 @@ func TestGetAndSetMode(t *testing.T) {
 		fmt.Sprintf(`{"result":"%s"}`, types.Manual.String()))
 
 	// Set mode to manual by endpoint, ensure failure on non-admin.
-	settings.CustomizeAdminUsers([]string{}) // Remove admin users.
+	settings.CustomizeAdminEmails([]string{}) // Remove admin users.
 	form := url.Values{"mode": []string{"manual"}}
 	req, err = http.NewRequest("POST", path, strings.NewReader(form.Encode()))
-	req.AddCookie(testData.TokenCookie)
+	req.Header.Add("X-Conductor-User", testData.User.Name)
+	req.Header.Add("X-Conductor-Email", testData.User.Email)
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	assert.NoError(t, err)
 	res = httptest.NewRecorder()
@@ -108,12 +111,13 @@ func TestGetAndSetMode(t *testing.T) {
 	assert.Contains(t, res.Body.String(), AdminPermissionMessage)
 
 	// Set current user to an admin user.
-	settings.CustomizeAdminUsers([]string{testData.User.Email})
+	settings.CustomizeAdminEmails([]string{testData.User.Email})
 
 	// Set mode to manual by endpoint.
 	form = url.Values{"mode": []string{"manual"}}
 	req, err = http.NewRequest("POST", path, strings.NewReader(form.Encode()))
-	req.AddCookie(testData.TokenCookie)
+	req.Header.Add("X-Conductor-User", testData.User.Name)
+	req.Header.Add("X-Conductor-Email", testData.User.Email)
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	assert.NoError(t, err)
 	res = httptest.NewRecorder()
@@ -128,7 +132,8 @@ func TestGetAndSetMode(t *testing.T) {
 	// Set mode to schedule by endpoint.
 	form = url.Values{"mode": []string{"schedule"}}
 	req, err = http.NewRequest("POST", path, strings.NewReader(form.Encode()))
-	req.AddCookie(testData.TokenCookie)
+	req.Header.Add("X-Conductor-User", testData.User.Name)
+	req.Header.Add("X-Conductor-Email", testData.User.Email)
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	assert.NoError(t, err)
 	res = httptest.NewRecorder()
@@ -155,7 +160,8 @@ func TestGetAndSetOptions(t *testing.T) {
 	// Get options from endpoint and ensure they are the default options set above.
 	path := "/api/options"
 	req, err := http.NewRequest("GET", path, nil)
-	req.AddCookie(testData.TokenCookie)
+	req.Header.Add("X-Conductor-User", testData.User.Name)
+	req.Header.Add("X-Conductor-Email", testData.User.Email)
 	assert.NoError(t, err)
 	res := httptest.NewRecorder()
 	server.ServeHTTP(res, req)
@@ -185,10 +191,11 @@ func TestGetAndSetOptions(t *testing.T) {
 	newOptions.CloseTime[0].StartTime.Hour = 20
 
 	// Set options by endpoint, ensure failure on non-admin.
-	settings.CustomizeAdminUsers([]string{}) // Remove admin users.
+	settings.CustomizeAdminEmails([]string{}) // Remove admin users.
 	form := url.Values{"options": []string{newOptions.String()}}
 	req, err = http.NewRequest("POST", path, strings.NewReader(form.Encode()))
-	req.AddCookie(testData.TokenCookie)
+	req.Header.Add("X-Conductor-User", testData.User.Name)
+	req.Header.Add("X-Conductor-Email", testData.User.Email)
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	assert.NoError(t, err)
 	res = httptest.NewRecorder()
@@ -196,11 +203,12 @@ func TestGetAndSetOptions(t *testing.T) {
 	assert.Contains(t, res.Body.String(), AdminPermissionMessage)
 
 	// Set current user to an admin user.
-	settings.CustomizeAdminUsers([]string{testData.User.Email})
+	settings.CustomizeAdminEmails([]string{testData.User.Email})
 
 	// Change options and ensure it worked.
 	req, err = http.NewRequest("POST", path, strings.NewReader(form.Encode()))
-	req.AddCookie(testData.TokenCookie)
+	req.Header.Add("X-Conductor-User", testData.User.Name)
+	req.Header.Add("X-Conductor-Email", testData.User.Email)
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	assert.NoError(t, err)
 	res = httptest.NewRecorder()
@@ -225,7 +233,8 @@ func TestGetAndSetOptions(t *testing.T) {
 	for _, invalidOptionString := range invalidOptionStrings {
 		form = url.Values{"options": []string{invalidOptionString}}
 		req, err = http.NewRequest("POST", path, strings.NewReader(form.Encode()))
-		req.AddCookie(testData.TokenCookie)
+		req.Header.Add("X-Conductor-User", testData.User.Name)
+		req.Header.Add("X-Conductor-Email", testData.User.Email)
 		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 		assert.NoError(t, err)
 		res = httptest.NewRecorder()

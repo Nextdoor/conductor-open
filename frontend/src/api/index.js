@@ -58,7 +58,6 @@ const train = function(trainID) {
   return uri;
 };
 const self = baseURI + '/user';
-const logout = baseURI + '/auth/logout';
 const closeTrain = function(trainID) {
   return baseURI + '/train/' + trainID + '/close';
 };
@@ -94,9 +93,6 @@ const handleResponse = (response, dispatch, receive, receiveError) => {
 
   if (response.status !== undefined) {
     switch (response.status) {
-      case 401:
-        dispatch(Actions.Token.promptLogin());
-        return;
       default:
         response.json().then((body) =>
           dispatch(receiveError(body.error))
@@ -227,18 +223,6 @@ const API = {
           dispatch,
           Actions.Train.receiveRollback,
           Actions.Train.receiveRollbackError);
-      });
-  },
-
-  logout: (dispatch) => {
-    dispatch(Actions.Token.requestLogout());
-    post(logout)
-      .then((response) => {
-        handleResponse(
-          response,
-          dispatch,
-          Actions.Token.receiveLogout,
-          Actions.Token.receiveLogoutError);
       });
   },
 

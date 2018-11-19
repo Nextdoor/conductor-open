@@ -73,7 +73,6 @@ export const trainProps = PropTypes.shape({
     name: PropTypes.string.isRequired,
     created_at: PropTypes.string.isRequired,
     email: PropTypes.string.isRequired,
-    avatar_url: PropTypes.string,
   }),
 
   tickets: PropTypes.arrayOf(ticketProps),
