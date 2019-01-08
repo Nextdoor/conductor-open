@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import Auth from 'components/Auth';
 import Header from 'containers/Header';
 import Train from 'containers/Train';
 import Search from 'containers/Search';
@@ -11,23 +10,7 @@ class App extends React.Component {
     super(props);
   }
 
-  componentWillMount() {
-    const {needToken, promptLogin, getToken} = this.props;
-    if (needToken === true && promptLogin !== true) {
-      getToken();
-    }
-  }
-
   render() {
-    const {needToken, promptLogin} = this.props;
-    if (needToken === true && promptLogin !== true) {
-      return null;
-    }
-
-    if (promptLogin) {
-      return <Auth/>;
-    }
-
     if (this.props.location.pathname.includes('/search')) {
       return this.getSearch(this.props.params);
     }
@@ -55,9 +38,6 @@ class App extends React.Component {
 }
 
 App.propTypes = {
-  needToken: PropTypes.bool.isRequired,
-  promptLogin: PropTypes.bool.isRequired,
-  getToken: PropTypes.func.isRequired,
   params: PropTypes.shape({
     trainId: PropTypes.string,
 

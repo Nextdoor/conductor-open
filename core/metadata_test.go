@@ -36,7 +36,8 @@ var (
 
 func listNamespaces() string {
 	req, _ := http.NewRequest("GET", "/api/metadata", nil)
-	req.AddCookie(testData.TokenCookie)
+	req.Header.Add("X-Conductor-User", testData.User.Name)
+	req.Header.Add("X-Conductor-Email", testData.User.Email)
 	res := httptest.NewRecorder()
 	testServer.ServeHTTP(res, req)
 	return res.Body.String()
@@ -45,7 +46,8 @@ func listNamespaces() string {
 func listKeys(namespace string) string {
 	path := fmt.Sprintf("/api/metadata/%s", namespace)
 	req, _ := http.NewRequest("GET", path, nil)
-	req.AddCookie(testData.TokenCookie)
+	req.Header.Add("X-Conductor-User", testData.User.Name)
+	req.Header.Add("X-Conductor-Email", testData.User.Email)
 	res := httptest.NewRecorder()
 	testServer.ServeHTTP(res, req)
 	return res.Body.String()
@@ -54,7 +56,8 @@ func listKeys(namespace string) string {
 func getKey(namespace, key string) string {
 	path := fmt.Sprintf("/api/metadata/%s/%s", namespace, key)
 	req, _ := http.NewRequest("GET", path, nil)
-	req.AddCookie(testData.TokenCookie)
+	req.Header.Add("X-Conductor-User", testData.User.Name)
+	req.Header.Add("X-Conductor-Email", testData.User.Email)
 	res := httptest.NewRecorder()
 	testServer.ServeHTTP(res, req)
 	return res.Body.String()
@@ -63,7 +66,8 @@ func getKey(namespace, key string) string {
 func deleteNamespace(namespace string) string {
 	path := fmt.Sprintf("/api/metadata/%s", namespace)
 	req, _ := http.NewRequest("DELETE", path, nil)
-	req.AddCookie(testData.TokenCookie)
+	req.Header.Add("X-Conductor-User", testData.User.Name)
+	req.Header.Add("X-Conductor-Email", testData.User.Email)
 	res := httptest.NewRecorder()
 	testServer.ServeHTTP(res, req)
 	return res.Body.String()
@@ -71,7 +75,8 @@ func deleteNamespace(namespace string) string {
 func deleteKey(namespace, key string) string {
 	path := fmt.Sprintf("/api/metadata/%s/%s", namespace, key)
 	req, _ := http.NewRequest("DELETE", path, nil)
-	req.AddCookie(testData.TokenCookie)
+	req.Header.Add("X-Conductor-User", testData.User.Name)
+	req.Header.Add("X-Conductor-Email", testData.User.Email)
 	res := httptest.NewRecorder()
 	testServer.ServeHTTP(res, req)
 	return res.Body.String()
@@ -88,7 +93,8 @@ func set(namespace string, newData map[string]string) string {
 
 	req, _ := http.NewRequest("POST", path, strings.NewReader(form.Encode()))
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	req.AddCookie(testData.TokenCookie)
+	req.Header.Add("X-Conductor-User", testData.User.Name)
+	req.Header.Add("X-Conductor-Email", testData.User.Email)
 	res := httptest.NewRecorder()
 	testServer.ServeHTTP(res, req)
 	return res.Body.String()
@@ -221,9 +227,9 @@ func TestMetadataGetKeyTwo(t *testing.T) {
 
 func TestMetadataSetAdminRequired(t *testing.T) {
 	// Admin permissions should be required.
-	settings.CustomizeAdminUsers([]string{}) // Remove admin users.
+	settings.CustomizeAdminEmails([]string{}) // Remove admin users.
 	assert.Contains(t, set(namespace1, nil), AdminPermissionMessage)
-	settings.CustomizeAdminUsers([]string{testData.User.Email}) // Add admin user.
+	settings.CustomizeAdminEmails([]string{testData.User.Email}) // Add admin user.
 }
 
 func TestMetadataSetNewNamespace(t *testing.T) {
@@ -268,9 +274,9 @@ func TestMetadataSetIsolation(t *testing.T) {
 
 func TestMetadataDeleteNamespaceAdminRequired(t *testing.T) {
 	// Admin permissions should be required.
-	settings.CustomizeAdminUsers([]string{}) // Remove admin users.
+	settings.CustomizeAdminEmails([]string{}) // Remove admin users.
 	assert.Contains(t, deleteNamespace(namespace1), AdminPermissionMessage)
-	settings.CustomizeAdminUsers([]string{testData.User.Email}) // Add admin user.
+	settings.CustomizeAdminEmails([]string{testData.User.Email}) // Add admin user.
 }
 
 func TestMetadataDeleteNoNamespace(t *testing.T) {
@@ -343,9 +349,9 @@ func TestMetadataDeleteNamespacesWithTwoKeys(t *testing.T) {
 
 func TestMetadataDeleteKeyAdminRequired(t *testing.T) {
 	// Admin permissions should be required.
-	settings.CustomizeAdminUsers([]string{}) // Remove admin users.
+	settings.CustomizeAdminEmails([]string{}) // Remove admin users.
 	assert.Contains(t, deleteKey(namespace1, key1), AdminPermissionMessage)
-	settings.CustomizeAdminUsers([]string{testData.User.Email}) // Add admin user.
+	settings.CustomizeAdminEmails([]string{testData.User.Email}) // Add admin user.
 }
 
 func TestMetadataDeleteKeyNoNamespace(t *testing.T) {

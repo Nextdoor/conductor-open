@@ -5,133 +5,130 @@ import (
 	"fmt"
 	"net/http"
 
-	uuid "github.com/satori/go.uuid"
-
-	"github.com/Nextdoor/conductor/services/auth"
 	"github.com/Nextdoor/conductor/services/data"
+	"github.com/Nextdoor/conductor/shared/datadog"
+	"github.com/Nextdoor/conductor/shared/flags"
 	"github.com/Nextdoor/conductor/shared/logger"
 	"github.com/Nextdoor/conductor/shared/settings"
 	"github.com/Nextdoor/conductor/shared/types"
 )
 
+var (
+	// The headers to trust for auth.
+	// This header's value should be the authed user's name. It must be set.
+	// If this header is not set, authentication will be denied.
+	authHeaderName = flags.EnvString("AUTH_HEADER_NAME", "X-Conductor-User")
+	// This header's value should be the authed user's email. It must be set.
+	// If this header is not set, authentication will be denied.
+	// This is checked against VIEWER_EMAILS to admit viewers.
+	// This is checked against USER_EMAILS to admit users.
+	// This is checked against ADMIN_EMAILS to admit admins.
+	authHeaderEmail = flags.EnvString("AUTH_HEADER_EMAIL", "X-Conductor-Email")
+	// This optional header's value should be a comma-seperated string of the authed user's groups.
+	// This is checked against VIEWER_EMAILS to admit viewers.
+	// This is checked against USER_EMAILS to admit users.
+	// This is checked against ADMIN_EMAILS to admit admins.
+	authHeaderGroups = flags.EnvString("AUTH_HEADER_GROUPS", "X-Conductor-Groups")
+
+	// Debug auth values - Only use this for dev!
+	devAuthNameOverride   = flags.EnvString("DEV_AUTH_NAME_VALUE", "")
+	devAuthEmailOverride  = flags.EnvString("DEV_AUTH_EMAIL_VALUE", "")
+	devAuthGroupsOverride = flags.EnvString("DEV_AUTH_GROUPS_VALUE", "")
+)
+
 func newAuthMiddleware() authMiddleware {
+	if devAuthNameOverride != "" {
+		datadog.Info("Auth Name override set: %s", devAuthNameOverride)
+	}
+
+	if devAuthEmailOverride != "" {
+		datadog.Info("Auth Email override set: %s", devAuthEmailOverride)
+	}
+
+	if devAuthGroupsOverride != "" {
+		datadog.Info("Auth Groups override set: %s", devAuthGroupsOverride)
+	}
+
 	return authMiddleware{}
 }
 
 type authMiddleware struct{}
 
-const AdminPermissionMessage = "Only admins can call this endpoint."
+const AdminPermissionMessage = "Only Conductor admins can use this."
+const UserPermissionMessage = "Only Conductor users can use this."
+const ViewerPermissionMessage = "Only Conductor viewers can see this."
 
 func (_ authMiddleware) Wrap(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if handler.(endpoint).needsAuth {
-			cookie, err := r.Cookie(auth.GetCookieName())
-			// Note: Only possible error is ErrNoCookie.
-			if err == http.ErrNoCookie {
+		if !handler.(endpoint).NeedsAuth() {
+			handler.ServeHTTP(w, r)
+		} else {
+			name := r.Header.Get(authHeaderName)
+			email := r.Header.Get(authHeaderEmail)
+			groups := r.Header.Get(authHeaderGroups)
+
+			fmt.Println("Headers", r.Header)
+
+			if name == "" {
+				if devAuthNameOverride != "" {
+					name = devAuthNameOverride
+				}
+			}
+
+			if email == "" {
+				if devAuthEmailOverride != "" {
+					email = devAuthEmailOverride
+				}
+			}
+
+			if groups == "" {
+				if devAuthGroupsOverride != "" {
+					groups = devAuthGroupsOverride
+				}
+			}
+
+			if name == "" || email == "" {
 				errorResponse("Unauthorized", http.StatusUnauthorized).Write(w, r)
 				return
 			}
-			token := cookie.Value
+
+			var user *types.User
+			var err error
 
 			dataClient := data.NewClient()
-			user, err := dataClient.UserByToken(token)
+			user, err = dataClient.ReadOrCreateUser(name, email)
 			if err != nil {
-				logger.Error("Error getting user by token (%s): %v", token, err)
+				logger.Error("Error getting user by email (%s): %v", email, err)
 				errorResponse("Unauthorized", http.StatusUnauthorized).Write(w, r)
 				return
 			}
-			user.IsAdmin = settings.IsAdminUser(user.Email)
 
-			// Check admin access restrictions.
+			user.IsViewer = settings.IsViewer(user.Email, groups)
+			user.IsUser = settings.IsUser(user.Email, groups)
+			user.IsAdmin = settings.IsAdmin(user.Email, groups)
+
 			if handler.(endpoint).needsAdmin && !user.IsAdmin {
+				// Check admin access restrictions.
 				errorResponse(
-					fmt.Sprintf("%s You are logged in as %s.",
-						AdminPermissionMessage, user.Name),
+					fmt.Sprintf("%s You are logged in as %s (%s).",
+						AdminPermissionMessage, user.Name, user.Email),
 					http.StatusForbidden).Write(w, r)
-				return
+			} else if handler.(endpoint).needsUser && !user.IsUser && !user.IsAdmin {
+				// Check user access restrictions.
+				errorResponse(
+					fmt.Sprintf("%s You are logged in as %s (%s).",
+						UserPermissionMessage, user.Name, user.Email),
+					http.StatusForbidden).Write(w, r)
+			} else if handler.(endpoint).needsViewer && !user.IsViewer && !user.IsUser && !user.IsAdmin {
+				// Check viewer access restrictions.
+				errorResponse(
+					fmt.Sprintf("%s You are logged in as %s (%s).",
+						ViewerPermissionMessage, user.Name, user.Email),
+					http.StatusForbidden).Write(w, r)
+			} else {
+				handler.ServeHTTP(w, r.WithContext(
+					context.WithValue(r.Context(), "user", user)))
 			}
-
-			handler.ServeHTTP(w, r.WithContext(
-				context.WithValue(r.Context(), "user", user)))
-		} else {
-			handler.ServeHTTP(w, r)
 		}
 	})
-}
-
-func authEndpoints() []endpoint {
-	return []endpoint{
-		newOpenEp("/api/auth/info", get, authInfo),
-		newOpenEp("/api/auth/login", get, authLogin),
-		newEp("/api/auth/logout", post, authLogout),
-	}
-}
-
-// Provides auth info.
-// This endpoint is currently unused, but we might want it in the future (cli?).
-func authInfo(_ *http.Request) response {
-	authService := auth.GetService()
-	authURL := authService.AuthURL(settings.GetHostname())
-	authProvider := authService.AuthProvider()
-	return dataResponse(struct {
-		URL      string `json:"url"`
-		Provider string `json:"provider"`
-	}{
-		authURL,
-		authProvider,
-	})
-}
-
-func authLogin(r *http.Request) response {
-	authService := auth.GetService()
-	dataClient := data.NewClient()
-	code, ok := r.URL.Query()["code"]
-	if !ok {
-		return errorResponse("'code' must be included in post form.", http.StatusBadRequest)
-	}
-	if len(code) != 1 {
-		return errorResponse(fmt.Sprintf("'code' in post form had %d elements; 1 expected.", len(code)),
-			http.StatusBadRequest)
-	}
-	name, email, avatar, codeToken, err := authService.Login(code[0])
-	if err != nil {
-		return errorResponse(err.Error(), http.StatusInternalServerError)
-	}
-	if name == "" || email == "" {
-		return errorResponse(
-			fmt.Sprintf("Name, email, and avatar must be set, were %s, %s, and %s respectively.",
-				name, email, avatar), http.StatusInternalServerError)
-	}
-	token := uuid.NewV4().String() // TODO: Read from env for robot user.
-	err = dataClient.WriteToken(token, name, email, avatar, codeToken)
-	if err != nil {
-		return errorResponse(err.Error(), http.StatusInternalServerError)
-	}
-
-	return loginResponse(token)
-}
-
-func authLogout(r *http.Request) response {
-	dataClient := data.NewClient()
-	authedUser := r.Context().Value("user").(*types.User)
-	err := dataClient.RevokeToken(authedUser.Token, authedUser.Email)
-	if err != nil {
-		return errorResponse(err.Error(), http.StatusInternalServerError)
-	}
-	return logoutResponse()
-}
-
-func loginResponse(token string) response {
-	return response{
-		Code:         http.StatusFound,
-		Cookie:       auth.NewCookie(token),
-		RedirectPath: "/",
-	}
-}
-
-func logoutResponse() response {
-	return response{
-		Code:   http.StatusOK,
-		Cookie: auth.EmptyCookie(),
-	}
 }
