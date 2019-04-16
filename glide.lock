@@ -1,6 +1,8 @@
-hash: ad9ae9a0e3fabbb4f19ed7815d60801cc21ac499bc97e92677a70c5bc73fdf6c
-updated: 2018-08-07T11:32:41.553503-07:00
+hash: 14f3c547b5b5f4f3dae5435c038da190eb2f427cff906e611c7e7404f8d2af48
+updated: 2019-04-15T20:12:06.76443-07:00
 imports:
+- name: github.com/andygrunwald/go-jira
+  version: 53c468062dcbcce3d44d6c031e3cb31292ffcc31
 - name: github.com/astaxie/beego
   version: f16688817aa428d10361394015b40d096b680542
   subpackages:
@@ -31,10 +33,10 @@ imports:
   version: ba5d4f7a35561e22fbdf7a39aa0070f4d460cfc0
   subpackages:
   - oid
-- name: github.com/niallo/go-jira
-  version: 04c9a59a49b91c752ceac70fec0d5eb612e49162
 - name: github.com/nlopes/slack
   version: 6519657c021b7add19c4ef48220140cca0b1657b
+- name: github.com/pkg/errors
+  version: 27936f6d90f9c8e1145f11ed52ffffbfdb9e0af7
 - name: github.com/satori/go.uuid
   version: b061729afc07e77a8aa4fad0a2fd840958f1942a
 - name: github.com/trivago/tgo
