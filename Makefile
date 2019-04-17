@@ -68,7 +68,7 @@ docker-logs:
 
 docker-tag:
 	@echo "Tagging $(DOCKER_IMAGE) as $(TARGET_DOCKER_NAME)"
-	docker tag -f $(DOCKER_IMAGE) $(TARGET_DOCKER_NAME)
+	docker tag $(DOCKER_IMAGE) $(TARGET_DOCKER_NAME)
 
 docker-push: docker-tag
 	@echo "Pushing $(DOCKER_IMAGE) to $(TARGET_DOCKER_NAME)"
@@ -77,7 +77,6 @@ docker-push: docker-tag
 docker-login:
 	@echo "Logging into $(DOCKER_REGISTRY)"
 	@docker login \
-		-e $(DOCKER_EMAIL) \
 		-u $(DOCKER_USER) \
 		-p "$(value DOCKER_PASS)" $(DOCKER_REGISTRY)
 
