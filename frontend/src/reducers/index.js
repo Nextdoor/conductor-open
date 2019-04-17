@@ -4,6 +4,7 @@ import admin from 'reducers/admin';
 import phase from 'reducers/phase';
 import search from 'reducers/search';
 import self from 'reducers/self';
+import token from 'reducers/token';
 import train from 'reducers/train';
 
 export const initialState = {
@@ -38,6 +39,15 @@ export const initialState = {
   self: {
     details: null,
     request: {
+      fetching: false,
+      error: null,
+      receivedAt: null
+    }
+  },
+  token: {
+    promptLogin: false,
+    token: null,
+    logoutRequest: {
       fetching: false,
       error: null,
       receivedAt: null
@@ -88,5 +98,6 @@ export default combineReducers({
   phase,
   search,
   self,
+  token,
   train,
 });

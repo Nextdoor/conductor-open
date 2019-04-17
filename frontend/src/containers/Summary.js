@@ -5,7 +5,6 @@ import Component from 'components/Summary';
 
 const mapStateToProps = (state) => {
   return {
-    self: state.self.details,
     train: state.train.details,
     request: state.train.request,
     requestExtend: state.train.requestExtend,

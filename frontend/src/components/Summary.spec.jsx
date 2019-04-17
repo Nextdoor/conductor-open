@@ -16,7 +16,6 @@ describe('Summary', function() {
   it('Delivering renders correctly', function() {
     const wrapper = mount(
       <Summary
-        self={user}
         train={this.train}
         extendTrain={() => {}}
         blockTrain={() => {}}
@@ -41,7 +40,6 @@ describe('Summary', function() {
     this.train.all_phase_groups[0].delivery.completed_at = '2000-01-01T00:00:00Z';
     const wrapper = mount(
       <Summary
-        self={user}
         train={this.train}
         request={completeRequest}
         extendTrain={() => {}}
@@ -62,7 +60,6 @@ describe('Summary', function() {
     this.train.not_deployable_reason = 'test reason';
     const wrapper = mount(
       <Summary
-        self={user}
         train={this.train}
         request={completeRequest}
         extendTrain={() => {}}
@@ -82,7 +79,6 @@ describe('Summary', function() {
     this.train.active_phase = Phases.Deploy;
     const wrapper = mount(
       <Summary
-        self={user}
         train={this.train}
         request={completeRequest}
         extendTrain={() => {}}
@@ -104,7 +100,6 @@ describe('Summary', function() {
     this.train.deployed_at = '2000-01-01T00:00:00Z';
     const wrapper = mount(
       <Summary
-        self={user}
         train={this.train}
         request={completeRequest}
         extendTrain={() => {}}
@@ -127,7 +122,6 @@ describe('Summary', function() {
     this.train.cancelled_at = '2000-01-01T00:00:00Z';
     const wrapper = mount(
       <Summary
-        self={user}
         train={this.train}
         request={completeRequest}
         extendTrain={() => {}}
@@ -151,7 +145,6 @@ describe('Summary', function() {
     this.train.active_phases.deploy.started_at = null;
     const wrapper = mount(
       <Summary
-        self={user}
         train={this.train}
         request={completeRequest}
         extendTrain={() => {}}

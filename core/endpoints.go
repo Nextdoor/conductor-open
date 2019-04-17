@@ -13,6 +13,7 @@ import (
 
 func Endpoints() []endpoint {
 	var endpoints []endpoint
+	endpoints = append(endpoints, authEndpoints()...)
 	endpoints = append(endpoints, codeEndpoints()...)
 	endpoints = append(endpoints, searchEndpoints()...)
 	endpoints = append(endpoints, coreEndpoints()...)
@@ -53,17 +54,14 @@ type middleware interface {
 type handlerFunc func(*http.Request) response
 
 // Creates an endpoint that requires authentication.
-// If the method is "get", it will require at least "viewer" permissions.
-// Otherwise, it will require at least "user" permissions.
 func newEp(path string, method httpMethod,
 	handler handlerFunc) endpoint {
 	return endpoint{
-		uri:         path,
-		method:      method,
-		needsViewer: true,
-		needsUser:   method != get,
-		needsAdmin:  false,
-		handler:     handler,
+		uri:        path,
+		method:     method,
+		needsAuth:  true,
+		needsAdmin: false,
+		handler:    handler,
 	}
 }
 
@@ -71,12 +69,11 @@ func newEp(path string, method httpMethod,
 func newAdminEp(path string, method httpMethod,
 	handler handlerFunc) endpoint {
 	return endpoint{
-		uri:         path,
-		method:      method,
-		needsViewer: true,
-		needsUser:   true,
-		needsAdmin:  true,
-		handler:     handler,
+		uri:        path,
+		method:     method,
+		needsAuth:  true,
+		needsAdmin: true,
+		handler:    handler,
 	}
 }
 
@@ -84,50 +81,49 @@ func newAdminEp(path string, method httpMethod,
 func newOpenEp(path string, method httpMethod,
 	handler handlerFunc) endpoint {
 	return endpoint{
-		uri:         path,
-		method:      method,
-		needsViewer: false,
-		needsUser:   false,
-		needsAdmin:  false,
-		handler:     handler,
+		uri:        path,
+		method:     method,
+		needsAuth:  false,
+		needsAdmin: false,
+		handler:    handler,
 	}
 }
 
 type endpoint struct {
 	http.Handler
 
-	uri         string
-	method      httpMethod
-	needsViewer bool
-	needsUser   bool
-	needsAdmin  bool
-	handler     handlerFunc
+	uri        string
+	method     httpMethod
+	needsAuth  bool
+	needsAdmin bool
+	handler    handlerFunc
 }
 
-func (e endpoint) NeedsAuth() bool {
-	return e.needsViewer || e.needsUser || e.needsAdmin
-}
-
-func (e endpoint) Route(r *mux.Router, handler http.Handler) {
+func (h endpoint) Route(r *mux.Router, handler http.Handler) {
 	r.NewRoute().
 		//  Support different response formats.
-		Path(fmt.Sprintf(`%s{format:(\.(json|pretty))?}`, e.uri)).
-		Methods(e.method.String()).
+		Path(fmt.Sprintf(`%s{format:(\.(json|pretty))?}`, h.uri)).
+		Methods(h.method.String()).
 		Handler(handler)
 }
 
-func (e endpoint) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	e.handler(r).Write(w, r)
+func (h endpoint) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	h.handler(r).Write(w, r)
 }
 
 type response struct {
-	Result       interface{} `json:"result,omitempty"`
-	Error        interface{} `json:"error,omitempty"`
-	Code         int         `json:"-"`
-	RedirectPath string      `json:"-"`
+	Result       interface{}  `json:"result,omitempty"`
+	Error        interface{}  `json:"error,omitempty"`
+	Code         int          `json:"-"`
+	Cookie       *http.Cookie `json:"-"`
+	RedirectPath string       `json:"-"`
 }
 
 func (resp response) Write(w http.ResponseWriter, r *http.Request) {
+	if resp.Cookie != nil {
+		http.SetCookie(w, resp.Cookie)
+	}
+
 	if resp.RedirectPath != "" {
 		http.Redirect(w, r, resp.RedirectPath, resp.Code)
 		return

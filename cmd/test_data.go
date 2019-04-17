@@ -43,7 +43,13 @@ func full() {
 
 	dataClient := data.NewClient()
 
-	_, err := dataClient.ReadOrCreateUser("robot", "robot@example.com")
+	user, err := dataClient.ReadOrCreateUser("robot", "robot@example.com")
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	token := "robot"
+	err = dataClient.WriteToken(token, user.Name, user.Email, "", "")
 	if err != nil {
 		fmt.Println(err)
 	}

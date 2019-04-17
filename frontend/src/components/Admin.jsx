@@ -140,6 +140,7 @@ Admin.propTypes = {
   self: PropTypes.shape({
     name: PropTypes.string.isRequired,
     email: PropTypes.string.isRequired,
+    avatar_url: PropTypes.string,
     is_admin: PropTypes.bool.isRequired,
   }),
   train: trainProps,

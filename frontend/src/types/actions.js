@@ -20,6 +20,14 @@ export default {
   ReceiveSelf: 'ReceiveSelf',
   ReceiveSelfError: 'ReceiveSelfError',
 
+  // Token
+  SetToken: 'SetToken',
+  PromptLogin: 'PromptLogin',
+  DeleteToken: 'DeleteToken',
+  RequestLogout: 'RequestLogout',
+  ReceiveLogout: 'ReceiveLogout',
+  ReceiveLogoutError: 'ReceiveLogoutError',
+
   // Train
   RequestTrain: 'RequestTrain',
   ReceiveTrain: 'ReceiveTrain',

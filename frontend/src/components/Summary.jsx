@@ -356,37 +356,27 @@ class Summary extends TrainComponent {
   }
 
   isTrainExtendable(train) {
-    return this.isUser() && !train.done && train.active_phases.deploy.started_at === null;
+    return !train.done && train.active_phases.deploy.started_at === null;
   }
 
   isTrainBlockable(train) {
-    return this.isUser() && !train.done && train.active_phases.deploy.started_at === null && train.blocked === false;
+    return !train.done && train.active_phases.deploy.started_at === null && train.blocked === false;
   }
 
   isTrainUnblockable(train) {
-    return this.isUser() && !train.done && train.active_phases.deploy.started_at === null && train.blocked === true;
+    return !train.done && train.active_phases.deploy.started_at === null && train.blocked === true;
   }
 
   isTrainCancellable(train) {
-    return this.isUser() && !train.done;
+    return !train.done;
   }
 
   isTrainRollbackable(train) {
-    return this.isUser() && train.can_rollback;
-  }
-
-  isUser() {
-    return this.props.self.is_user || this.props.self.is_admin;
+    return train.can_rollback;
   }
 }
 
 Summary.propTypes = {
-  self: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    email: PropTypes.string.isRequired,
-    is_user: PropTypes.bool.isRequired,
-    is_admin: PropTypes.bool.isRequired,
-  }),
   train: trainProps,
   request: requestProps.isRequired,
   extendTrain: PropTypes.func.isRequired,

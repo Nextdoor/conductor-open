@@ -37,6 +37,7 @@ func (d *data) initialize() {
 	orm.RegisterModelWithPrefix(tablePrefix, new(types.Commit))
 	orm.RegisterModelWithPrefix(tablePrefix, new(types.Ticket))
 	orm.RegisterModelWithPrefix(tablePrefix, new(types.User))
+	orm.RegisterModelWithPrefix(tablePrefix, new(types.Auth))
 	orm.RegisterModelWithPrefix(tablePrefix, new(types.Metadata))
 
 	err := d.RegisterDB()
@@ -964,6 +965,72 @@ func (d *dataClient) TrainsByCommit(commit *types.Commit) ([]*types.Train, error
 
 /* User */
 
+func (d *dataClient) WriteToken(newToken, name, email, avatar, codeToken string) error {
+	user := types.User{
+		Email: email,
+	}
+
+	// Read by email.
+	_, _, err := d.Client.ReadOrCreate(&user, "Email")
+	if err != nil {
+		return err
+	}
+
+	auth := types.Auth{
+		User:      &user,
+		Token:     newToken,
+		CodeToken: codeToken,
+	}
+
+	tokens := make([]*types.Auth, 0)
+	query := d.Client.QueryTable(&types.Auth{})
+	query = query.Filter("User", &user)
+	_, err = query.All(&tokens)
+	if err != nil && err != orm.ErrNoRows {
+		return err
+	} else {
+		// Insert a new token (including the code token).
+		_, err = d.Client.Insert(&auth)
+		if err != nil && err.Error() != "no LastInsertId available" {
+			return err
+		}
+	}
+	// Update name and avatar.
+	user.Name = name
+	user.AvatarURL = avatar
+	_, err = d.Client.Update(&user)
+	if err != nil {
+		return err
+	}
+	datadog.Info("Wrote token %v", auth.Token)
+	return nil
+}
+
+func (d *dataClient) RevokeToken(oldToken, email string) error {
+	// Find auth data for token.
+	auth := types.Auth{
+		Token: oldToken,
+	}
+	err := d.Client.Read(&auth, "Token")
+	if err != nil {
+		return err
+	}
+
+	// Verify email / token combination.
+	_, err = d.Client.LoadRelated(&auth, "User")
+	if err != nil {
+		return err
+	}
+	if auth.User.Email != email {
+		return errors.New("Token and email don't match.")
+	}
+
+	// Delete.
+	_, err = d.Client.Delete(&auth)
+	datadog.Info("Revoked token %v", auth.Token)
+	return err
+}
+
 func (d *dataClient) ReadOrCreateUser(name, email string) (*types.User, error) {
 	user := types.User{Name: name, Email: email}
 
@@ -974,6 +1041,22 @@ func (d *dataClient) ReadOrCreateUser(name, email string) (*types.User, error) {
 	}
 	datadog.Info("Read/Created user (ID, Name) %v, %v", user.ID, user.Name)
 	return &user, nil
+}
+
+func (d *dataClient) UserByToken(token string) (*types.User, error) {
+	auth := types.Auth{Token: token}
+	err := d.Client.Read(&auth)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = d.Client.LoadRelated(&auth, "User")
+	if err != nil {
+		return nil, err
+	}
+
+	auth.User.Token = token
+	return auth.User, nil
 }
 
 /* Ticket */

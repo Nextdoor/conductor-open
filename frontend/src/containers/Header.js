@@ -16,6 +16,9 @@ const mapDispatchToProps = (dispatch) => {
     load: () => {
       dispatch(Actions.Self.fetch());
     },
+    logout: () => {
+      dispatch(Actions.Token.logout());
+    }
   };
 };
 

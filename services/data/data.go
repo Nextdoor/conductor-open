@@ -62,7 +62,10 @@ type Client interface {
 	LatestCommitForTrain(*types.Train) (*types.Commit, error)
 	TrainsByCommit(*types.Commit) ([]*types.Train, error)
 
+	WriteToken(newToken, name, email, avatar, codeToken string) error
+	RevokeToken(oldToken, email string) error
 	ReadOrCreateUser(name, email string) (*types.User, error)
+	UserByToken(token string) (*types.User, error)
 
 	WriteTickets([]*types.Ticket) error
 	UpdateTickets([]*types.Ticket) error

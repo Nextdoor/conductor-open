@@ -11,6 +11,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Nextdoor/conductor/services/auth"
 	"github.com/Nextdoor/conductor/shared/flags"
 	"github.com/Nextdoor/conductor/shared/logger"
 	"github.com/Nextdoor/conductor/shared/types"
@@ -180,6 +181,7 @@ func fakeStartJob(jobName string, trainID, phaseID uint64) error {
 		return err
 	}
 
+	req.AddCookie(auth.NewCookie("robot"))
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -201,6 +203,7 @@ func fakeCompleteJob(jobName string, trainID, phaseID, result uint64) error {
 		return err
 	}
 
+	req.AddCookie(auth.NewCookie("robot"))
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {

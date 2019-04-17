@@ -104,6 +104,7 @@ export const newTrain = {
     name: 'Rob Mackenzie',
     created_at: '2000-01-01T00:00:00Z',
     email: 'rob@nextdoor.com',
+    avatar_url: null,
   },
 
   tickets: [ticket1, ticket2],
@@ -156,14 +157,15 @@ export const configManual = {
 
 export const user = {
   is_admin: false,
-  is_user: true,
   name: 'Regular User',
   email: 'user@domain.com',
+  avatar_url: null,
+
 };
 
 export const adminUser = {
   is_admin: true,
-  is_user: true,
   name: 'Admin User',
   email: 'admin@domain.com',
+  avatar_url: null,
 };
