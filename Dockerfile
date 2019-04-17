@@ -1,4 +1,4 @@
-FROM golang:1.9.2-stretch
+FROM golang:1.11.9-stretch
 ENTRYPOINT [ "/app/entrypoint.sh" ]
 EXPOSE 80 443
 
@@ -18,6 +18,12 @@ RUN mkdir -p /app/ssl && cd /app/ssl && \
 # Generate swagger docs.
 ADD swagger/swagger.yml swagger/config.json /app/swagger/
 RUN pretty-swag -c /app/swagger/config.json
+
+# Add awscli
+RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
+    python get-pip.py && \
+    pip install awscli && \
+    rm -f get-pip.py
 
 # Set up Go app.
 ADD .build /go/src/github.com/Nextdoor/conductor/

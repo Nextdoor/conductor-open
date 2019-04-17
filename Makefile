@@ -29,6 +29,7 @@ define ARGS
 --env LOGLEVEL=DEBUG \
 --env-file envfile \
 --volume $(shell pwd)/resources/frontend:/app/frontend \
+--volume $(HOME)/.aws:/root/.aws \
 --publish 80:80 \
 --publish 443:443 \
 --link conductor-postgres
