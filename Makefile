@@ -57,10 +57,11 @@ docker-build:
 
 docker-run: docker-stop
 	@echo "Running $(DOCKER_IMAGE)"
-	[ -e envfile ] || touch envfile
+	@[ -e envfile ] || touch envfile
 	docker run $$ARGS $$NETWORK_ARGS $$INTERACTIVE_ARGS --name $(DOCKER_IMAGE) $(DOCKER_IMAGE)
 
 docker-test:
+	@[ -e envfile ] || touch envfile
 	docker run $$ARGS $(DOCKER_IMAGE) $$TEST_ARGS
 
 docker-stop:
