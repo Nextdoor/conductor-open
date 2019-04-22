@@ -120,8 +120,8 @@ postgres-perm:
 	docker run $$PG_ARGS -v $$HOME/data/conductor:$(PGDATA) postgres
 
 postgres-wipe:
-	PGPASSWORD=conductor dropdb -h localhost -U conductor conductor || true
-	PGPASSWORD=conductor createdb -h localhost -U conductor conductor || true
+	docker exec conductor-postgres dropdb -h localhost -U conductor conductor || true
+	docker exec conductor-postgres createdb -h localhost -U conductor conductor || true
 
 psql:
 	PGPASSWORD=$(PGPASS) \
