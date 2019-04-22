@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	jira "github.com/niallo/go-jira"
+	jira "github.com/andygrunwald/go-jira"
 
 	"github.com/Nextdoor/conductor/shared/datadog"
 	"github.com/Nextdoor/conductor/shared/flags"
@@ -19,7 +19,7 @@ import (
 var (
 	jiraURL             = flags.EnvString("JIRA_URL", "")
 	jiraUsername        = flags.EnvString("JIRA_USERNAME", "")
-	jiraPassword        = flags.EnvString("JIRA_PASSWORD", "")
+	jiraApiToken        = flags.EnvString("JIRA_API_TOKEN", "")
 	jiraProject         = flags.EnvString("JIRA_PROJECT", "")
 	jiraParentIssueType = flags.EnvString("JIRA_PARENT_ISSUE_TYPE", "")
 	jiraIssueType       = flags.EnvString("JIRA_ISSUE_TYPE", "")
@@ -44,8 +44,8 @@ func newJIRA() *JIRA {
 	if jiraUsername == "" {
 		panic(errors.New("jira_username flag must be set."))
 	}
-	if jiraPassword == "" {
-		panic(errors.New("jira_password flag must be set."))
+	if jiraApiToken == "" {
+		panic(errors.New("jira_api_token flag must be set."))
 	}
 	if jiraProject == "" {
 		panic(errors.New("jira_project flag must be set."))
@@ -57,13 +57,13 @@ func newJIRA() *JIRA {
 		panic(errors.New("jira_issue_type flag must be set."))
 	}
 
-	var err error
-	jiraClient, err = jira.NewClient(nil, jiraURL)
-	if err != nil {
-		panic(err)
+	tp := jira.BasicAuthTransport{
+		Username: jiraUsername,
+		Password: jiraApiToken,
 	}
 
-	_, err = jiraClient.Authentication.AcquireSessionCookie(jiraUsername, jiraPassword)
+	var err error
+	jiraClient, err = jira.NewClient(tp.Client(), jiraURL)
 	if err != nil {
 		panic(err)
 	}
@@ -102,7 +102,7 @@ func (t *JIRA) DeleteTickets(train *types.Train) error {
 	if err != nil {
 		return err
 	}
-	resp, err := jiraClient.Issue.Delete(parentIssue.Key, true)
+	resp, err := jiraClient.Issue.Delete(parentIssue.Key)
 	if err != nil {
 		return parseBodyError(resp, err)
 	}
@@ -429,10 +429,10 @@ func commitsByEmail(commits []*types.Commit) map[string][]*types.Commit {
 
 // If not found, returns DefaultTicketUsername.
 func emailToUsernameInJIRA(email string) string {
-	users, resp, err := jiraClient.User.FindUsers(email, nil)
+	users, resp, err := jiraClient.User.Find(email)
 	if err != nil {
 		err = parseBodyError(resp, err)
-		logger.Error("Error finding JIRA user for email %s: %v: %s", email, err)
+		logger.Error("Error finding JIRA user for email %s: %v", email, err)
 		return DefaultTicketUsername
 	}
 
