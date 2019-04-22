@@ -25,14 +25,16 @@ glide:
 	glide install
 
 define ARGS
---name $(DOCKER_IMAGE) \
 --env LOGLEVEL=DEBUG \
 --env-file envfile \
 --volume $(shell pwd)/resources/frontend:/app/frontend \
 --volume $(HOME)/.aws:/root/.aws \
+--link conductor-postgres
+endef
+
+define NETWORK_ARGS
 --publish 80:80 \
 --publish 443:443 \
---link conductor-postgres
 --hostname conductor-dev
 endef
 
@@ -43,6 +45,7 @@ INTERACTIVE_ARGS = -it
 endif
 
 export ARGS
+export NETWORK_ARGS
 export INTERACTIVE_ARGS
 
 .PHONY: docker-build docker-run docker-stop docker-logs docker-tag docker-push docker-login docker-populate-cache
@@ -55,7 +58,10 @@ docker-build:
 docker-run: docker-stop
 	@echo "Running $(DOCKER_IMAGE)"
 	[ -e envfile ] || touch envfile
-	docker run $$ARGS $$INTERACTIVE_ARGS $(DOCKER_IMAGE)
+	docker run $$ARGS $$NETWORK_ARGS $$INTERACTIVE_ARGS --name $(DOCKER_IMAGE) $(DOCKER_IMAGE)
+
+docker-test:
+	docker run $$ARGS $(DOCKER_IMAGE) $$TEST_ARGS
 
 docker-stop:
 	@echo "Stopping $(DOCKER_IMAGE)"

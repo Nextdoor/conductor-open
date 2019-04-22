@@ -2,6 +2,12 @@
 set -e
 set -o pipefail
 
+if [[ "$#" != "0" ]]; then
+    cd /go/src/github.com/Nextdoor/conductor
+    go test $@
+    exit 0
+fi
+
 # Set timezone.
 export TZ=${TIMEZONE:-"America/Los_Angeles"}
 

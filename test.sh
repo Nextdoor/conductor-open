@@ -28,13 +28,6 @@ run_tests() {
     local tags=$2
     local mode=$3
 
-    if [[ $test_dirs == "" ]]; then
-        test_dirs='./cmd/... ./core/... ./services/... ./shared/...'
-    else
-        # For each dir in test_dirs, transform "$dir" -> "./$dir/..."
-        test_dirs=$(echo "$test_dirs" | awk '{for (i=1;i<=NF;i++) print "./"$i"/..."}')
-    fi
-
     if [[ $tags != "" ]]; then
         tags="-tags \"$tags\""
     fi
@@ -44,9 +37,8 @@ run_tests() {
         parallelism="-p 1"
     fi
 
-    local cmd="go test $parallelism $test_dirs $tags"
-    echo "$cmd"
-    eval "$cmd"
+    local test_args="$parallelism ./... $tags"
+    TEST_ARGS="$test_args" make docker-test
 }
 
 test_style() {
