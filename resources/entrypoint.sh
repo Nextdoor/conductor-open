@@ -2,12 +2,6 @@
 set -e
 set -o pipefail
 
-if [[ "$#" != "0" ]]; then
-    cd /go/src/github.com/Nextdoor/conductor
-    go test $@
-    exit 0
-fi
-
 # Set timezone.
 export TZ=${TIMEZONE:-"America/Los_Angeles"}
 
@@ -26,12 +20,26 @@ SECRETS="GITHUB_ADMIN_TOKEN GITHUB_AUTH_CLIENT_SECRET GITHUB_WEBHOOK_SECRET JENK
 for SECRET in $SECRETS; do
     BLOB_NAME="${SECRET}_BLOB"
     if [[ -n "${!BLOB_NAME}" ]]; then
-        echo "Decoding ${BLOB_NAME}."
-        DECRYPTED=$(kms_decrypt "${!BLOB_NAME}")
-        declare "${SECRET}=${DECRYPTED}"
-        export "${SECRET}"
+        (
+            echo "Decoding ${BLOB_NAME}."
+            DECRYPTED=$(kms_decrypt "${!BLOB_NAME}")
+            echo "${SECRET}='${DECRYPTED}'" >> /tmp/secrets
+        ) &
     fi
 done
+
+wait
+
+set -a
+source /tmp/secrets
+set +a
+rm -rf /tmp/secrets
+
+if [[ "$#" != "0" ]]; then
+    cd /go/src/github.com/Nextdoor/conductor
+    go test "$@"
+    exit 0
+fi
 
 # Check if the CLIENT_USER_SECRET variables was passed in - if so, this
 # variable will contain our database username and password through a call to

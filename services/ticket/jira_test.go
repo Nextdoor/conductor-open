@@ -94,9 +94,9 @@ func TestJIRATickets(t *testing.T) {
 	train.Tickets = append(train.Tickets, newTickets[0])
 
 	// Test that deletion is detected.
-	_, err = jiraClient.Issue.Delete(train.Tickets[0].Key, false)
+	_, err = jiraClient.Issue.Delete(train.Tickets[0].Key)
 	assert.NoError(t, err)
-	_, err = jiraClient.Issue.Delete(train.Tickets[1].Key, false)
+	_, err = jiraClient.Issue.Delete(train.Tickets[1].Key)
 	assert.NoError(t, err)
 
 	newTickets, updatedTickets, err = jiraService.SyncTickets(train)

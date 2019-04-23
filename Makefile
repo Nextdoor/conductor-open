@@ -44,11 +44,18 @@ ifeq ($(INTERACTIVE),true)
 INTERACTIVE_ARGS = -it
 endif
 
+define TEST_ARGS
+--env-file testenv
+endef
+
 export ARGS
 export NETWORK_ARGS
 export INTERACTIVE_ARGS
+export TEST_ARGS
 
-.PHONY: docker-build docker-run docker-stop docker-logs docker-tag docker-push docker-login docker-populate-cache
+TEST_CMD ?= "./..."
+
+.PHONY: docker-build docker-run docker-test docker-stop docker-logs docker-tag docker-push docker-login docker-populate-cache
 
 docker-build:
 	rm -rf .build && mkdir .build && cp -rf  cmd core services shared vendor .build
@@ -61,8 +68,9 @@ docker-run: docker-stop
 	docker run $$ARGS $$NETWORK_ARGS $$INTERACTIVE_ARGS --name $(DOCKER_IMAGE) $(DOCKER_IMAGE)
 
 docker-test:
+	@[ -e testenv ] || touch testenv
 	@[ -e envfile ] || touch envfile
-	docker run $$ARGS $(DOCKER_IMAGE) $$TEST_ARGS
+	docker run $$ARGS $$INTERACTIVE_ARGS $$TEST_ARGS $(DOCKER_IMAGE) $(TEST_CMD)
 
 docker-stop:
 	@echo "Stopping $(DOCKER_IMAGE)"
