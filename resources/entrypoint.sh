@@ -17,6 +17,7 @@ kms_decrypt () {
 
 SECRETS="GITHUB_ADMIN_TOKEN GITHUB_AUTH_CLIENT_SECRET GITHUB_WEBHOOK_SECRET JENKINS_PASSWORD SLACK_TOKEN JIRA_API_TOKEN"
 # Try to decrypt the various KMS blobs, if they're set.
+touch /tmp/secrets
 for SECRET in $SECRETS; do
     BLOB_NAME="${SECRET}_BLOB"
     if [[ -n "${!BLOB_NAME}" ]]; then
