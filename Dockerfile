@@ -4,7 +4,7 @@ EXPOSE 80 443
 
 # Install packages.
 RUN curl -sL https://deb.nodesource.com/setup_9.x | bash - && \
-    apt-get install -y nginx nodejs patch unzip && \
+    apt-get install -y jq nginx nodejs patch unzip && \
     apt-get clean && \
     npm install -g pretty-swag@0.1.144
 
