@@ -1,8 +1,6 @@
-hash: 14f3c547b5b5f4f3dae5435c038da190eb2f427cff906e611c7e7404f8d2af48
-updated: 2019-04-15T20:12:06.76443-07:00
+hash: b5d9e40e7460b465d299116019c7e60d9e1d479d541e205cf0b78a3a44164b74
+updated: 2019-04-24T12:01:50.057161-07:00
 imports:
-- name: github.com/andygrunwald/go-jira
-  version: 53c468062dcbcce3d44d6c031e3cb31292ffcc31
 - name: github.com/astaxie/beego
   version: f16688817aa428d10361394015b40d096b680542
   subpackages:
@@ -33,6 +31,8 @@ imports:
   version: ba5d4f7a35561e22fbdf7a39aa0070f4d460cfc0
   subpackages:
   - oid
+- name: github.com/Nextdoor/go-jira
+  version: 1c43ea14716de91dc78aa4dd38b4a6b81cabf829
 - name: github.com/nlopes/slack
   version: 6519657c021b7add19c4ef48220140cca0b1657b
 - name: github.com/pkg/errors

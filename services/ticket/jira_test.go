@@ -5,7 +5,7 @@ package ticket
 import (
 	"testing"
 
-	jira "github.com/andygrunwald/go-jira"
+	"github.com/Nextdoor/go-jira"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/Nextdoor/conductor/shared/types"

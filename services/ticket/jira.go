@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/andygrunwald/go-jira"
+	"github.com/Nextdoor/go-jira"
 
 	"github.com/Nextdoor/conductor/shared/datadog"
 	"github.com/Nextdoor/conductor/shared/flags"

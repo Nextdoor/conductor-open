@@ -42,6 +42,8 @@ endef
 INTERACTIVE = $(shell [ "`tty`" != "not a tty" ] && echo true || echo false)
 ifeq ($(INTERACTIVE),true)
 INTERACTIVE_ARGS = -it
+else
+INTERACTIVE_ARGS =
 endif
 
 define TEST_ARGS
