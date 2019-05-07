@@ -25,13 +25,16 @@ glide:
 	glide install
 
 define ARGS
---name $(DOCKER_IMAGE) \
 --env LOGLEVEL=DEBUG \
 --env-file envfile \
 --volume $(shell pwd)/resources/frontend:/app/frontend \
+--volume $(HOME)/.aws:/root/.aws \
+--link conductor-postgres
+endef
+
+define NETWORK_ARGS
 --publish 80:80 \
 --publish 443:443 \
---link conductor-postgres
 --hostname conductor-dev
 endef
 
@@ -39,12 +42,22 @@ endef
 INTERACTIVE = $(shell [ "`tty`" != "not a tty" ] && echo true || echo false)
 ifeq ($(INTERACTIVE),true)
 INTERACTIVE_ARGS = -it
+else
+INTERACTIVE_ARGS =
 endif
 
-export ARGS
-export INTERACTIVE_ARGS
+define TEST_ARGS
+--env-file testenv
+endef
 
-.PHONY: docker-build docker-run docker-stop docker-logs docker-tag docker-push docker-login docker-populate-cache
+export ARGS
+export NETWORK_ARGS
+export INTERACTIVE_ARGS
+export TEST_ARGS
+
+TEST_CMD ?= "./..."
+
+.PHONY: docker-build docker-run docker-test docker-stop docker-logs docker-tag docker-push docker-login docker-populate-cache
 
 docker-build:
 	rm -rf .build && mkdir .build && cp -rf  cmd core services shared vendor .build
@@ -53,8 +66,13 @@ docker-build:
 
 docker-run: docker-stop
 	@echo "Running $(DOCKER_IMAGE)"
-	[ -e envfile ] || touch envfile
-	docker run $$ARGS $$INTERACTIVE_ARGS $(DOCKER_IMAGE)
+	@[ -e envfile ] || touch envfile
+	docker run $$ARGS $$NETWORK_ARGS $$INTERACTIVE_ARGS --name $(DOCKER_IMAGE) $(DOCKER_IMAGE)
+
+docker-test:
+	@[ -e testenv ] || touch testenv
+	@[ -e envfile ] || touch envfile
+	docker run $$ARGS $$INTERACTIVE_ARGS $$TEST_ARGS $(DOCKER_IMAGE) $(TEST_CMD)
 
 docker-stop:
 	@echo "Stopping $(DOCKER_IMAGE)"
@@ -67,7 +85,7 @@ docker-logs:
 
 docker-tag:
 	@echo "Tagging $(DOCKER_IMAGE) as $(TARGET_DOCKER_NAME)"
-	docker tag -f $(DOCKER_IMAGE) $(TARGET_DOCKER_NAME)
+	docker tag $(DOCKER_IMAGE) $(TARGET_DOCKER_NAME)
 
 docker-push: docker-tag
 	@echo "Pushing $(DOCKER_IMAGE) to $(TARGET_DOCKER_NAME)"
@@ -76,7 +94,6 @@ docker-push: docker-tag
 docker-login:
 	@echo "Logging into $(DOCKER_REGISTRY)"
 	@docker login \
-		-e $(DOCKER_EMAIL) \
 		-u $(DOCKER_USER) \
 		-p "$(value DOCKER_PASS)" $(DOCKER_REGISTRY)
 
@@ -120,8 +137,8 @@ postgres-perm:
 	docker run $$PG_ARGS -v $$HOME/data/conductor:$(PGDATA) postgres
 
 postgres-wipe:
-	PGPASSWORD=conductor dropdb -h localhost -U conductor conductor || true
-	PGPASSWORD=conductor createdb -h localhost -U conductor conductor || true
+	docker exec conductor-postgres dropdb -h localhost -U conductor conductor || true
+	docker exec conductor-postgres createdb -h localhost -U conductor conductor || true
 
 psql:
 	PGPASSWORD=$(PGPASS) \

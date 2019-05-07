@@ -28,13 +28,6 @@ run_tests() {
     local tags=$2
     local mode=$3
 
-    if [[ $test_dirs == "" ]]; then
-        test_dirs='./cmd/... ./core/... ./services/... ./shared/...'
-    else
-        # For each dir in test_dirs, transform "$dir" -> "./$dir/..."
-        test_dirs=$(echo "$test_dirs" | awk '{for (i=1;i<=NF;i++) print "./"$i"/..."}')
-    fi
-
     if [[ $tags != "" ]]; then
         tags="-tags \"$tags\""
     fi
@@ -44,9 +37,7 @@ run_tests() {
         parallelism="-p 1"
     fi
 
-    local cmd="go test $parallelism $test_dirs $tags"
-    echo "$cmd"
-    eval "$cmd"
+    TEST_CMD="$parallelism ./... $tags" make docker-test
 }
 
 test_style() {
@@ -74,42 +65,32 @@ test_unit() {
 }
 
 test_integration() {
-    if [[ -e testenv ]]; then
-        set -a; source testenv; set +a
-    fi
+    touch testenv
 
     test_types=()
     test_typed_formatted=()
 
-    case "$DATA_IMPL" in
-        "postgres")
-            reset_postgres
-            export POSTGRES_HOST=localhost
-            test_types+=("data")
-            test_typed_formatted+=("Data: Postgres")
-            ;;
-    esac
+    if grep "DATA_IMPL=postgres" testenv > /dev/null; then
+        reset_postgres
+        export POSTGRES_HOST=localhost
+        test_types+=("data")
+        test_typed_formatted+=("Data: Postgres")
+    fi
 
-    case "$MESSAGING_IMPL" in
-        "slack")
-            test_types+=("messaging")
-            test_typed_formatted+=("Messaging: Slack")
-            ;;
-    esac
+    if grep "MESSAGING_IMPL=slack" testenv > /dev/null; then
+        test_types+=("messaging")
+        test_typed_formatted+=("Messaging: Slack")
+    fi
 
-    case "$PHASE_IMPL" in
-        "jenkins")
-            test_types+=("phase")
-            test_typed_formatted+=("Phase: Jenkins")
-            ;;
-    esac
+    if grep "PHASE_IMPL=jenkins" testenv > /dev/null; then
+        test_types+=("phase")
+        test_typed_formatted+=("Phase: Jenkins")
+    fi
 
-    case "$TICKET_IMPL" in
-        "jira")
-            test_types+=("ticket")
-            test_typed_formatted+=("Ticket: JIRA")
-            ;;
-    esac
+    if grep "TICKET_IMPL=jira" testenv > /dev/null; then
+        test_types+=("ticket")
+        test_typed_formatted+=("Ticket: JIRA")
+    fi
 
     test_types_display=$(join_by ', ' "${test_typed_formatted[@]}")
     if [[ "$test_types_display" == "" ]]; then

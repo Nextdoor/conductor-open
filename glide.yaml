@@ -8,7 +8,7 @@ import:
   - github
 - package: github.com/gorilla/mux
 - package: github.com/lib/pq
-- package: github.com/andygrunwald/go-jira
+- package: github.com/Nextdoor/go-jira
 - package: github.com/nlopes/slack
 - package: github.com/satori/go.uuid
 - package: github.com/xeipuuv/gojsonschema
