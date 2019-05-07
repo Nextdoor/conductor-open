@@ -24,7 +24,7 @@ var (
 	slackEmailUserCacheUnixTime int64
 )
 
-const SLACK_CACHE_TTL = 60
+const SlackCacheTtl = 60
 
 type slackEngine struct {
 	api *slack.Client
@@ -55,10 +55,9 @@ func (e *slackEngine) sendDirect(name, email, text string) {
 
 func (e *slackEngine) sendToSlack(destination, text string) {
 	logger.Info("%s", text)
-	params := slack.NewPostMessageParameters()
-	params.AsUser = true
-	params.EscapeText = false
-	_, _, err := e.api.PostMessage(destination, text, params)
+	_, _, err := e.api.PostMessage(destination,
+		slack.MsgOptionText(text, false),
+		slack.MsgOptionAsUser(true))
 	if err != nil {
 		logger.Error("%v", err)
 	}
@@ -105,16 +104,16 @@ func (e *slackEngine) escape(text string) string {
 	return text
 }
 
-func (m *slackEngine) cacheSlackUsers() (map[string]*slack.User, error) {
+func (e *slackEngine) cacheSlackUsers() (map[string]*slack.User, error) {
 	// We maintain a cache of email address to Slack user.
 	// This is required to map a commit author to a Slack user we can @-mention.
 	// Since Slack users can change their handles, we only keep the cache for SLACK_CACHE_TTL seconds.
 	now := time.Now()
 
-	if slackEmailUserCacheUnixTime == 0 || now.Unix()-slackEmailUserCacheUnixTime > SLACK_CACHE_TTL {
+	if slackEmailUserCacheUnixTime == 0 || now.Unix()-slackEmailUserCacheUnixTime > SlackCacheTtl {
 		slackEmailUserCache = make(map[string]*slack.User, 200)
 
-		users, err := m.api.GetUsers()
+		users, err := e.api.GetUsers()
 		if err != nil {
 			logger.Error("Could not fetch Slack users list: %v", err)
 			if slackEmailUserCacheUnixTime == 0 {
@@ -139,8 +138,8 @@ func (m *slackEngine) cacheSlackUsers() (map[string]*slack.User, error) {
 	return slackEmailUserCache, nil
 }
 
-func (m *slackEngine) emailToSlackUser(email string) (*slack.User, error) {
-	users, err := m.cacheSlackUsers()
+func (e *slackEngine) emailToSlackUser(email string) (*slack.User, error) {
+	users, err := e.cacheSlackUsers()
 	if err != nil {
 		return nil, err
 	}

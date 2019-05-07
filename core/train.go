@@ -16,6 +16,7 @@ import (
 	"github.com/Nextdoor/conductor/services/messaging"
 	"github.com/Nextdoor/conductor/services/phase"
 	"github.com/Nextdoor/conductor/services/ticket"
+	"github.com/Nextdoor/conductor/shared/datadog"
 	"github.com/Nextdoor/conductor/shared/logger"
 	"github.com/Nextdoor/conductor/shared/settings"
 	"github.com/Nextdoor/conductor/shared/types"
@@ -151,6 +152,9 @@ func CreateTrain(
 		return nil
 	}
 
+	train.SendCommitCountMetrics()
+
+	datadog.Incr("train.create", train.DatadogTags())
 	messagingService.TrainCreation(train, commits)
 
 	clearLatestTrainCache()
@@ -181,6 +185,9 @@ func ExtendTrain(
 		return
 	}
 
+	datadog.Incr("train.extend", train.DatadogTags())
+	train.SendCommitCountMetrics()
+
 	messagingService.TrainExtension(train, commits, requester)
 
 	clearLatestTrainCache()
@@ -197,6 +204,9 @@ func DuplicateTrain(
 		logger.Error("Error duplicating train: %v", err)
 		return nil
 	}
+
+	datadog.Incr("train.duplicate", train.DatadogTags())
+	train.SendCommitCountMetrics()
 
 	messagingService.TrainDuplication(train, oldTrain, commits)
 
@@ -282,6 +292,25 @@ func deployTrain(
 	if !train.IsDeployable() {
 		// The train isn't deployable.
 		return
+	}
+
+	options, err := dataClient.Options()
+	if err != nil {
+		logger.Error("Error getting options: %v", err)
+		return
+	}
+	inRegularHours := false
+	for _, interval := range options.CloseTime {
+		if interval.Includes(time.Now()) {
+			inRegularHours = true
+		}
+	}
+
+	datadog.Incr("train.deploy", train.DatadogTags())
+	if inRegularHours {
+		datadog.Incr("train.deploy.regular_hours", train.DatadogTags())
+	} else {
+		datadog.Incr("train.deploy.after_hours", train.DatadogTags())
 	}
 
 	messagingService.TrainDeploying()
@@ -590,6 +619,8 @@ func blockTrain(r *http.Request) response {
 			http.StatusInternalServerError)
 	}
 
+	datadog.Incr("train.block", train.DatadogTags())
+
 	authedUser := r.Context().Value("user").(*types.User)
 
 	messagingService := messaging.GetService()
@@ -618,6 +649,8 @@ func unblockTrain(r *http.Request) response {
 			"Train is not blocked",
 			http.StatusBadRequest)
 	}
+
+	datadog.Incr("train.unblock", train.DatadogTags())
 
 	err := dataClient.UnblockTrain(train)
 	if err != nil {
@@ -658,6 +691,24 @@ func cancelTrain(r *http.Request) response {
 			fmt.Sprintf("Error cancelling train: %v", err),
 			http.StatusInternalServerError)
 	}
+
+	datadog.Incr("train.cancel", train.DatadogTags())
+
+	duration := train.CancelledAt.Value.Sub(train.CreatedAt.Value)
+
+	options, err := dataClient.Options()
+	if err != nil {
+		return errorResponse(
+			fmt.Sprintf("Error getting options: %v", err),
+			http.StatusInternalServerError)
+	}
+
+	regularHoursDuration := options.CloseTimeOverlap(train.DeployedAt.Value, train.CreatedAt.Value)
+	afterHoursDuration := duration - regularHoursDuration
+
+	datadog.Gauge("train.cancel.lifetime.all_hours", duration.Seconds(), train.DatadogTags())
+	datadog.Gauge("train.cancel.lifetime.regular_hours", regularHoursDuration.Seconds(), train.DatadogTags())
+	datadog.Gauge("train.cancel.lifetime.after_hours", afterHoursDuration.Seconds(), train.DatadogTags())
 
 	authedUser := r.Context().Value("user").(*types.User)
 
@@ -701,6 +752,8 @@ func rollbackTrain(r *http.Request) response {
 			"No rollback job configured",
 			http.StatusBadRequest)
 	}
+
+	datadog.Incr("train.rollback", train.DatadogTags())
 
 	authedUser := r.Context().Value("user").(*types.User)
 

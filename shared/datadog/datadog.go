@@ -9,24 +9,49 @@ import (
 	"github.com/Nextdoor/conductor/shared/logger"
 )
 
-var c = func() *statsd.Client {
-	c, err := statsd.New(fmt.Sprintf("%v:%v", os.Getenv("STATSD_HOST"), 8125))
+func newStatsdClient() *statsd.Client {
+	c, err := statsd.New(fmt.Sprintf("%v:%v", os.Getenv("STATSD_HOST"), 8125),
+		statsd.WithNamespace("conductor."))
 	if err != nil {
-		logger.Error("Could not create statsd client: %s", err)
-		return nil
+		panic(fmt.Sprintf("Could not create statsd client: %v", err))
 	}
 	return c
-}()
+}
 
+var c = newStatsdClient()
+
+func Client() *statsd.Client {
+	return c
+}
+
+func Incr(name string, tags []string) {
+	err := c.Incr(name, tags, 1)
+	if err != nil {
+		logger.Error("Error sending %s metric: %v", name, err)
+	}
+}
+
+func Count(name string, count int, tags []string) {
+	err := c.Count(name, int64(count), tags, 1)
+	if err != nil {
+		logger.Error("Error sending %s metric: %v", name, err)
+	}
+}
+
+func Gauge(name string, value float64, tags []string) {
+	err := c.Gauge(name, value, tags, 1)
+	if err != nil {
+		logger.Error("Error sending %s metric: %v", name, err)
+	}
+}
+
+// log logs an event to stdout, and also sends it to datadog.
 func log(alertType statsd.EventAlertType, format string, args ...interface{}) {
-	// Send event to statsd and log it too!
-	if c != nil {
-		e := statsd.NewEvent("conductor", fmt.Sprintf(format, args...))
-		e.AlertType = alertType
-		err := c.Event(e)
-		if err != nil {
-			logger.Error("Could not create datadog event: %v", err)
-		}
+	e := statsd.NewEvent("conductor", fmt.Sprintf(format, args...))
+	e.AlertType = alertType
+	err := c.Event(e)
+	if err != nil {
+		logger.Error("Could not create datadog event: %v", err)
 	}
 	switch alertType {
 	case statsd.Info:

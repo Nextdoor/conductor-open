@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Nextdoor/conductor/shared/datadog"
 	"github.com/Nextdoor/conductor/shared/settings"
 )
 
@@ -19,7 +20,7 @@ type Config struct {
 	Options Options `json:"options"`
 }
 
-var DefaultConfig *Config = &Config{ID: 1, Mode: Schedule, Options: DefaultOptions}
+var DefaultConfig = &Config{ID: 1, Mode: Schedule, Options: DefaultOptions}
 
 type Train struct {
 	ID               uint64        `orm:"pk;auto;column(id)" json:"id,string"`
@@ -219,6 +220,37 @@ func (train *Train) GetNotDeployableReason() *string {
 	return &reason
 }
 
+func (train *Train) DatadogTags() []string {
+	return []string{fmt.Sprintf("train_id:%d", train.ID)}
+}
+
+func (train *Train) SendCommitCountMetrics() {
+	// Calculate how many commits there are on the train for metrics.
+	var commitCount = len(train.Commits)
+	var robotCommitCount = 0
+	var humanCommitCount = 0
+	var needsStagingCommits = 0
+	var noVerifyCommits = 0
+	for _, commit := range train.Commits {
+		if settings.IsRobotUser(commit.AuthorEmail) {
+			robotCommitCount += 1
+		} else {
+			humanCommitCount += 1
+			if commit.IsNeedsStaging() {
+				needsStagingCommits += 1
+			} else if commit.IsNoVerify() {
+				noVerifyCommits += 1
+			}
+		}
+	}
+
+	datadog.Count("commit.count", commitCount, train.DatadogTags())
+	datadog.Count("commit.robot", robotCommitCount, train.DatadogTags())
+	datadog.Count("commit.human", humanCommitCount, train.DatadogTags())
+	datadog.Count("commit.needs_staging", needsStagingCommits, train.DatadogTags())
+	datadog.Count("commit.no_verify", noVerifyCommits, train.DatadogTags())
+}
+
 func DoesCommitNeedTicket(commit *Commit, commitsOnTickets map[string]struct{}) bool {
 	_, found := commitsOnTickets[commit.SHA]
 	// Exclude commits with tickets and commits marked for no verification.
@@ -269,7 +301,7 @@ func (train *Train) CommitsSince(headSHA string) []*Commit {
 
 // Return includes head but not tail.
 func (train *Train) CommitsBetween(headSHA string, tailSHA string) []*Commit {
-	commits := []*Commit{}
+	var commits []*Commit
 	inBetween := false
 	for i := range train.Commits {
 		commit := train.Commits[i]
@@ -400,6 +432,13 @@ func (phaseGroup *PhaseGroup) Phases() []*Phase {
 
 func (phaseGroup *PhaseGroup) GitReference() string {
 	return fmt.Sprintf("%s-%s", phaseGroup.Train.Branch, ShortSHA(phaseGroup.HeadSHA))
+}
+
+func (job *Job) DatadogTags() []string {
+	tags := job.Phase.Train.DatadogTags()
+	tags = append(tags, fmt.Sprintf("job_name:%s", job.Name))
+	tags = append(tags, fmt.Sprintf("phase_name:%s", job.Phase.Type.String()))
+	return tags
 }
 
 type Jobs []*Job

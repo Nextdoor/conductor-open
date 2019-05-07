@@ -1,14 +1,17 @@
 package core
 
 import (
+	"fmt"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/Nextdoor/conductor/services/code"
 	"github.com/Nextdoor/conductor/services/data"
 	"github.com/Nextdoor/conductor/services/messaging"
 	"github.com/Nextdoor/conductor/services/phase"
 	"github.com/Nextdoor/conductor/services/ticket"
+	"github.com/Nextdoor/conductor/shared/datadog"
 	"github.com/Nextdoor/conductor/shared/logger"
 	"github.com/Nextdoor/conductor/shared/types"
 )
@@ -68,6 +71,22 @@ func syncTickets(
 	if err != nil {
 		logger.Error("Error updating tickets: %v", err)
 		return
+	}
+
+	datadog.Count("ticket.count", len(newTickets), latestTrain.DatadogTags())
+	for _, updatedTicket := range updatedTickets {
+		if updatedTicket.ClosedAt.HasValue() || updatedTicket.DeletedAt.HasValue() {
+			var finished time.Time
+			if updatedTicket.ClosedAt.HasValue() {
+				finished = updatedTicket.ClosedAt.Value
+			} else {
+				finished = updatedTicket.DeletedAt.Value
+			}
+			duration := finished.Sub(updatedTicket.CreatedAt.Value)
+			tags := latestTrain.DatadogTags()
+			tags = append(tags, fmt.Sprintf("ticket_user:%s", updatedTicket.AssigneeEmail))
+			datadog.Gauge("ticket.duration", duration.Seconds(), tags)
+		}
 	}
 
 	switch latestTrain.ActivePhase {
