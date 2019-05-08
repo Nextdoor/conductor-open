@@ -14,6 +14,8 @@ var sock, _ = net.ListenUDP("udp", addr)
 
 func TestLogInfo(t *testing.T) {
 	os.Setenv("STATSD_HOST", "localhost")
+	enableDatadog = true
+	c = newStatsdClient()
 	assert.NotNil(t, c)
 	log(statsd.Info, "%s testing", "conductor")
 	buf := make([]byte, 1024)
@@ -23,6 +25,8 @@ func TestLogInfo(t *testing.T) {
 
 func TestLogError(t *testing.T) {
 	os.Setenv("STATSD_HOST", "localhost")
+	enableDatadog = true
+	c = newStatsdClient()
 	assert.NotNil(t, c)
 	log(statsd.Error, "%s testing", "conductor")
 	buf := make([]byte, 1024)
