@@ -13,6 +13,7 @@ import (
 	"github.com/Nextdoor/conductor/services/messaging"
 	"github.com/Nextdoor/conductor/services/phase"
 	"github.com/Nextdoor/conductor/services/ticket"
+	"github.com/Nextdoor/conductor/shared/datadog"
 	"github.com/Nextdoor/conductor/shared/logger"
 	"github.com/Nextdoor/conductor/shared/types"
 )
@@ -171,16 +172,29 @@ func startJob(r *http.Request) response {
 		logger.Error("Warning: Job with name %s has already been started for Train %d, Phase %d",
 			jobName, targetPhase.Train.ID, targetPhase.ID)
 
+		datadog.Incr("job.start", job.DatadogTags())
+		datadog.Incr("job.restart", job.DatadogTags())
 		err = dataClient.RestartJob(job, url)
 		if err != nil {
 			return errorResponse("Error restarting job", http.StatusInternalServerError)
 		}
 	} else {
+		datadog.Incr("job.start", job.DatadogTags())
 		err = dataClient.StartJob(job, url)
 		if err != nil {
-			return errorResponse("Error creating job", http.StatusInternalServerError)
+			return errorResponse("Error starting job", http.StatusInternalServerError)
 		}
 	}
+
+	// Measure how long after the phase started did the job start.
+	// If the job completes before the phase starts, we give a duration of 0.
+	if job.Phase.StartedAt.HasValue() {
+		timeSincePhaseStart := job.StartedAt.Value.Sub(job.Phase.StartedAt.Value)
+		datadog.Gauge("job.start.time_since_phase_start", timeSincePhaseStart.Seconds(), job.DatadogTags())
+	} else {
+		datadog.Gauge("job.start.time_since_phase_start", 0, job.DatadogTags())
+	}
+
 	return dataResponse(job)
 }
 
@@ -244,8 +258,25 @@ func completeJob(r *http.Request) response {
 	}
 
 	messagingService := messaging.GetService()
-	if jobResult != types.Ok {
+
+	datadog.Incr("job.complete", job.DatadogTags())
+	if jobResult == types.Ok {
+		datadog.Incr("job.success", job.DatadogTags())
+	} else {
+		datadog.Incr("job.failure", job.DatadogTags())
 		messagingService.JobFailed(job)
+	}
+
+	duration := job.CompletedAt.Value.Sub(job.StartedAt.Value)
+	datadog.Gauge("job.duration", duration.Seconds(), job.DatadogTags())
+
+	// Measure how long after the phase started did the job complete.
+	// If the job completes before the phase starts, we give a duration of 0.
+	if job.Phase.StartedAt.HasValue() {
+		timeSincePhaseStart := job.CompletedAt.Value.Sub(job.Phase.StartedAt.Value)
+		datadog.Gauge("job.complete.time_since_phase_start", timeSincePhaseStart.Seconds(), job.DatadogTags())
+	} else {
+		datadog.Gauge("job.complete.time_since_phase_start", 0, job.DatadogTags())
 	}
 
 	codeService := code.GetService()

@@ -23,9 +23,9 @@ type Options struct {
 	//          EndTime: Clock{Hour: 17, Minute: 0},
 	//      },
 	//  }
-	CloseTime            []RepeatingTimeInterval `json:"close_time"`
-	ValidationError      error                   `orm:"-" json:"-"`
-	InvalidOptionsString string                  `orm:"-" json:"-"`
+	CloseTime            RepeatingTimeIntervals `json:"close_time"`
+	ValidationError      error                  `orm:"-" json:"-"`
+	InvalidOptionsString string                 `orm:"-" json:"-"`
 }
 
 // Implement beego Fielder interface to handle serialization and deserialization.
@@ -85,8 +85,12 @@ func (o Options) InCloseTime() bool {
 	return false
 }
 
+func (o Options) CloseTimeOverlap(start time.Time, end time.Time) time.Duration {
+	return o.CloseTime.TotalOverlap(start, end)
+}
+
 // Default is M-F 9-5. Hours are in UTC.
-var defaultCloseTime = []RepeatingTimeInterval{
+var defaultCloseTime = RepeatingTimeIntervals{
 	{
 		Every: []time.Weekday{
 			time.Monday, time.Tuesday, time.Wednesday, time.Thursday, time.Friday},
@@ -95,7 +99,7 @@ var defaultCloseTime = []RepeatingTimeInterval{
 	},
 }
 
-var DefaultOptions Options = Options{CloseTime: defaultCloseTime}
+var DefaultOptions = Options{CloseTime: defaultCloseTime}
 
 // Used for JSON Schema validation.
 // Update this when the structure of Options changes.

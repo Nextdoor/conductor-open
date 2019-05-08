@@ -14,6 +14,7 @@ import (
 	"github.com/Nextdoor/conductor/services/messaging"
 	"github.com/Nextdoor/conductor/services/phase"
 	"github.com/Nextdoor/conductor/services/ticket"
+	"github.com/Nextdoor/conductor/shared/datadog"
 	"github.com/Nextdoor/conductor/shared/logger"
 	"github.com/Nextdoor/conductor/shared/types"
 )
@@ -269,6 +270,13 @@ func checkPhaseCompletion(
 		return
 	}
 
+	tags := train.DatadogTags()
+	tags = append(tags, fmt.Sprintf("phase_name:%s", targetPhase.Type.String()))
+
+	datadog.Incr("phase.complete", tags)
+	duration := targetPhase.CompletedAt.Value.Sub(targetPhase.StartedAt.Value)
+	datadog.Gauge("phase.duration", duration.Seconds(), tags)
+
 	logger.Info("Phase %s was completed for train %v (%s). "+
 		"It had %d tickets causing %d extra checks.\n\n%+v",
 		targetPhase.Type, train.ID, train.HeadSHA, len(train.Tickets), len(extraChecks), train)
@@ -291,6 +299,20 @@ func checkPhaseCompletion(
 		if err != nil {
 			logger.Error("Error deploying train: %v", err)
 			return
+		}
+
+		duration := train.DeployedAt.Value.Sub(train.CreatedAt.Value)
+		datadog.Gauge("train.deploy.lifetime.all_hours", duration.Seconds(), train.DatadogTags())
+
+		options, err := dataClient.Options()
+		if err != nil {
+			logger.Error("Error getting options: %v", err)
+		} else {
+			regularHoursDuration := options.CloseTimeOverlap(train.DeployedAt.Value, train.CreatedAt.Value)
+			afterHoursDuration := duration - regularHoursDuration
+
+			datadog.Gauge("train.deploy.lifetime.regular_hours", regularHoursDuration.Seconds(), train.DatadogTags())
+			datadog.Gauge("train.deploy.lifetime.after_hours", afterHoursDuration.Seconds(), train.DatadogTags())
 		}
 
 		messagingService.TrainDeployed(train)

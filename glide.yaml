@@ -14,7 +14,7 @@ import:
 - package: github.com/xeipuuv/gojsonschema
 - package: golang.org/x/oauth2
 - package: github.com/DataDog/datadog-go
-  version: 2.1.0
+  version: 2.2.0
   subpackages:
   - statsd
 testImport:
