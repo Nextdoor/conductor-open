@@ -378,11 +378,11 @@ func parseTrainVars(r *http.Request, dataClient data.Client, readFromCache bool)
 var latestTrainCache *types.Train
 var latestTrainCacheUnixTime int64
 
-const TRAIN_CACHE_TTL = 5
+const TrainCacheTtl = 5
 
 func getCacheBackedLatestTrain(dataClient data.Client, readFromCache bool) (*types.Train, error) {
 	now := time.Now()
-	if readFromCache && latestTrainCacheUnixTime != 0 && now.Unix()-latestTrainCacheUnixTime <= TRAIN_CACHE_TTL {
+	if readFromCache && latestTrainCacheUnixTime != 0 && now.Unix()-latestTrainCacheUnixTime <= TrainCacheTtl {
 		return latestTrainCache, nil
 	}
 

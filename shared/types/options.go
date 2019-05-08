@@ -89,7 +89,8 @@ func (o Options) CloseTimeOverlap(start time.Time, end time.Time) time.Duration 
 	return o.CloseTime.TotalOverlap(start, end)
 }
 
-// Default is M-F 9-5. Hours are in UTC.
+// Default is M-F 9-5. Hours are in the Conductor timezone
+// (defaults to PST, overridden with TIMEZONE environment variable).
 var defaultCloseTime = RepeatingTimeIntervals{
 	{
 		Every: []time.Weekday{

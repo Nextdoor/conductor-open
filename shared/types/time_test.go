@@ -157,8 +157,8 @@ func TestWeekdayIntervalsSingle(t *testing.T) {
 
 	// Monday should be 0-12.
 	assert.Equal(t, Interval{
-		start: time.Time{},
-		end:   time.Time{}.Add(time.Hour * 12),
+		start: time.Date(0, 0, 0, 0, 0, 0, 0, time.Local),
+		end:   time.Date(0, 0, 0, 12, 0, 0, 0, time.Local),
 	}, weekdayToIntervals[time.Monday][0])
 }
 
@@ -191,31 +191,31 @@ func TestWeekdayIntervalsMultiplePerDay(t *testing.T) {
 	// Monday should be 3-6 and 8-10:30.
 	// In descending order of start time, so 8-10:30 first.
 	assert.Equal(t, Interval{
-		start: time.Time{}.Add(time.Hour * 8),
-		end:   time.Time{}.Add(time.Hour*10 + time.Minute*30),
+		start: time.Date(0, 0, 0, 8, 0, 0, 0, time.Local),
+		end:   time.Date(0, 0, 0, 10, 30, 0, 0, time.Local),
 	}, weekdayToIntervals[time.Monday][0])
 	assert.Equal(t, Interval{
-		start: time.Time{}.Add(time.Hour * 3),
-		end:   time.Time{}.Add(time.Hour * 6),
+		start: time.Date(0, 0, 0, 3, 0, 0, 0, time.Local),
+		end:   time.Date(0, 0, 0, 6, 0, 0, 0, time.Local),
 	}, weekdayToIntervals[time.Monday][1])
 
 	// Tuesday should be 3-7.
 	assert.Equal(t, Interval{
-		start: time.Time{}.Add(time.Hour * 3),
-		end:   time.Time{}.Add(time.Hour * 7),
+		start: time.Date(0, 0, 0, 3, 0, 0, 0, time.Local),
+		end:   time.Date(0, 0, 0, 7, 0, 0, 0, time.Local),
 	}, weekdayToIntervals[time.Tuesday][0])
 
 	// Friday should be 3-6.
 	assert.Equal(t, Interval{
-		start: time.Time{}.Add(time.Hour * 3),
-		end:   time.Time{}.Add(time.Hour * 6),
+		start: time.Date(0, 0, 0, 3, 0, 0, 0, time.Local),
+		end:   time.Date(0, 0, 0, 6, 0, 0, 0, time.Local),
 	}, weekdayToIntervals[time.Friday][0])
 }
 
 func TestWithDate(t *testing.T) {
 	interval := Interval{
-		start: time.Time{}.Add(time.Hour * 3),
-		end:   time.Time{}.Add(time.Hour * 6),
+		start: time.Date(0, 0, 0, 3, 0, 0, 0, time.Local),
+		end:   time.Date(0, 0, 0, 6, 0, 0, 0, time.Local),
 	}
 
 	var year int
@@ -249,19 +249,19 @@ func TestTimeOverlapStartEnd(t *testing.T) {
 	// Test with an interval from 3-6:30 and 10-12.
 	intervals := []Interval{
 		{
-			start: time.Time{}.Add(time.Hour * 3),
-			end:   time.Time{}.Add(time.Hour*6 + time.Minute*30),
+			start: time.Date(0, 0, 0, 3, 0, 0, 0, time.Local),
+			end:   time.Date(0, 0, 0, 6, 30, 0, 0, time.Local),
 		},
 		{
-			start: time.Time{}.Add(time.Hour * 10),
-			end:   time.Time{}.Add(time.Hour * 12),
+			start: time.Date(0, 0, 0, 10, 0, 0, 0, time.Local),
+			end:   time.Date(0, 0, 0, 12, 0, 0, 0, time.Local),
 		},
 	}
 
 	// Get the overlap between those intervals and 4-11.
 	// Start and end must be at the same date. Let's try Dec 31st, 2019.
-	start := time.Date(2019, 12, 31, 4, 0, 0, 0, time.UTC)
-	end := time.Date(2019, 12, 31, 11, 0, 0, 0, time.UTC)
+	start := time.Date(2019, 12, 31, 4, 0, 0, 0, time.Local)
+	end := time.Date(2019, 12, 31, 11, 0, 0, 0, time.Local)
 
 	overlap := timeOverlap(intervals, &start, &end)
 	// The expected overlap is 2.5 hours for the first interval,
@@ -273,18 +273,18 @@ func TestTimeOverlapStart(t *testing.T) {
 	// Test with an interval from 3-6:30 and 10-12.
 	intervals := []Interval{
 		{
-			start: time.Time{}.Add(time.Hour * 3),
-			end:   time.Time{}.Add(time.Hour*6 + time.Minute*30),
+			start: time.Date(0, 0, 0, 3, 0, 0, 0, time.Local),
+			end:   time.Date(0, 0, 0, 6, 30, 0, 0, time.Local),
 		},
 		{
-			start: time.Time{}.Add(time.Hour * 10),
-			end:   time.Time{}.Add(time.Hour * 12),
+			start: time.Date(0, 0, 0, 10, 0, 0, 0, time.Local),
+			end:   time.Date(0, 0, 0, 12, 0, 0, 0, time.Local),
 		},
 	}
 
 	// Get the overlap between those intervals and 1 to end of day.
 	// Let's try Dec 31st, 2019.
-	start := time.Date(2019, 12, 31, 1, 0, 0, 0, time.UTC)
+	start := time.Date(2019, 12, 31, 1, 0, 0, 0, time.Local)
 
 	overlap := timeOverlap(intervals, &start, nil)
 	// The expected overlap is 3.5 hours for the first interval,
@@ -296,18 +296,18 @@ func TestTimeOverlapEnd(t *testing.T) {
 	// Test with an interval from 3-6:30 and 10-12.
 	intervals := []Interval{
 		{
-			start: time.Time{}.Add(time.Hour * 3),
-			end:   time.Time{}.Add(time.Hour*6 + time.Minute*30),
+			start: time.Date(0, 0, 0, 3, 0, 0, 0, time.Local),
+			end:   time.Date(0, 0, 0, 6, 30, 0, 0, time.Local),
 		},
 		{
-			start: time.Time{}.Add(time.Hour * 10),
-			end:   time.Time{}.Add(time.Hour * 12),
+			start: time.Date(0, 0, 0, 10, 0, 0, 0, time.Local),
+			end:   time.Date(0, 0, 0, 12, 0, 0, 0, time.Local),
 		},
 	}
 
 	// Get the overlap between those intervals and start of day to 11.
 	// Let's try Dec 31st, 2019.
-	end := time.Date(2019, 12, 31, 11, 0, 0, 0, time.UTC)
+	end := time.Date(2019, 12, 31, 11, 0, 0, 0, time.Local)
 
 	overlap := timeOverlap(intervals, nil, &end)
 	// The expected overlap is 3.5 hours for the first interval,
@@ -320,8 +320,8 @@ func TestTotalOverlapSingleDayNoIntervals(t *testing.T) {
 
 	// Let's start from Dec 31st, 2019, so it rolls over a year.
 	// Dec 31st, 2019 is a Tuesday.
-	start := time.Date(2019, 12, 31, 0, 0, 0, 0, time.UTC)
-	end := time.Date(2019, 12, 31, 24, 0, 0, 0, time.UTC)
+	start := time.Date(2019, 12, 31, 0, 0, 0, 0, time.Local)
+	end := time.Date(2019, 12, 31, 24, 0, 0, 0, time.Local)
 
 	// With no intervals, the overlap should be 0.
 	overlap := intervals.TotalOverlap(start, end)
@@ -343,8 +343,8 @@ func TestTotalOverlapSingleDayWrongDayOfWeek(t *testing.T) {
 
 	// Let's start from Dec 31st, 2019, so it rolls over a year.
 	// Dec 31st, 2019 is a Tuesday.
-	start := time.Date(2019, 12, 31, 0, 0, 0, 0, time.UTC)
-	end := time.Date(2019, 12, 31, 24, 0, 0, 0, time.UTC)
+	start := time.Date(2019, 12, 31, 0, 0, 0, 0, time.Local)
+	end := time.Date(2019, 12, 31, 24, 0, 0, 0, time.Local)
 
 	// With no intervals on Tuesday, the total should be 0.
 	overlap := intervals.TotalOverlap(start, end)
@@ -366,8 +366,8 @@ func TestTotalOverlapSingleDay(t *testing.T) {
 
 	// Let's start from Dec 31st, 2019, so it rolls over a year.
 	// Dec 31st, 2019 is a Tuesday.
-	start := time.Date(2019, 12, 31, 0, 0, 0, 0, time.UTC)
-	end := time.Date(2019, 12, 31, 24, 0, 0, 0, time.UTC)
+	start := time.Date(2019, 12, 31, 0, 0, 0, 0, time.Local)
+	end := time.Date(2019, 12, 31, 24, 0, 0, 0, time.Local)
 
 	// With 0-3, 6-9 intervals, the overlap should be 6 hours total.
 	overlap := intervals.TotalOverlap(start, end)
@@ -390,8 +390,8 @@ func TestTotalOverlapSingleDayPartial(t *testing.T) {
 	// Let's start from Dec 31st, 2019, so it rolls over a year.
 	// Dec 31st, 2019 is a Tuesday.
 	// Let's start from 2:15 and end at 7.
-	start := time.Date(2019, 12, 31, 2, 15, 0, 0, time.UTC)
-	end := time.Date(2019, 12, 31, 7, 0, 0, 0, time.UTC)
+	start := time.Date(2019, 12, 31, 2, 15, 0, 0, time.Local)
+	end := time.Date(2019, 12, 31, 7, 0, 0, 0, time.Local)
 
 	// With 0-3, 6-9 intervals, the overlap should be 45 minutes + 1 hour,
 	// for 1 hour 45 minutes total.
@@ -418,9 +418,9 @@ func TestTotalOverlapTwoDay(t *testing.T) {
 
 	// Let's start from Dec 31st, 2019, so it rolls over a year.
 	// Dec 31st, 2019 is a Tuesday.
-	start := time.Date(2019, 12, 31, 0, 0, 0, 0, time.UTC)
+	start := time.Date(2019, 12, 31, 0, 0, 0, 0, time.Local)
 	// End goes 48 hours into the future.
-	end := time.Date(2019, 12, 31, 48, 0, 0, 0, time.UTC)
+	end := time.Date(2019, 12, 31, 48, 0, 0, 0, time.Local)
 
 	// With 0-3, 6-9 intervals, the overlap should be 6 hours total on Tuesday.
 	// With the 12-20:30 interval, the overlap should be 8.5 hours on Wednesday.
@@ -449,9 +449,9 @@ func TestTotalOverlapTwoDayPartial(t *testing.T) {
 	// Let's start from Dec 31st, 2019, so it rolls over a year.
 	// Dec 31st, 2019 is a Tuesday.
 	// Let's start at 2 (2am) on Tuesday.
-	start := time.Date(2019, 12, 31, 2, 0, 0, 0, time.UTC)
+	start := time.Date(2019, 12, 31, 2, 0, 0, 0, time.Local)
 	// Let's end at 17 (5pm) on Wednesday.
-	end := time.Date(2020, 1, 1, 17, 0, 0, 0, time.UTC)
+	end := time.Date(2020, 1, 1, 17, 0, 0, 0, time.Local)
 
 	// With 0-3, 6-9 intervals, the overlap should be 4 hours total on Tuesday.
 	// With the 12-20:30 interval, the overlap should be 5 hours on Wednesday.
@@ -489,9 +489,9 @@ func TestTotalOverlapMultiday(t *testing.T) {
 	// Let's start from Dec 31st, 2019, so it rolls over a year.
 	// Dec 31st, 2019 is a Tuesday.
 	// Let's start at 2 (2am) on Tuesday.
-	start := time.Date(2019, 12, 31, 2, 0, 0, 0, time.UTC)
+	start := time.Date(2019, 12, 31, 2, 0, 0, 0, time.Local)
 	// Let's end at 17 (5pm) on Friday.
-	end := time.Date(2020, 1, 3, 17, 0, 0, 0, time.UTC)
+	end := time.Date(2020, 1, 3, 17, 0, 0, 0, time.Local)
 
 	// With 0-3, 6-9 intervals, the overlap should be 4 hours total on Tuesday.
 	// Wednesday and Thursday both have 12 hour intervals.
@@ -530,9 +530,9 @@ func TestTotalOverlapMultimonth(t *testing.T) {
 	// Let's start from Dec 31st, 2019, so it rolls over a year.
 	// Dec 31st, 2019 is a Tuesday.
 	// Let's start at 2 (2am) on Tuesday.
-	start := time.Date(2019, 12, 31, 2, 0, 0, 0, time.UTC)
+	start := time.Date(2019, 12, 31, 2, 0, 0, 0, time.Local)
 	// Let's end at 17 (5pm) on Friday, 10 weeks later.
-	end := time.Date(2020, 3, 6, 17, 0, 0, 0, time.UTC)
+	end := time.Date(2020, 3, 6, 17, 0, 0, 0, time.Local)
 
 	// The first Tuesday has a 4 hour overlap.
 	// The last Friday has a 5 hour overlap.

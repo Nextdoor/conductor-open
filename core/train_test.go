@@ -295,7 +295,7 @@ func TestCacheBackedLatestTrain(t *testing.T) {
 
 	// Cache time is too old - shouldn't get from cache, should update it.
 	latestTrainCache = &types.Train{ID: 5000}
-	cacheTime = time.Now().Unix() - TRAIN_CACHE_TTL - 1
+	cacheTime = time.Now().Unix() - TrainCacheTtl - 1
 	latestTrainCacheUnixTime = cacheTime
 	train, err = getCacheBackedLatestTrain(dataClient, true)
 	assert.NoError(t, err)

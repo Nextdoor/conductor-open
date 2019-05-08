@@ -22,10 +22,6 @@ type Clock struct {
 	Minute int `json:"minute"`
 }
 
-func (clock Clock) ToDuration() time.Duration {
-	return time.Hour*time.Duration(clock.Hour) + time.Minute*time.Duration(clock.Minute)
-}
-
 type Moment interface {
 	Weekday() time.Weekday
 	Clock() (hour, minute, second int)
@@ -107,8 +103,9 @@ func (repeatingTimeIntervals RepeatingTimeIntervals) weekdayIntervals() map[time
 			}
 
 			intervals = append(intervals, Interval{
-				start: time.Time{}.Add(interval.StartTime.ToDuration()),
-				end:   time.Time{}.Add(interval.EndTime.ToDuration())})
+				start: time.Date(0, 0, 0, interval.StartTime.Hour, interval.StartTime.Minute, 0, 0, time.Local),
+				end:   time.Date(0, 0, 0, interval.EndTime.Hour, interval.EndTime.Minute, 0, 0, time.Local),
+			})
 		}
 
 		// Sort and merge intervals for the weekday.
