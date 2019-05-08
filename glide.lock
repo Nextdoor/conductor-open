@@ -1,5 +1,5 @@
-hash: b5d9e40e7460b465d299116019c7e60d9e1d479d541e205cf0b78a3a44164b74
-updated: 2019-05-03T14:30:52.293876-07:00
+hash: 128945504e5f2ba4c137a0011e864ee6edfa54a271979d5abdcfd51fb291eff3
+updated: 2019-05-08T12:04:52.1084-07:00
 imports:
 - name: github.com/astaxie/beego
   version: f16688817aa428d10361394015b40d096b680542
@@ -27,6 +27,8 @@ imports:
   version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
 - name: github.com/gorilla/mux
   version: 757bef944d0f21880861c2dd9c871ca543023cba
+- name: github.com/gorilla/websocket
+  version: 80c2d40e9b91f2ef7a9c1a403aeec64d1b89a9a6
 - name: github.com/lib/pq
   version: ba5d4f7a35561e22fbdf7a39aa0070f4d460cfc0
   subpackages:
@@ -35,6 +37,10 @@ imports:
   version: 1c43ea14716de91dc78aa4dd38b4a6b81cabf829
 - name: github.com/nlopes/slack
   version: 65ea2b979a7ffe628676bdb6b924e2498d66c1bf
+  subpackages:
+  - internal/errorsx
+  - internal/timex
+  - slackutilsx
 - name: github.com/pkg/errors
   version: 27936f6d90f9c8e1145f11ed52ffffbfdb9e0af7
 - name: github.com/satori/go.uuid
@@ -53,7 +59,6 @@ imports:
   version: 61557ac0112b576429a0df080e1c2cef5dfbb642
   subpackages:
   - context
-  - websocket
 - name: golang.org/x/oauth2
   version: b9780ec78894ab900c062d58ee3076cd9b2a4501
   subpackages:
