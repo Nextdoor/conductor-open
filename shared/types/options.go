@@ -23,9 +23,9 @@ type Options struct {
 	//          EndTime: Clock{Hour: 17, Minute: 0},
 	//      },
 	//  }
-	CloseTime            RepeatingTimeIntervals  `json:"close_time"`
-	ValidationError      error                   `orm:"-" json:"-"`
-	InvalidOptionsString string                  `orm:"-" json:"-"`
+	CloseTime            RepeatingTimeIntervals `json:"close_time"`
+	ValidationError      error                  `orm:"-" json:"-"`
+	InvalidOptionsString string                 `orm:"-" json:"-"`
 }
 
 // Implement beego Fielder interface to handle serialization and deserialization.
