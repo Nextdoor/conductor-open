@@ -390,6 +390,12 @@ func (phase *Phase) EarlierPhasesComplete() bool {
 	return false
 }
 
+func (phase *Phase) DatadogTags() []string {
+	tags := phase.Train.DatadogTags()
+	tags = append(tags, fmt.Sprintf("phase_name:%s", phase.Type.String()))
+	return tags
+}
+
 func (phaseGroup *PhaseGroup) IsActivePhaseGroup() bool {
 	return phaseGroup.ID == phaseGroup.Train.ActivePhases.ID
 }

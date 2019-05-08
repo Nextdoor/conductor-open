@@ -124,6 +124,8 @@ func startPhase(
 		return
 	}
 
+	datadog.Incr("phase.start", phaseToStart.DatadogTags())
+
 	switch phaseToStart.Type {
 	case types.Deploy:
 		// Check for any commits waiting for a train.
@@ -238,6 +240,7 @@ func checkPhaseCompletion(
 
 	if phaseCompletedPreviously && !phaseCurrentlyCompleted {
 		// Phase is no longer completed - uncomplete it.
+		datadog.Incr("phase.uncomplete", targetPhase.DatadogTags())
 		err := dataClient.UncompletePhase(targetPhase)
 		if err != nil {
 			logger.Error("Error uncompleting phase: %v", err)
@@ -270,12 +273,9 @@ func checkPhaseCompletion(
 		return
 	}
 
-	tags := train.DatadogTags()
-	tags = append(tags, fmt.Sprintf("phase_name:%s", targetPhase.Type.String()))
-
-	datadog.Incr("phase.complete", tags)
+	datadog.Incr("phase.complete", targetPhase.DatadogTags())
 	duration := targetPhase.CompletedAt.Value.Sub(targetPhase.StartedAt.Value)
-	datadog.Gauge("phase.duration", duration.Seconds(), tags)
+	datadog.Gauge("phase.duration", duration.Seconds(), targetPhase.DatadogTags())
 
 	logger.Info("Phase %s was completed for train %v (%s). "+
 		"It had %d tickets causing %d extra checks.\n\n%+v",
