@@ -73,7 +73,9 @@ func syncTickets(
 		return
 	}
 
-	datadog.Count("ticket.count", len(newTickets), latestTrain.DatadogTags())
+	if len(newTickets) > 0 {
+		datadog.Count("ticket.count", len(newTickets), latestTrain.DatadogTags())
+	}
 	for _, updatedTicket := range updatedTickets {
 		if updatedTicket.ClosedAt.HasValue() || updatedTicket.DeletedAt.HasValue() {
 			var finished time.Time
