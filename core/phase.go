@@ -181,6 +181,8 @@ func phaseGroupDelivered(
 			return err
 		}
 
+		datadog.Count("ticket.count", len(tickets), train.DatadogTags())
+
 		// Add these tickets to the train for anything that'll immediate check them.
 		// There might be existing tickets, so append first.
 		train.Tickets = append(train.Tickets, tickets...)
