@@ -185,6 +185,9 @@ func timeOverlap(intervals []Interval, start *time.Time, end *time.Time) time.Du
 
 // TotalOverlap calculates the total overlap duration between the specified start and end times.
 func (repeatingTimeIntervals RepeatingTimeIntervals) TotalOverlap(start time.Time, end time.Time) time.Duration {
+	start = start.In(time.Local)
+	end = end.In(time.Local)
+
 	if end.Sub(start) < 0 {
 		// End is before start, so no overlap.
 		return 0
