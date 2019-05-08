@@ -21,6 +21,11 @@ setup_data() {
         exit 1
     fi
 
+    touch envfile
+    set -a
+    source envfile
+    set +a
+    source resources/decrypt_secrets.sh
     go run cmd/test_data.go -test_data_type $type
 }
 
