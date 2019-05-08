@@ -6,10 +6,17 @@ import (
 
 	"github.com/DataDog/datadog-go/statsd"
 
+	"github.com/Nextdoor/conductor/shared/flags"
 	"github.com/Nextdoor/conductor/shared/logger"
 )
 
+var enableDatadog = flags.EnvBool("ENABLE_DATADOG", true)
+
 func newStatsdClient() *statsd.Client {
+	if !enableDatadog {
+		return nil
+	}
+	// All metrics with be prefixed with "conductor."
 	c, err := statsd.New(fmt.Sprintf("%v:%v", os.Getenv("STATSD_HOST"), 8125),
 		statsd.WithNamespace("conductor."))
 	if err != nil {
@@ -25,6 +32,9 @@ func Client() *statsd.Client {
 }
 
 func Incr(name string, tags []string) {
+	if !enableDatadog {
+		return
+	}
 	err := c.Incr(name, tags, 1)
 	if err != nil {
 		logger.Error("Error sending %s metric: %v", name, err)
@@ -32,6 +42,9 @@ func Incr(name string, tags []string) {
 }
 
 func Count(name string, count int, tags []string) {
+	if !enableDatadog {
+		return
+	}
 	err := c.Count(name, int64(count), tags, 1)
 	if err != nil {
 		logger.Error("Error sending %s metric: %v", name, err)
@@ -39,6 +52,9 @@ func Count(name string, count int, tags []string) {
 }
 
 func Gauge(name string, value float64, tags []string) {
+	if !enableDatadog {
+		return
+	}
 	err := c.Gauge(name, value, tags, 1)
 	if err != nil {
 		logger.Error("Error sending %s metric: %v", name, err)
@@ -47,11 +63,13 @@ func Gauge(name string, value float64, tags []string) {
 
 // log logs an event to stdout, and also sends it to datadog.
 func log(alertType statsd.EventAlertType, format string, args ...interface{}) {
-	e := statsd.NewEvent("conductor", fmt.Sprintf(format, args...))
-	e.AlertType = alertType
-	err := c.Event(e)
-	if err != nil {
-		logger.Error("Could not create datadog event: %v", err)
+	if enableDatadog {
+		e := statsd.NewEvent("conductor", fmt.Sprintf(format, args...))
+		e.AlertType = alertType
+		err := c.Event(e)
+		if err != nil {
+			logger.Error("Could not create datadog event: %v", err)
+		}
 	}
 	switch alertType {
 	case statsd.Info:
