@@ -302,19 +302,18 @@ func checkPhaseCompletion(
 		}
 
 		duration := train.DeployedAt.Value.Sub(train.CreatedAt.Value)
+		datadog.Gauge("train.deploy.lifetime.all_hours", duration.Seconds(), train.DatadogTags())
 
 		options, err := dataClient.Options()
 		if err != nil {
 			logger.Error("Error getting options: %v", err)
-			return
+		} else {
+			regularHoursDuration := options.CloseTimeOverlap(train.DeployedAt.Value, train.CreatedAt.Value)
+			afterHoursDuration := duration - regularHoursDuration
+
+			datadog.Gauge("train.deploy.lifetime.regular_hours", regularHoursDuration.Seconds(), train.DatadogTags())
+			datadog.Gauge("train.deploy.lifetime.after_hours", afterHoursDuration.Seconds(), train.DatadogTags())
 		}
-
-		regularHoursDuration := options.CloseTimeOverlap(train.DeployedAt.Value, train.CreatedAt.Value)
-		afterHoursDuration := duration - regularHoursDuration
-
-		datadog.Gauge("train.deploy.lifetime.all_hours", duration.Seconds(), train.DatadogTags())
-		datadog.Gauge("train.deploy.lifetime.regular_hours", regularHoursDuration.Seconds(), train.DatadogTags())
-		datadog.Gauge("train.deploy.lifetime.after_hours", afterHoursDuration.Seconds(), train.DatadogTags())
 
 		messagingService.TrainDeployed(train)
 

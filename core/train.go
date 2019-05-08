@@ -294,23 +294,23 @@ func deployTrain(
 		return
 	}
 
+	datadog.Incr("train.deploy", train.DatadogTags())
+
 	options, err := dataClient.Options()
 	if err != nil {
 		logger.Error("Error getting options: %v", err)
-		return
-	}
-	inRegularHours := false
-	for _, interval := range options.CloseTime {
-		if interval.Includes(time.Now()) {
-			inRegularHours = true
-		}
-	}
-
-	datadog.Incr("train.deploy", train.DatadogTags())
-	if inRegularHours {
-		datadog.Incr("train.deploy.regular_hours", train.DatadogTags())
 	} else {
-		datadog.Incr("train.deploy.after_hours", train.DatadogTags())
+		inRegularHours := false
+		for _, interval := range options.CloseTime {
+			if interval.Includes(time.Now()) {
+				inRegularHours = true
+			}
+		}
+		if inRegularHours {
+			datadog.Incr("train.deploy.regular_hours", train.DatadogTags())
+		} else {
+			datadog.Incr("train.deploy.after_hours", train.DatadogTags())
+		}
 	}
 
 	messagingService.TrainDeploying()
@@ -695,20 +695,18 @@ func cancelTrain(r *http.Request) response {
 	datadog.Incr("train.cancel", train.DatadogTags())
 
 	duration := train.CancelledAt.Value.Sub(train.CreatedAt.Value)
+	datadog.Gauge("train.cancel.lifetime.all_hours", duration.Seconds(), train.DatadogTags())
 
 	options, err := dataClient.Options()
 	if err != nil {
-		return errorResponse(
-			fmt.Sprintf("Error getting options: %v", err),
-			http.StatusInternalServerError)
+		logger.Error("Error getting options: %v", err)
+	} else {
+		regularHoursDuration := options.CloseTimeOverlap(train.DeployedAt.Value, train.CreatedAt.Value)
+		afterHoursDuration := duration - regularHoursDuration
+
+		datadog.Gauge("train.cancel.lifetime.regular_hours", regularHoursDuration.Seconds(), train.DatadogTags())
+		datadog.Gauge("train.cancel.lifetime.after_hours", afterHoursDuration.Seconds(), train.DatadogTags())
 	}
-
-	regularHoursDuration := options.CloseTimeOverlap(train.DeployedAt.Value, train.CreatedAt.Value)
-	afterHoursDuration := duration - regularHoursDuration
-
-	datadog.Gauge("train.cancel.lifetime.all_hours", duration.Seconds(), train.DatadogTags())
-	datadog.Gauge("train.cancel.lifetime.regular_hours", regularHoursDuration.Seconds(), train.DatadogTags())
-	datadog.Gauge("train.cancel.lifetime.after_hours", afterHoursDuration.Seconds(), train.DatadogTags())
 
 	authedUser := r.Context().Value("user").(*types.User)
 
