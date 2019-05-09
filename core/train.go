@@ -701,7 +701,7 @@ func cancelTrain(r *http.Request) response {
 	if err != nil {
 		logger.Error("Error getting options: %v", err)
 	} else {
-		regularHoursDuration := options.CloseTimeOverlap(train.DeployedAt.Value, train.CreatedAt.Value)
+		regularHoursDuration := options.CloseTimeOverlap(train.CreatedAt.Value, train.DeployedAt.Value)
 		afterHoursDuration := duration - regularHoursDuration
 
 		datadog.Gauge("train.cancel.lifetime.regular_hours", regularHoursDuration.Seconds(), train.DatadogTags())
