@@ -296,8 +296,8 @@ func (m Messenger) JobFailed(job *types.Job) {
 	}
 	message := fmt.Sprintf("%s. Check failure and consider restarting the job.", jobFailedText)
 	engineer := job.Phase.Train.Engineer
-	if engineer != nil {
-		// Add @mention for the train engineer.
+	if engineer != nil && job.Phase.Train.Closed {
+		// Add @mention for the train engineer if the train is closed.
 		message = fmt.Sprintf("%s: %s",
 			m.Engine.formatNameEmailNotification(engineer.Name, engineer.Email),
 			message)
