@@ -2,9 +2,22 @@
 
 **Table of Contents**
 
+- [Introduction](#introduction)
 - [Diagrams](#diagrams)
 - [Terminology](#terminology)
 - [Trains](#trains)
+
+
+## Introduction
+
+Conductor is a Continious Deployment (CI) tool for cherry-picked changes. It is useful in large enterprises with many engineers working on a codebase. Conductor helps make more frequent releases with smaller increments of changelists, so that changes can be landed more frequently into releases. This prevents a large amount of changes from being backed up and reverted due to a slow and cumbersome release cycle.
+
+Central to Conductor's  workflow is the concept of a train. Trains are our smallest unit of deployable code. Commits on a train are deployed to production in a process driven by the engineers themselves. When you cherrypick a change, there are two possibilities:
+
+* Train already exists, your commit "waiting on the platform" with other commits for the next train.
+* No train exists, new train created and picks up all of those commits which have been "waiting on the platform".
+
+
 
 ## Diagrams
 
