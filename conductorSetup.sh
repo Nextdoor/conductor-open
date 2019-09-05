@@ -19,7 +19,7 @@ echo -e "${PINK}creating frontend/envfile ...${NC}"
 echo -e "OAUTH_PROVIDER=Github \nOAUTH_ENDPOINT=https://git.corp.nextdoor.com/login/oauth/authorize \nOAUTH_PAYLOAD='{\"client_id\": \"${OAUTH_CLIENT_ID}\", \"redirect_uri\": \"http://localhost/api/auth/login\", \"scope\": \"user repo\"}'" > frontend/envfile
 
 echo -e "${PINK}building react.js and frontend static files webpack into resources/frontend...${NC}"
-make frontend
+make prod-compile -C frontend
 echo -e "${PINK}building backend conductor service${NC}"
 make docker-build
 echo -e "${PINK}starting conductor service${NC}"
