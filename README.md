@@ -32,7 +32,7 @@ Built using [Gravizool](https://github.com/swaggy/gravizool).
 
 ## Quick Dev Setup
 
-Conductor runs by starting two docker containers. One for Postgres DB, and the other for Go service running the webapp. You can run the script below many times, to have a basic conductor setup up the two docker containers, and have it run using fake data in the database.
+Conductor runs by starting two docker containers. One for Postgres DB, and the other for Go service running the webapp. You can run the script below many times, to have a basic conductor setup up the two docker containers, and have it run using fake data in the database. The conductor frontend will be accessible on localhost:80
 
 ```
 
@@ -42,7 +42,7 @@ chmod +x conductorSetup.sh
 ./conductorSetup.sh
 ```
 
-Later on, to test integration with Github, Jenkins and Slack. Set the respective variables in a the ```envfile``` in the root conductor folder.
+Later on, to test integration with Github, Jenkins and Slack. Set the respective variables in the ```envfile``` in the root conductor folder.
 
 
 ## Terminology
