@@ -1,7 +1,7 @@
 '''
 This script setups docker containers for the postgres database and conductor service, on your local machine.
 Hence you should have docker app downloaded and running on your machine before running this script.
-It is also adviced to increase available memory for the docker app, then the default setting, to speed up performance.
+It is also adviced to increase available memory for the docker app more than the default setting, to speed up performance.
 '''
 
 #!/bin/bash
