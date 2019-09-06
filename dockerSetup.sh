@@ -1,3 +1,9 @@
+'''
+This script setups docker containers for the postgres database and conductor service, on your local machine.
+Hence you should have docker app downloaded and running on your machine before running this script.
+It is also adviced to increase available memory for the docker app, then the default setting, to speed up performance.
+'''
+
 # 1) go to https://git.corp.nextdoor.com/settings/developers, and create a new OAuth app for conductor
 # replace the Client Id and Client Secret in the variable below
 OAUTH_CLIENT_ID='YOUR_OAUTH_CLIENT_ID'
