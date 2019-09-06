@@ -4,6 +4,7 @@
 
 - [Introduction](#introduction)
 - [Diagrams](#diagrams)
+- [Quick Dev Setup](#QuickDevSetup)
 - [Terminology](#terminology)
 - [Trains](#trains)
 
@@ -28,6 +29,21 @@ Built using [Gravizool](https://github.com/swaggy/gravizool).
 
 ### Full architecture
 ![Alt text](https://g.gravizo.com/svg?%0A%20%20%20%20digraph%20G%20{%0A%20%20%20%20%20%20%20%20node[shape="rectangle"]%3B%0A%20%20%20%20%20%20%20%20db%20[label="Postgres%20DB"]%3B%0A%20%20%20%20%20%20%20%20slack%20[label="Slack"]%3B%0A%20%20%20%20%20%20%20%20jira%20[label="JIRA"]%3B%0A%20%20%20%20%20%20%20%20jenkins%20[label="Jenkins"]%3B%0A%20%20%20%20%20%20%20%20ghe%20[label="Github"]%3B%0A%20%20%20%20%20%20%20%20git_hook%20[label="Git%20Hook"]%3B%0A%20%20%20%20%20%20%20%20web_app%20[label="Web%20App"]%3B%0A%20%20%20%20%20%20%20%20slack_bot%20[label="Slack%20Bot"]%3B%0A%20%20%20%20%20%20%20%20ghe%20->%20git_hook%3B%0A%20%20%20%20%20%20%20%20dev%20[label="Some%20Dev%20Box"]%3B%0A%20%20%20%20%20%20%20%20dev%20->%20ghe%3B%0A%20%20%20%20%20%20%20%20dev%20->%20web_app%3B%0A%20%20%20%20%20%20%20%20dev%20->%20slack_bot%3B%0A%20%20%20%20%20%20%20%20api%20[label="API"]%3B%0A%20%20%20%20%20%20%20%20data%20[label="Data"]%3B%0A%20%20%20%20%20%20%20%20build%20[label="Build"]%3B%0A%20%20%20%20%20%20%20%20code%20[label="Code"]%3B%0A%20%20%20%20%20%20%20%20deploy%20[label="Deploy"]%3B%0A%20%20%20%20%20%20%20%20messaging%20[label="Messaging"]%3B%0A%20%20%20%20%20%20%20%20verification%20[label="Verification"]%3B%0A%20%20%20%20%20%20%20%20data%20->%20db%3B%0A%20%20%20%20%20%20%20%20build%20->%20jenkins%3B%0A%20%20%20%20%20%20%20%20code%20->%20ghe%3B%0A%20%20%20%20%20%20%20%20deploy%20->%20jenkins%3B%0A%20%20%20%20%20%20%20%20messaging%20->%20slack%3B%0A%20%20%20%20%20%20%20%20verification%20->%20jira%3B%0A%20%20%20%20%20%20%20%20git_hook%20->%20api%3B%0A%20%20%20%20%20%20%20%20web_app%20->%20api%3B%0A%20%20%20%20%20%20%20%20slack_bot%20->%20api%3B%0A%20%20%20%20%20%20%20%20api%20->%20data%3B%0A%20%20%20%20%20%20%20%20api%20->%20build%3B%0A%20%20%20%20%20%20%20%20api%20->%20code%3B%0A%20%20%20%20%20%20%20%20api%20->%20deploy%3B%0A%20%20%20%20%20%20%20%20api%20->%20messaging%3B%0A%20%20%20%20%20%20%20%20api%20->%20verification%3B%0A%20%20%20%20}%0A)
+
+## Quick Dev Setup
+
+Conductor runs by starting two docker containers. One for Postgres DB, and the other for Go service running the webapp. You can run the script below many times, to have a basic conductor setup up the two docker containers, and have it run using fake data in the database. The conductor frontend will be accessible on localhost:80
+
+```
+
+# Before running this script set the CLIENT_ID value in it from a github account OAuth client
+
+chmod +x conductorSetup.sh
+./conductorSetup.sh
+```
+
+Later on, to test integration with Github, Jenkins and Slack. Set the respective variables in the ```envfile``` in the root conductor folder.
+
 
 ## Terminology
 
