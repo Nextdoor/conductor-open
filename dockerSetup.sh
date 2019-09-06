@@ -4,6 +4,8 @@ Hence you should have docker app downloaded and running on your machine before r
 It is also adviced to increase available memory for the docker app, then the default setting, to speed up performance.
 '''
 
+#!/bin/bash
+
 # 1) go to https://git.corp.nextdoor.com/settings/developers, and create a new OAuth app for conductor
 # replace the Client Id and Client Secret in the variable below
 OAUTH_CLIENT_ID='YOUR_OAUTH_CLIENT_ID'
@@ -12,7 +14,7 @@ PINK='\033[0;35m'
 NC='\033[0m'        # No Color
 
 # echo -e "${PINK}checking install of package management tools..${NC}"
-if ! brew ls --versions yarn; then install yarn; fi; 
+if ! brew ls --versions yarn; then brew install yarn; fi; 
 
 echo -e "${PINK}bringing up new postgres docker container for conductor...${NC}"
 make postgres
