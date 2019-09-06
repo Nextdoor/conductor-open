@@ -83,5 +83,8 @@ func (a *fake) AuthURL(hostname string) string {
 }
 
 func (a *fake) Login(code string) (name, email, avatar, codeToken string, err error) {
-	return
+	// If a developer doesn't choose to do github setup in envfile, 
+	// this should still allow going past the login page, without fetching
+	// github profile details and avatar
+	return "dev", "dev@conductor.com", "", "", nil
 }
