@@ -6,7 +6,7 @@ It is also adviced to increase available memory for the docker app more than the
 
 #!/bin/bash
 
-# 1) go to https://git.corp.nextdoor.com/settings/developers, and create a new OAuth app for conductor
+# 1) go to https://{your-git-host}/settings/developers, and create a new OAuth app for conductor
 # replace the Client Id and Client Secret in the variable below
 OAUTH_CLIENT_ID='YOUR_OAUTH_CLIENT_ID'
 
