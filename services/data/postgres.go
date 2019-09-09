@@ -9,8 +9,11 @@ import (
 	"github.com/Nextdoor/conductor/shared/flags"
 )
 
-var (
-	postgresHost         = flags.EnvString("POSTGRES_HOST", "conductor-postgres")
+var (	
+	// change postgres_host to conductor-postgres / localhost in envfile. 
+	// try this from the image that your accessing to see if you have access to the postgres instance
+	// psql -h localhost -U conductor
+	postgresHost         = flags.EnvString("POSTGRES_HOST", "localhost")
 	postgresPort         = flags.EnvString("POSTGRES_PORT", "5432")
 	postgresUsername     = flags.EnvString("POSTGRES_USERNAME", "conductor")
 	postgresPassword     = flags.EnvString("POSTGRES_PASSWORD", "conductor")
