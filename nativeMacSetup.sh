@@ -41,6 +41,10 @@ sleep 5
 echo -e "${PINK}filling postgres instance with test data...${NC}"
 make test-data
 
+
+echo -e "${PINK}building conductor service binary...${NC}"
+go build -o $HOME/app/conductor $HOME/go/src/github.com/Nextdoor/conductor/cmd/conductor/conductor.go
+
 # Generate SSL certs.
 echo -e "${PINK}Generate SSL certs....${NC}"
 mkdir -p $HOME/app/ssl && cd $HOME/app/ssl && \
@@ -49,15 +53,20 @@ mkdir -p $HOME/app/ssl && cd $HOME/app/ssl && \
                 -days 36500 -subj '/CN=localhost' && \
     openssl dhparam -dsaparam -out dhparam.pem 4096
 
+
+echo -e "${PINK}stopping nginx server globally...${NC}"
+nginx -s stop
+
 # use the mac nginx config
 echo -e "${PINK}use the mac nginx config...${NC}"
 mv $HOME/app/nginx-mac.conf $HOME/app/nginx.conf
-
-echo -e "${PINK}starting go service..${NC}"
-go build -o $HOME/app/conductor $HOME/go/src/github.com/Nextdoor/conductor/cmd/conductor/conductor.go &
+ 
 
 echo -e "${PINK}starting nginx..${NC}"
-nginx -c $HOME/app/nginx.conf -p $HOME/app/ &
+nginx -c $HOME/app/nginx.conf -p $HOME/app/
+
+echo -e "${PINK}starting go service..${NC}"
+exec $HOME/app/conductor
 
 
 
