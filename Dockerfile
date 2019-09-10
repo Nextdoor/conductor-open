@@ -1,4 +1,4 @@
-FROM golang:1.11.9-stretch
+FROM golang:1.11.12-stretch
 ENTRYPOINT [ "/app/entrypoint.sh" ]
 EXPOSE 80 443
 
