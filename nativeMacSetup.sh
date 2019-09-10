@@ -43,6 +43,10 @@ make test-data
 
 
 echo -e "${PINK}building conductor service binary...${NC}"
+rm -rf .build && mkdir .build && cp -rf  cmd core services shared .build
+mkdir -p $HOME/go/src/github.com/Nextdoor/conductor
+cp -R  .build/ $HOME/go/src/github.com/Nextdoor/conductor 
+
 go build -o $HOME/app/conductor $HOME/go/src/github.com/Nextdoor/conductor/cmd/conductor/conductor.go
 
 # Generate SSL certs.
