@@ -14,7 +14,7 @@ var (
 	// try this from the image that your accessing to see if you have access to the postgres instance
 	// psql -h localhost -U conductor
 	postgresHost         = flags.EnvString("POSTGRES_HOST", "localhost")
-	postgresPort         = flags.EnvString("POSTGRES_PORT", "5432")
+	postgresPort         = flags.EnvString("POSTGRES_PORT", "5434")
 	postgresUsername     = flags.EnvString("POSTGRES_USERNAME", "conductor")
 	postgresPassword     = flags.EnvString("POSTGRES_PASSWORD", "conductor")
 	postgresDatabaseName = flags.EnvString("POSTGRES_DATABASE_NAME", "conductor")
