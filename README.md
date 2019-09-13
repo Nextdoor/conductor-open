@@ -4,7 +4,7 @@
 
 - [Introduction](#introduction)
 - [Diagrams](#diagrams)
-- [Quick Dev Setup](#quickDevSetup)
+- [Quick Dev Setup](#quick-dev-setup)
 - [Terminology](#terminology)
 - [Trains](#trains)
 
