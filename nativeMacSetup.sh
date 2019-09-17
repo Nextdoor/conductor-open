@@ -13,6 +13,7 @@ PINK='\033[0;35m'
 RED='\033[1;31m'
 NC='\033[0m'        # No Color
 
+
 echo -e "${PINK}checking install of yarn, node, nginx server and swagger..${NC}"
 node -v || echo -e "${RED}ERROR: please install node using installer: https://nodejs.org/en/download/ ${NC}"
 npm -v || echo -e "${RED}ERROR: please install node using installer: https://nodejs.org/en/download/ ${NC}"
@@ -24,6 +25,9 @@ echo -e "${PINK}creating and coping static resources into webserver...${NC}"
 make prod-compile -C frontend
 cp -R resources/ $HOME/app
 
+echo -e "${PINK}stop all existing containers to avoid attached port conflicts..${NC}"
+docker container stop $(docker container ls -aq)
+
 echo -e "${PINK}bringing up new postgres docker container for conductor...${NC}"
 make postgres
 
@@ -32,7 +36,6 @@ sleep 5
 
 echo -e "${PINK}filling postgres instance with test data...${NC}"
 make test-data
-
 
 echo -e "${PINK}building conductor service binary...${NC}"
 rm -rf .build && mkdir .build && cp -rf  cmd core services shared .build
@@ -43,6 +46,8 @@ echo -e "${PINK}generating index.html from swagger specs..${NC}"
 cp -R swagger/ $HOME/app/swagger
 pretty-swag -c $HOME/app/swagger/config.json
 
+echo -e "${PINK}build conductor Go binary, postgres host is set to localhost since it's not accessed over docker network bridge..${NC}"
+export POSTGRES_HOST=localhost;
 go build -o $HOME/app/conductor $HOME/go/src/github.com/Nextdoor/conductor/cmd/conductor/conductor.go
 
 # Generate SSL certs.
@@ -65,4 +70,3 @@ sudo nginx -c $HOME/app/nginx.conf -p $HOME/app/
 
 echo -e "${PINK}starting go service..${NC}"
 exec $HOME/app/conductor
-
