@@ -34,23 +34,14 @@ Built using [Gravizool](https://github.com/swaggy/gravizool).
 
 ### Downloading Tools
 
--Install latest go, by downloading and running installer from: 
-https://golang.org/dl/#featured
+-If missing, install latest go, by downloading and running [official installer](https://golang.org/dl/#featured)
 
 
--Install latest nodejs by downloading and running installer from: 
-https://nodejs.org/en/download/
+-If missing, install latest nodejs by downloading and running [official installer] (https://nodejs.org/en/download/)
 
+-If missing, install latest docker client, by signing up and [downloading client](https://docs.docker.com/docker-for-mac/install/)
 
--Installing latest dep (go dependency management tool):
-```curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh```
-
-
--Install latest docker client, by signing up and downloading from:
-https://docs.docker.com/docker-for-mac/install/
-
-NOTE: make sure docker is up and running on your machine before running ./dockerSetup.sh script as shown in step below.
-
+NOTE: make sure docker is up and running (either `docker up` or check if you see client running on top bar of your mac OS screen), on your machine before proceeding to running setup scripts.
 
 ### Downloading Source Code
 
