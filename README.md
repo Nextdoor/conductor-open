@@ -36,10 +36,11 @@ Built using [Gravizool](https://github.com/swaggy/gravizool).
 
 -If missing, install latest go, by downloading and running [official installer](https://golang.org/dl/#featured)
 
-
 -If missing, install latest nodejs by downloading and running [official installer](https://nodejs.org/en/download/)
 
 -If missing, install latest docker client, by signing up and [downloading client](https://docs.docker.com/docker-for-mac/install/)
+
+-If missing nginx (optional; for local machine setup only), install it via `brew install nginx` or compile from [source](http://nginx.org/en/download.html)
 
 NOTE: make sure docker is up and running (either `docker up` or check if you see client running on top bar of your mac OS screen), on your machine before proceeding to running setup scripts.
 
@@ -57,49 +58,17 @@ git clone https://github.com/Nextdoor/conductor.git
 
 ### Simple Deployment of Conductor on Dev Environment
 
-1. Create a client and OAuth token from you git login by going to `https://github.com/settings/developers`. Create a `New OAuth App`. Set Application Name to `conductor`.  Homepage URL to `github.com/Nextdoor/conductor`.  And Authorized callback URL to your local dev URL for now `http://localhost/api/auth/login`
-
-2. Now, set the client id created in step above, in the `frontend/envfile` of your downloaded source code. 
-
-2. On your terminal `cd $GOPATH/src/conductor/conductor`
-3. To create a conductor setup on a docker container , run `chmod +x ./dockerSetup.sh`, followed by `./dockerSetup.sh`
-4. To create a conductor setup on native mac , run `chmod +x ./nativeMacSetup.sh`, followed by `./nativeMacSetup.sh`
-5. In either case, your docker service is now accessible through your browser on `localhost:80`
+1. On your terminal `cd $GOPATH/src/conductor/conductor`
+2. Create a client and OAuth token from you git login by going to `https://github.com/settings/developers`. Create a `New OAuth App`. Set Application Name to `conductor`.  Homepage URL to `github.com/Nextdoor/conductor`.  And Authorized callback URL to your local dev URL for now `http://localhost/api/auth/login`
+3. Now, set the client id created in step above, in the `OAUTH_PAYLOAD` varialbe in `frontend/envfile` of your downloaded source code. 
+4. To create a conductor setup on a docker container , run `chmod +x ./dockerSetup.sh`, followed by `./dockerSetup.sh`
+5. To create a conductor setup on native mac , run `chmod +x ./nativeMacSetup.sh`, followed by `./nativeMacSetup.sh`
+6. In either case, your docker service is now accessible through your browser on `localhost:80`
 
 NOTE: This is without integrations with GitHub, Slack, Jenkins, Jira. These are specific features that you can setup on a need-for basis on your dev environment, by generating real access keys with these systems and setting them into the `envfile`. Otherwise we use mocked simulation of these tools in dev
 
 
-### Help on Potential Common Setup Error:
-
-While running either of the setup scripts, if you get an error such as 
-
-```
-[ORM] register db Ping `default`, dial tcp 127.0.0.1:5434: connect: connection refused
-panic: register db Ping `default`, dial tcp 127.0.0.1:5434: connect: connection refused
-```
-
-Then, first see that your Postgres docker container is up by running the command ``` docker ps ```,
-next try connecting it from the terminal by running the command ``` psql postgres -h localhost -p 5434 -U conductor```.
-If the connection work, then perhaps, in your services/data/postgres.go file you need to replace localhost with the public ip of the Postgres docker container.
-You can get the public ip, by finding the postgres container id throug, `docker ps` and running the command ```docker inspect <container id>``` to see machine details.
-
-
 ### Debugging Instructions
-
-You can attach a debugger either on your native machine terminal (of IDE), or within the shell of the conductor docker container.
-The instruction in either case is 
-
-1) Download delve debugger:
-```
-go get -u github.com/go-delve/delve/cmd/dlv
-```
-
-2) Get the process id of the running conductor process, and run the delve command
-
-```
-ps -ef | grep conductor
-dlv attach <your-local-conductor-process-id> --headless=true --listen=localhost --api-version=2 --wd=$GOPATH/src/conductor/conductor
-```
 
 For the native environment debugging (which is generally faster than developing on docker), you can use VSCode, and add a debug configuration to you launch.json as below.
 When the debugger line goes from blue to orange it mean it attached successfully, and should now hit your breakpoints. NOTE: VSCode doesn’t appear to support remote debugging for Go language yet.
@@ -119,13 +88,30 @@ When the debugger line goes from blue to orange it mean it attached successfully
     ]
 ```
 
+OR
+
+You can attach a debugger either on your native machine terminal (of IDE), or within the shell of the conductor docker container.
+The instruction in either case is 
+
+1) Download delve debugger:
+```
+go get -u github.com/go-delve/delve/cmd/dlv
+```
+
+2) Get the process id of the running conductor process, and run the delve command
+
+```
+ps -ef | grep conductor
+dlv attach <your-local-conductor-process-id> --headless=true --listen=localhost --api-version=2 --wd=$GOPATH/src/conductor/conductor
+```
+
 ### Few Other Useful Commands
 
-1) To attach to the shell of a docker image, do `docker ps`, followed my `docker exec -t <container-id>`. Or get the Docker plugin on VSCode, and right click and attach shell on the running containers panel.
+1) To attach to the shell of a docker image, do `docker ps`, followed my `docker exec -t <container-id> bash`. Or get the Docker plugin on VSCode, and right click and attach shell on the running containers panel.
 
 2) If changes on your local code are not reflecting on your docker container deployment. Delete old conductor docker volume and images (VSCode Docker plugin is very helpful for seeing this visually), and run the ./dockerSetup.sh command again.
 
-3) In local deployment to restart your nginx server, try `nginx -s stop` and `nginx start`
+3) In local deployment to restart your nginx server, try `sudo nginx -s stop` and `sudo nginx start`
 
 4) To see if an existing process is running on a port try  `lsof -i :<port-number>`
 
