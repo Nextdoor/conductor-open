@@ -991,7 +991,7 @@ func (d *dataClient) WriteToken(newToken, name, email, avatar, codeToken string)
 	} else {
 		// Insert a new token (including the code token).
 		_, err = d.Client.Insert(&auth)
-		if err != nil && err.Error() != "no LastInsertId available" {
+		if err != nil && !(err.Error() == "LastInsertId is not supported by this driver" || err.Error() == "no LastInsertId available") {
 			return err
 		}
 	}
