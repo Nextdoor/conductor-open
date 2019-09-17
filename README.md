@@ -81,7 +81,7 @@ panic: register db Ping `default`, dial tcp 127.0.0.1:5434: connect: connection 
 Then, first see that your Postgres docker container is up by running the command ``` docker ps ```,
 next try connecting it from the terminal by running the command ``` psql postgres -h localhost -p 5434 -U conductor```.
 If the connection work, then perhaps, in your services/data/postgres.go file you need to replace localhost with the public ip of the Postgres docker container.
-You can get the public ip, by entering the shell of that container, and running the command ```docker inspect <container id>```
+You can get the public ip, by finding the postgres container id throug, `docker ps` and running the command ```docker inspect <container id>``` to see machine details.
 
 
 ### Debugging Instructions
@@ -89,12 +89,12 @@ You can get the public ip, by entering the shell of that container, and running 
 You can attach a debugger either on your native machine terminal (of IDE), or within the shell of the conductor docker container.
 The instruction in either case is 
 
-1) download delve debugger:
+1) Download delve debugger:
 ```
 go get -u github.com/go-delve/delve/cmd/dlv
 ```
 
-2) get the process id of the running conductor process, and run the delve command
+2) Get the process id of the running conductor process, and run the delve command
 
 ```
 ps -ef | grep conductor
@@ -118,6 +118,18 @@ When the debugger line goes from blue to orange it mean it attached successfully
 
     ]
 ```
+
+### Few Other Useful Commands
+
+1) To attach to the shell of a docker image, do `docker ps`, followed my `docker exec -t <container-id>`. Or get the Docker plugin on VSCode, and right click and attach shell on the running containers panel.
+
+2) If changes on your local code are not reflecting on your docker container deployment. Delete old conductor docker volume and images (VSCode Docker plugin is very helpful for seeing this visually), and run the ./dockerSetup.sh command again.
+
+3) In local deployment to restart your nginx server, try `nginx -s stop` and `nginx start`
+
+4) To see if an existing process is running on a port try  `lsof -i :<port-number>`
+
+5) To kill and debugger process which would prevent re-running conductor, simply get process id by `ps -ef | grep conductor` and `kill -9` all of the listed results.
 
 
 ## Terminology
