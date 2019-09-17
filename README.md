@@ -34,7 +34,7 @@ Built using [Gravizool](https://github.com/swaggy/gravizool).
 
 ### Download Tools
 
--If missing, install latest go, by downloading and running [official installer](https://golang.org/dl/#featured)
+-If missing, install latest GoLang (v1.13 or above), by downloading and running [official installer](https://golang.org/dl/#featured)
 
 -If missing, install latest nodejs by downloading and running [official installer](https://nodejs.org/en/download/)
 
