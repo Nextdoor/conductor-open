@@ -47,7 +47,7 @@ cp -R swagger/ $HOME/app/swagger
 pretty-swag -c $HOME/app/swagger/config.json
 
 echo -e "${PINK}build conductor Go binary, postgres host is set to localhost since it's not accessed over docker network bridge..${NC}"
-export POSTGRES_HOST=localhost;
+export POSTGRES_HOST=localhost
 go build -o $HOME/app/conductor $HOME/go/src/github.com/Nextdoor/conductor/cmd/conductor/conductor.go
 
 # Generate SSL certs.
