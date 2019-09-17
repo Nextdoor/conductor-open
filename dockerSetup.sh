@@ -28,7 +28,8 @@ make prod-compile -C frontend
 echo -e "${PINK} Stop potential running ngnix (from nativeMacSetup) to avoid port conflict...${NC}"
 sudo nginx -s stop
 
-echo -e "${PINK}building backend conductor service${NC}"
+echo -e "${PINK}building backend conductor service...${NC}"
+export POSTGRES_HOST=conductor-postgres
 make docker-build
 
 echo -e "${PINK}starting conductor service${NC}"
