@@ -32,7 +32,7 @@ Built using [Gravizool](https://github.com/swaggy/gravizool).
 
 ## Quick Dev Setup
 
-### Downloading Tools
+### Download Tools
 
 -If missing, install latest go, by downloading and running [official installer](https://golang.org/dl/#featured)
 
@@ -43,7 +43,7 @@ Built using [Gravizool](https://github.com/swaggy/gravizool).
 
 NOTE: make sure docker is up and running (either `docker up` or check if you see client running on top bar of your mac OS screen), on your machine before proceeding to running setup scripts.
 
-### Downloading Source Code
+### Download Source Code
 
 -Download project in the given path relative to GO path:
 
