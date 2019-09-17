@@ -111,11 +111,15 @@ dlv attach <your-local-conductor-process-id> --headless=true --listen=localhost 
 
 2) If changes on your local code are not reflecting on your docker container deployment. Delete old conductor docker volume and images (VSCode Docker plugin is very helpful for seeing this visually), and run the ./dockerSetup.sh command again.
 
+2) If changes on your local code are not reflecting on your native mac conductor deployment. `rm -rf ~/app/conductor`, and run the ./nativeMacSetup.sh command again (els
+
 3) In local deployment to restart your nginx server, try `sudo nginx -s stop` and `sudo nginx start`
 
 4) To see if an existing process is running on a port try  `lsof -i :<port-number>`
 
 5) To kill and debugger process which would prevent re-running conductor, simply get process id by `ps -ef | grep conductor` and `kill -9` all of the listed results.
+
+
 
 
 ## Terminology
