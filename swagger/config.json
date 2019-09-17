@@ -1,6 +1,6 @@
 {
-  "input": "app/swagger/swagger.yml",
-  "output": "app/swagger/index.html",
+  "input": "swagger/swagger.yml",
+  "output": "swagger/index.html",
   "format": "singlefile",
   "markdown": true,
   "theme": {
