@@ -32,7 +32,7 @@ Built using [Gravizool](https://github.com/swaggy/gravizool).
 
 ## Quick Dev Setup
 
-###DOWNLOADING TOOLS
+### Downloading Tools
 
 -Install latest go, by downloading and running installer from: 
 https://golang.org/dl/#featured
@@ -52,9 +52,9 @@ https://docs.docker.com/docker-for-mac/install/
 NOTE: make sure docker is up and running on your machine before running ./dockerSetup.sh script as shown in step below.
 
 
-###DOWNLOADING SOURCE CODE
+### Downloading Source Code
 
--Download project in GO Path:
+-Download project in the given path relative to GO path:
 
 ```
 cd $GOPATH/src
@@ -64,26 +64,21 @@ cd conductor
 git clone https://github.com/Nextdoor/conductor.git
 ```
 
-
-###SIMPLE DEPLOYMENT OF CONDUCTOR ON DEV ENVIRONMENT
-
-
+### Simple Deployment of Conductor on Dev Environment
 
 1. Create a client and OAuth token from you git login by going to `https://github.com/settings/developers`. Create a `New OAuth App`.
-    1. Set Application Name to `conductor`.  Homepage URL to `github.com/Nextdoor/conductor`.  And Authorized callback URL to your local dev URL for now `http://localhost/api/auth/login`/
-    2. Now, set the client id created in the `frontend/envfile` of your downloaded source code. Also set the same callback url as above in `frontend/envfile`.
+    1. Set Application Name to `conductor`.  Homepage URL to `github.com/Nextdoor/conductor`.  And Authorized callback URL to your local dev URL for now `http://localhost/api/auth/login`
+    2. Now, set the client id created in the `frontend/envfile` of your downloaded source code. 
 
 2. `cd $GOPATH/src/conductor/conductor`
 3. To create a conductor setup on a docker container , run `chmod +x ./dockerSetup.sh`, followed by `./dockerSetup.sh`
 4. To create a conductor setup on native mac , run `chmod +x ./nativeMacSetup.sh`, followed by `./nativeMacSetup.sh`
 5. In either case, your docker service is now accessible through your browser on `localhost:80`
 
-
 NOTE: This is without integrations with GitHub, Slack, Jenkins, Jira. These are specific features that you can setup on a need-for basis on your dev environment, by generating real access keys with these systems and setting them into the `envfile`. Otherwise we use mocked simulation of these tools in dev
 
 
-
-###COMMON SETUP ERROR:
+### Help on Potential Common Setup Error:
 
 While running either of the setup scripts, you get an error such as 
 
@@ -98,8 +93,7 @@ If the connection work, then perhaps, in your services/data/postgres.go file you
 You can get the public ip, by entering the shell of that container, and running the command ```docker inspect <container id>```
 
 
-
-###DEBUGGING INSTRUCTIONS
+### Debugging Instructions
 
 You can attach a debugger either on your native machine terminal (of IDE), or within the shell of the conductor docker container.
 The instruction in either case is 
@@ -109,14 +103,12 @@ The instruction in either case is
 go get -u github.com/go-delve/delve/cmd/dlv
 ```
 
-
-2)get the process id of the running conductor process, and run the delve command
+2) get the process id of the running conductor process, and run the delve command
 
 ```
 ps -ef | grep conductor
 dlv attach <your-local-conductor-process-id> --headless=true --listen=localhost --api-version=2 --wd=$GOPATH/src/conductor/conductor
 ```
-
 
 For the native environment debugging (which is generally faster than developing on docker), you can use VSCode, and add a debug configuration to you launch.json as below.
 When the debugger line goes from blue to orange it mean it attached successfully, and should now hit your breakpoints. NOTE: VSCode doesn’t appear to support remote debugging for Go language yet.
@@ -135,7 +127,6 @@ When the debugger line goes from blue to orange it mean it attached successfully
 
     ]
 ```
-
 
 
 ## Terminology
