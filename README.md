@@ -71,7 +71,7 @@ NOTE: This is without integrations with GitHub, Slack, Jenkins, Jira. These are 
 
 ### Help on Potential Common Setup Error:
 
-While running either of the setup scripts, you get an error such as 
+While running either of the setup scripts, if you get an error such as 
 
 ```
 [ORM] register db Ping `default`, dial tcp 127.0.0.1:5434: connect: connection refused
