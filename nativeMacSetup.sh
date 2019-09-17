@@ -46,7 +46,10 @@ echo -e "${PINK}generating index.html from swagger specs..${NC}"
 cp -R swagger/ $HOME/app/swagger
 pretty-swag -c $HOME/app/swagger/config.json
 
-echo -e "${PINK}build conductor Go binary, postgres host is set to localhost since it's not accessed over docker network bridge..${NC}"
+echo -e "${PINK}removing any existing conductor binary in ~/app folder...${NC}"
+rm -rf ~/app/conductor
+
+echo -e "${PINK}build conductor Go binary, postgres host is set to localhost since it\'s not accessed over docker network bridge..${NC}"
 export POSTGRES_HOST=localhost
 go build -o $HOME/app/conductor $HOME/go/src/github.com/Nextdoor/conductor/cmd/conductor/conductor.go
 
