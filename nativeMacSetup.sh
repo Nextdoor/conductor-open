@@ -54,14 +54,14 @@ mkdir -p $HOME/app/ssl && cd $HOME/app/ssl && \
     openssl dhparam -dsaparam -out dhparam.pem 4096
 
 echo -e "${PINK}stopping nginx server globally...${NC}"
-nginx -s stop
+sudo nginx -s stop
 
 # use the mac nginx config
 echo -e "${PINK}use the mac nginx config...${NC}"
 mv $HOME/app/nginx-mac.conf $HOME/app/nginx.conf
  
 echo -e "${PINK}starting nginx..${NC}"
-nginx -c $HOME/app/nginx.conf -p $HOME/app/
+sudo nginx -c $HOME/app/nginx.conf -p $HOME/app/
 
 echo -e "${PINK}starting go service..${NC}"
 exec $HOME/app/conductor
