@@ -116,7 +116,7 @@ PGDATA=/var/lib/postgresql/data/conductor
 
 define PG_ARGS
 --name conductor-postgres \
---publish 5434:5432 \
+--publish 5432:5432 \
 --env POSTGRES_USER=$(PGUSER) \
 --env POSTGRES_PASSWORD=$(PGPASS) \
 --env POSTGRES_DB=$(PGDB) \
@@ -150,7 +150,7 @@ psql:
 
 test-data: postgres-wipe
 	export POSTGRES_HOST=localhost; \
-	export POSTGRES_PORT=5434; \
+	export POSTGRES_PORT=5432; \
 	export ENABLE_DATADOG=false; \
 	set -a; \
 	if [[ -e testenv ]]; then \
