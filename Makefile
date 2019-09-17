@@ -60,7 +60,7 @@ TEST_CMD ?= "./..."
 .PHONY: docker-build docker-run docker-test docker-stop docker-logs docker-tag docker-push docker-login docker-populate-cache
 
 docker-build:
-	rm -rf .build && mkdir .build && cp -rf  cmd core services shared .build
+	rm -rf .build && mkdir .build && cp -rf  cmd core services shared go.mod go.sum .build
 	echo "Building Conductor Docker image..."
 	docker build -t $(DOCKER_IMAGE) .; result=$$?; rm -rf .build; exit $$result
 
