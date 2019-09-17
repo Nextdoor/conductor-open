@@ -1,12 +1,11 @@
-FROM golang:1.11.12-stretch
+FROM golang:1.11.13
 ENTRYPOINT [ "/app/entrypoint.sh" ]
 EXPOSE 80 443
 
 # Install packages.
 RUN curl -sL https://deb.nodesource.com/setup_9.x | bash - && \
     apt-get install -y jq nginx nodejs patch unzip && \
-    apt-get clean && \
-    npm install -g pretty-swag@0.1.144
+    apt-get clean
 
 # Generate SSL certs.
 RUN mkdir -p /app/ssl && cd /app/ssl && \
@@ -16,8 +15,10 @@ RUN mkdir -p /app/ssl && cd /app/ssl && \
     openssl dhparam -dsaparam -out dhparam.pem 4096
 
 # Generate swagger docs.
+RUN apt-get install -y npm && npm install -g pretty-swag@0.1.144
 ADD swagger/swagger.yml swagger/config.json /app/swagger/
-RUN pretty-swag -c /app/swagger/config.json
+RUN ls /app/swagger/
+RUN cd /app && pretty-swag -c /app/swagger/config.json
 
 # Add awscli
 RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
@@ -25,9 +26,11 @@ RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
     pip install awscli && \
     rm -f get-pip.py
 
+
 # Set up Go app.
+ADD .build /src/github.com/Nextdoor/conductor/
 ADD .build /go/src/github.com/Nextdoor/conductor/
-RUN go build -o /app/conductor /go/src/github.com/Nextdoor/conductor/cmd/conductor/conductor.go
+RUN cd /src/github.com/Nextdoor/conductor/ && go build -o /app/conductor /src/github.com/Nextdoor/conductor/cmd/conductor/conductor.go
 
 # Add static resources.
 ADD resources/ /app
