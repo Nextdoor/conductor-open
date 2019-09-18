@@ -14,62 +14,63 @@ RED='\033[1;31m'
 NC='\033[0m'        # No Color
 
 
-echo -e "${PINK}checking install of yarn, node, nginx server and swagger..${NC}"
-node -v || echo -e "${RED}ERROR: please install node using installer: https://nodejs.org/en/download/ ${NC}"
-npm -v || echo -e "${RED}ERROR: please install node using installer: https://nodejs.org/en/download/ ${NC}"
-nginx -v || echo -e "${RED}ERROR: please install nginx using installer: http://nginx.org/en/download.html ${NC}"
+echo -e "${PINK} Checking install of yarn, node, nginx server and swagger..${NC}"
+node -v || echo -e "${RED}ERROR: Please install node using installer: https://nodejs.org/en/download/ ${NC}"
+npm -v || echo -e "${RED}ERROR: Please install node using installer: https://nodejs.org/en/download/ ${NC}"
+nginx -v || echo -e "${PINK}INFO: Intalling nginx ${NC}"
+nginx -v || brew install nginx
 yarn -v || npm install -g yarn;
 npm install -g pretty-swag@0.1.144;
 
-echo -e "${PINK}creating and coping static resources into webserver...${NC}"
+echo -e "${PINK} Creating and coping static resources into webserver...${NC}"
 make prod-compile -C frontend
 cp -R resources/ $HOME/app
 
-echo -e "${PINK}stop all existing containers to avoid attached port conflicts..${NC}"
+echo -e "${PINK} Stopping all existing docker containers to avoid attached port conflicts..${NC}"
 docker container stop $(docker container ls -aq)
 
-echo -e "${PINK}bringing up new postgres docker container for conductor...${NC}"
+echo -e "${PINK} Bringing up new postgres docker container for conductor...${NC}"
 make postgres
 
-echo -e "${PINK}sleeping for 5 seconds before connecting with new postgres instance...${NC}"
+echo -e "${PINK} Sleeping for 5 seconds before connecting with new postgres instance...${NC}"
 sleep 5
 
-echo -e "${PINK}filling postgres instance with test data...${NC}"
+echo -e "${PINK} Filling postgres instance with test data...${NC}"
 make test-data
 
-echo -e "${PINK}building conductor service binary...${NC}"
+echo -e "${PINK} Building conductor service binary...${NC}"
 rm -rf .build && mkdir .build && cp -rf  cmd core services shared .build
 mkdir -p $HOME/go/src/github.com/Nextdoor/conductor
 cp -R  .build/ $HOME/go/src/github.com/Nextdoor/conductor 
 
-echo -e "${PINK}generating index.html from swagger specs..${NC}"
+echo -e "${PINK} Generating index.html from swagger specs..${NC}"
 cp -R swagger/ $HOME/app/swagger
 pretty-swag -c $HOME/app/swagger/config.json
 
-echo -e "${PINK}removing any existing conductor binary in ~/app folder...${NC}"
+echo -e "${PINK} Removing any existing conductor binary in ~/app folder...${NC}"
 rm -rf ~/app/conductor
 
-echo -e "${PINK}build conductor Go binary, postgres host is set to localhost since it\'s not accessed over docker network bridge..${NC}"
+echo -e "${PINK} Building Conductor Go binary, postgres host is set to localhost since it\'s not accessed over docker network bridge..${NC}"
 export POSTGRES_HOST=localhost
 go build -o $HOME/app/conductor $HOME/go/src/github.com/Nextdoor/conductor/cmd/conductor/conductor.go
 
 # Generate SSL certs.
-echo -e "${PINK}Generate SSL certs....${NC}"
+echo -e "${PINK} Generating SSL certs....${NC}"
 mkdir -p $HOME/app/ssl && cd $HOME/app/ssl && \
     openssl req -x509 -nodes -newkey rsa:4096 -sha256 \
                 -keyout privkey.pem -out fullchain.pem \
                 -days 36500 -subj '/CN=localhost' && \
     openssl dhparam -dsaparam -out dhparam.pem 4096
 
-echo -e "${PINK}stopping nginx server globally...${NC}"
+echo -e "${PINK} Stopping nginx server globally...${NC}"
 sudo nginx -s stop
 
 # use the mac nginx config
-echo -e "${PINK}use the mac nginx config...${NC}"
+echo -e "${PINK} Use the mac nginx config...${NC}"
 mv $HOME/app/nginx-mac.conf $HOME/app/nginx.conf
  
-echo -e "${PINK}starting nginx..${NC}"
+echo -e "${PINK} Starting nginx..${NC}"
 sudo nginx -c $HOME/app/nginx.conf -p $HOME/app/
 
-echo -e "${PINK}starting go service..${NC}"
+echo -e "${PINK} Starting go service..${NC}"
 exec $HOME/app/conductor
