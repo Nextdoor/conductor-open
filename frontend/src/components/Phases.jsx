@@ -163,6 +163,7 @@ class Phases extends TrainComponent {
       const job = jobs[i];
       const jobInfo = {
         name: job.name.charAt(0).toUpperCase() + job.name.slice(1),
+        id: job.id,
         url: job.url
       };
 
@@ -193,6 +194,7 @@ class Phases extends TrainComponent {
       const jobAttributes = (
         <div>
           <span className="job-name">{job.name}</span>
+          <span className="job-id">(ID: {job.id})</span>
           <span className="job-result">{job.result}</span>
           <span className="job-status">{job.status}</span>
         </div>
