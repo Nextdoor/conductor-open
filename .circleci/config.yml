@@ -34,7 +34,7 @@ jobs:
       - *setup-environment
       - run: docker pull $CACHE_FROM || true
       - run: make postgres
-      - run: make build
+      - run: make docker-build
       - run: make test
 
 workflows:
