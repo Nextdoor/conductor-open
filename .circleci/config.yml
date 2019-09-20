@@ -1,12 +1,38 @@
 version: 2
 
+defaults: &defaults
+  docker:
+    - image: circleci/golang
+  working_directory: ~/conductor
+  environment:
+    DOCKER_IMAGE: conductor
+    DOCKER_REGISTRY: hub.docker.com
+    DOCKER_NAMESPACE: nextdoor
+
+step_library:
+  - &setup-environment
+    run:
+      name: Set environment variables
+      command: |
+        # Set vars.
+        SHA1=$(echo $CIRCLE_SHA1 | cut -c -16)
+        DOCKER_TAG=$(echo ${CIRCLE_TAG:-$CIRCLE_BRANCH-$SHA1} | sed 's|/|_|g')
+        CACHE_FROM="${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/${DOCKER_IMAGE}"
+        # Export them into bash env.
+        echo "export SHA1=$SHA1" >> $BASH_ENV
+        echo "export DOCKER_TAG=$DOCKER_TAG" >> $BASH_ENV
+        echo "export CACHE_FROM=$CACHE_FROM" >> $BASH_ENV
+
 jobs:
   build:
     docker:
       - image: circleci/golang:1.12.2-stretch-node
     steps:
       - checkout
+      - setup_remote_docker
       - run: echo "Hello World"
+      - *setup-environment
+      - run: docker pull $CACHE_FROM || true
       - run: make postgres
       - run: make build
       - run: make test
