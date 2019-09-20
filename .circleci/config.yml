@@ -41,7 +41,7 @@ jobs:
       - run: docker pull $CACHE_FROM || true
       - run: make postgres
       - run: make docker-build
-      - run: make test
+      - run: make docker-test
 
 workflows:
   version: 2
