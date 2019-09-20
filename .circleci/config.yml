@@ -5,7 +5,11 @@ jobs:
     docker:
       - image: circleci/golang:1.12.2-stretch-node
     steps:
+      - checkout
       - run: echo "Hello World"
+      - run: make postgres
+      - run: make build
+      - run: make test
 
 workflows:
   version: 2
