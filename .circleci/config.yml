@@ -22,11 +22,17 @@ step_library:
         echo "export SHA1=$SHA1" >> $BASH_ENV
         echo "export DOCKER_TAG=$DOCKER_TAG" >> $BASH_ENV
         echo "export CACHE_FROM=$CACHE_FROM" >> $BASH_ENV
+    run:
+      name: Install goimports
+      command: go get golang.org/x/tools/cmd/goimports
 
 jobs:
   build:
     docker:
       - image: circleci/golang:1.12.2-stretch-node
+        environment:
+          GO111MODULE: "on"
+    working_directory: /go/src/github.com/Nextdoor/conductor
     steps:
       - checkout
       - setup_remote_docker
