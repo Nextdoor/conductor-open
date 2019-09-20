@@ -11,4 +11,4 @@ workflows:
   version: 2
   workflow:
     jobs:
-      - build:
+      - build
