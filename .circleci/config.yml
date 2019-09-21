@@ -25,6 +25,8 @@ step_library:
     run:
       name: Install goimports
       command: go get golang.org/x/tools/cmd/goimports
+    # Install yarn.
+    run: curl -o- -L https://yarnpkg.com/install.sh | bash
 
 jobs:
   build:
