@@ -21,6 +21,7 @@ jobs:
           docker_layer_caching: true
       - run: pwd
       - run: ls
+      - run:
           name: Set environment variables
           command: |
             # Set vars.
