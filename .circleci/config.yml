@@ -2,8 +2,7 @@ version: 2
 
 defaults: &defaults
   docker:
-    - image: circleci/golang
-  working_directory: ~/conductor
+    - image: circleci/golang:1.12.2-stretch-node
   environment:
     DOCKER_IMAGE: conductor
     DOCKER_REGISTRY: hub.docker.com
@@ -13,6 +12,9 @@ jobs:
   build:
     docker:
       - image: circleci/golang:1.12.2-stretch-node
+        environment:
+          GO111MODULE: "on"
+    working_directory: /go/src/github.com/Nextdoor/conductor
     steps:
       - checkout
       - setup_remote_docker
