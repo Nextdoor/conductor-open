@@ -37,6 +37,8 @@ jobs:
       - run: curl -o- -L https://yarnpkg.com/install.sh | bash
       - run: docker pull $CACHE_FROM || true
       - run: make postgres && sleep 15
+      # Compile the frontend
+      - run: make -C conductor/frontend prod-compile
       - run: make docker-build
       - run: make test
 
