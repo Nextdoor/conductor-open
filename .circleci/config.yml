@@ -16,9 +16,10 @@ jobs:
           GO111MODULE: "on"
     working_directory: /go/src/github.com/Nextdoor/conductor
     steps:
-      - checkout
       - setup_remote_docker
-      - run: echo "Hello World"
+          docker_layer_caching: true
+      - checkout
+      - run: make -C conductor docker-login docker-populate-cache
       - run:
           name: Set environment variables
           command: |
@@ -38,7 +39,7 @@ jobs:
       # Install yarn
       - run: curl -o- -L https://yarnpkg.com/install.sh | bash
       - run: docker pull $CACHE_FROM || true
-      - run: make postgres && sleep 15
+      - run: make postgres
       # Compile the frontend
       - run: make -C conductor/frontend prod-compile
       - run: make docker-build
