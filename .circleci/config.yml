@@ -16,10 +16,11 @@ jobs:
           GO111MODULE: "on"
     working_directory: /go/src/github.com/Nextdoor/conductor
     steps:
+      - checkout
       - setup_remote_docker:
           docker_layer_caching: true
-      - checkout
-      - run: make -C conductor docker-login docker-populate-cache
+      - run: make -C conductor docker-login
+      - run: make -C conductor docker-populate-cache
       - run:
           name: Set environment variables
           command: |
