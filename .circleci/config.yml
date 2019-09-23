@@ -9,27 +9,6 @@ defaults: &defaults
     DOCKER_REGISTRY: hub.docker.com
     DOCKER_NAMESPACE: nextdoor
 
-step_library:
-  - &setup-environment
-    run:
-      name: Set environment variables
-      command: |
-        # Set vars.
-        SHA1=$(echo $CIRCLE_SHA1 | cut -c -16)
-        DOCKER_TAG=$(echo ${CIRCLE_TAG:-$CIRCLE_BRANCH-$SHA1} | sed 's|/|_|g')
-        CACHE_FROM="${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/${DOCKER_IMAGE}"
-        # Export them into bash env.
-        echo "export SHA1=$SHA1" >> $BASH_ENV
-        echo "export DOCKER_TAG=$DOCKER_TAG" >> $BASH_ENV
-        echo "export CACHE_FROM=$CACHE_FROM" >> $BASH_ENV
-    run:
-      name: Install goimports
-      command: |
-        go get golang.org/x/tools/cmd/goimports
-        go install golang.org/x/tools/cmd/goimports
-    # Install yarn.
-    run: curl -o- -L https://yarnpkg.com/install.sh | bash
-
 jobs:
   build:
     docker:
@@ -38,7 +17,24 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: echo "Hello World"
-      - *setup-environment
+      - run:
+          name: Set environment variables
+          command: |
+            # Set vars.
+            SHA1=$(echo $CIRCLE_SHA1 | cut -c -16)
+            DOCKER_TAG=$(echo ${CIRCLE_TAG:-$CIRCLE_BRANCH-$SHA1} | sed 's|/|_|g')
+            CACHE_FROM="${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/${DOCKER_IMAGE}"
+            # Export them into bash env.
+            echo "export SHA1=$SHA1" >> $BASH_ENV
+            echo "export DOCKER_TAG=$DOCKER_TAG" >> $BASH_ENV
+            echo "export CACHE_FROM=$CACHE_FROM" >> $BASH_ENV
+      - run:
+          name: Install goimports
+          command: |
+            go get golang.org/x/tools/cmd/goimports
+            go install golang.org/x/tools/cmd/goimports
+      # Install yarn
+      - run: curl -o- -L https://yarnpkg.com/install.sh | bash
       - run: docker pull $CACHE_FROM || true
       - run: make postgres && sleep 15
       - run: make docker-build
