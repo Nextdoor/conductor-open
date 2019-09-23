@@ -145,16 +145,20 @@ class Phases extends TrainComponent {
     const activePhase = this.state.focusedPhase !== null ? this.state.focusedPhase : train.active_phase;
 
     let jobs = [];
+    let phaseId = 0;
     switch (activePhase) {
       default:
       case PhaseTypes.Delivery:
         jobs = train.active_phases.delivery.jobs;
+        phaseId = train.active_phases.delivery.id;
         break;
       case PhaseTypes.Verification:
         jobs = train.active_phases.verification.jobs;
+        phaseId = train.active_phases.verification.id;
         break;
       case PhaseTypes.Deploy:
         jobs = train.active_phases.deploy.jobs;
+        phaseId = train.active_phases.deploy.id;
         break;
     }
 
@@ -163,6 +167,7 @@ class Phases extends TrainComponent {
       const job = jobs[i];
       const jobInfo = {
         name: job.name.charAt(0).toUpperCase() + job.name.slice(1),
+        id: job.id,
         url: job.url
       };
 
@@ -193,6 +198,7 @@ class Phases extends TrainComponent {
       const jobAttributes = (
         <div>
           <span className="job-name">{job.name}</span>
+          <span className="job-id">(ID: {job.id})</span>
           <span className="job-result">{job.result}</span>
           <span className="job-status">{job.status}</span>
         </div>
@@ -217,9 +223,12 @@ class Phases extends TrainComponent {
     });
 
     return (
+      <div>
       <ul className="jobs-list">
         {listItems}
       </ul>
+      <p className="phase-id">Phase ID: {phaseId}</p>
+      </div>
     );
   }
 }
