@@ -20,9 +20,7 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: true
       - run: pwd
-      - run: make -C conductor docker-login
-      - run: make -C conductor docker-populate-cache
-      - run:
+      - run: ls
           name: Set environment variables
           command: |
             # Set vars.
@@ -43,7 +41,7 @@ jobs:
       - run: docker pull $CACHE_FROM || true
       - run: make postgres
       # Compile the frontend
-      - run: make -C conductor/frontend prod-compile
+      - run: make -C frontend prod-compile
       - run: make docker-build
       - run: make test
 
