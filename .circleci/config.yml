@@ -19,6 +19,7 @@ jobs:
       - checkout
       - setup_remote_docker:
           docker_layer_caching: true
+      - run: pwd
       - run: make -C conductor docker-login
       - run: make -C conductor docker-populate-cache
       - run:
