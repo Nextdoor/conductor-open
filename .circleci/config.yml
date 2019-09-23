@@ -24,7 +24,9 @@ step_library:
         echo "export CACHE_FROM=$CACHE_FROM" >> $BASH_ENV
     run:
       name: Install goimports
-      command: go get golang.org/x/tools/cmd/goimports
+      command: |
+        go get golang.org/x/tools/cmd/goimports
+        go install golang.org/x/tools/cmd/goimports
     # Install yarn.
     run: curl -o- -L https://yarnpkg.com/install.sh | bash
 
@@ -38,7 +40,7 @@ jobs:
       - run: echo "Hello World"
       - *setup-environment
       - run: docker pull $CACHE_FROM || true
-      - run: make postgres
+      - run: make postgres && sleep 15
       - run: make docker-build
       - run: make test
 
