@@ -7,13 +7,12 @@ defaults: &defaults
     DOCKER_IMAGE: conductor
     DOCKER_REGISTRY: hub.docker.com
     DOCKER_NAMESPACE: nextdoor
+    GO111MODULE: "on"
 
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.12.2-stretch-node
-        environment:
-          GO111MODULE: "on"
+      - image: circleci/golang:1.12.2-stretch-node          
     working_directory: /go/src/github.com/Nextdoor/conductor
     steps:
       - checkout
