@@ -28,7 +28,6 @@ RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
 
 
 # Set up Go app.
-COPY go.mod go.sum ./
 RUN go mod download
 
 ADD .build /src/github.com/Nextdoor/conductor/
