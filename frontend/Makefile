@@ -1,6 +1,6 @@
 all: watch
 
-ENVFILE = if [ -e envfile ]; then set -a; . envfile; fi;
+ENVFILE = if [ -e envfile ]; then set -a; source envfile; fi;
 install:
 	yarn install
 
