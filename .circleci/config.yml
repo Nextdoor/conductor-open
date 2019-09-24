@@ -44,6 +44,8 @@ jobs:
       # Compile the frontend
       # - run: make -C frontend prod-compile
       - run: make docker-build
+      # Check for module files
+      - run: ls
       - run: make test
 
 workflows:
