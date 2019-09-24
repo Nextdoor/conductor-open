@@ -42,7 +42,7 @@ jobs:
       - run: docker pull $CACHE_FROM || true
       - run: make postgres
       # Compile the frontend
-      - run: make -C frontend prod-compile
+      # - run: make -C frontend prod-compile
       - run: make docker-build
       - run: make test
 
