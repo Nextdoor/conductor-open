@@ -28,11 +28,9 @@ RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
 
 
 # Set up Go app.
-RUN go mod download
-
 ADD .build /src/github.com/Nextdoor/conductor/
 ADD .build /go/src/github.com/Nextdoor/conductor/
-RUN cd /src/github.com/Nextdoor/conductor/ && go build -o /app/conductor /src/github.com/Nextdoor/conductor/cmd/conductor/conductor.go
+RUN cd /src/github.com/Nextdoor/conductor/ && go mod download && go build -o /app/conductor /src/github.com/Nextdoor/conductor/cmd/conductor/conductor.go
 
 # Add static resources.
 ADD resources/ /app
