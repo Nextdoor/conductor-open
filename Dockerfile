@@ -26,9 +26,6 @@ RUN apt-get install -y \
     && pip3 --no-cache-dir install --upgrade awscli \
     && apt-get clean
 
-
-
-
 # Set up Go app.
 ADD .build /src/github.com/Nextdoor/conductor/
 ADD .build /go/src/github.com/Nextdoor/conductor/
