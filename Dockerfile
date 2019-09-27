@@ -21,17 +21,12 @@ RUN ls /app/swagger/
 RUN cd /app && pretty-swag -c /app/swagger/config.json
 
 # Add awscli
-RUN apt-get update && \
-    apt-get install -y \
-        python3 \
+RUN apt-get install -y \
         python3-pip \
-        python3-setuptools \
-        groff \
-        less \
-    && pip3 install --upgrade pip \
+    && pip3 --no-cache-dir install --upgrade awscli \
     && apt-get clean
 
-RUN pip3 --no-cache-dir install --upgrade awscli
+
 
 
 # Set up Go app.
