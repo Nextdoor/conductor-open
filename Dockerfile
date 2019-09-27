@@ -21,10 +21,17 @@ RUN ls /app/swagger/
 RUN cd /app && pretty-swag -c /app/swagger/config.json
 
 # Add awscli
-RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
-    python get-pip.py && \
-    pip install awscli && \
-    rm -f get-pip.py
+RUN apt-get update && \
+    apt-get install -y \
+        python3 \
+        python3-pip \
+        python3-setuptools \
+        groff \
+        less \
+    && pip3 install --upgrade pip \
+    && apt-get clean
+
+RUN pip3 --no-cache-dir install --upgrade awscli
 
 
 # Set up Go app.
