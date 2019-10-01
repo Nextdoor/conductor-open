@@ -152,6 +152,27 @@ const receiveRollbackError = (error) => {
   };
 };
 
+const requestRestart = () => {
+  return {
+    type: Actions.RequestRestart
+  };
+};
+
+const receiveRestart = () => {
+  return {
+    type: Actions.ReceiveRestart,
+    receivedAt: Date.now()
+  };
+};
+
+const receiveRestartError = (error) => {
+  return {
+    type: Actions.ReceiveRestartError,
+    error: error,
+    receivedAt: Date.now()
+  };
+};
+
 const fetch = (trainId) => (dispatch) => {
   API.getTrain(trainId, dispatch, false);
 };
@@ -176,6 +197,10 @@ const rollbackTo = (trainId) => (dispatch) => {
   API.rollbackToTrain(trainId, dispatch);
 };
 
+const restart = (trainId, phaseName) => (dispatch) => {
+  API.restartJob(trainId, phaseName, dispatch);
+};
+
 const goToTrain = (trainId) => (dispatch) => {
   API.getTrain(trainId, dispatch, true);
 };
@@ -193,6 +218,7 @@ export default {
   unblock,
   cancel,
   rollbackTo,
+  restart,
   fetch,
   goToTrain,
   request,
@@ -213,6 +239,9 @@ export default {
   requestRollback,
   receiveRollback,
   receiveRollbackError,
+  requestRestart,
+  receiveRestart,
+  receiveRestartError,
   requestToggleClose,
   receiveToggleClose,
   receiveToggleCloseError,
