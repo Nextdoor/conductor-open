@@ -83,6 +83,12 @@ const rollbackToTrain = function(trainID) {
 const search = function(params) {
   return baseURI + '/search?' + encodeQueryParams(params);
 };
+const restartJob = function(trainID, phaseName) {
+  return baseURI + '/train/' + trainID + '/phase/' + phaseName + '/restart';
+};
+
+
+
 const config = baseURI + '/config';
 const mode = baseURI + '/mode';
 
@@ -205,7 +211,7 @@ const API = {
           Actions.Train.receiveUnblockError);
       });
   },
-
+ 
   cancelTrain: (trainId, dispatch) => {
     dispatch(Actions.Train.requestCancel());
     post(cancelTrain(trainId))
@@ -227,6 +233,18 @@ const API = {
           dispatch,
           Actions.Train.receiveRollback,
           Actions.Train.receiveRollbackError);
+      });
+  },
+
+  restartJob: (trainId, phaseName, dispatch) => {
+    dispatch(Actions.Train.requestRestart());
+    post(restartJob(trainId, phaseName))
+      .then((response) => {
+        handleResponse(
+          response,
+          dispatch,
+          Actions.Train.receiveRestart,
+          Actions.Train.receiveRestartError);
       });
   },
 
