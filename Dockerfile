@@ -21,11 +21,10 @@ RUN ls /app/swagger/
 RUN cd /app && pretty-swag -c /app/swagger/config.json
 
 # Add awscli
-RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
-    python get-pip.py && \
-    pip install awscli && \
-    rm -f get-pip.py
-
+RUN apt-get install -y \
+        python3-pip \
+    && pip3 --no-cache-dir install --upgrade awscli \
+    && apt-get clean
 
 # Set up Go app.
 ADD .build /src/github.com/Nextdoor/conductor/

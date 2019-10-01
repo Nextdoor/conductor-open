@@ -1,6 +1,6 @@
 module github.com/Nextdoor/conductor
 
-go 1.12
+go 1.11.13
 
 require (
 	github.com/DataDog/datadog-go v2.2.0+incompatible
