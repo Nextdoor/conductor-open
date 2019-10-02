@@ -31,6 +31,7 @@ type Service interface {
 	TrainBlocked(*types.Train, *types.User)
 	TrainUnblocked(*types.Train, *types.User)
 	TrainCancelled(*types.Train, *types.User)
+	EngineerChanged(*types.Train, *types.User)
 	RollbackInitiated(*types.Train, *types.User)
 	RollbackInfo(*types.User)
 	JobFailed(*types.Job)
@@ -247,6 +248,15 @@ func (m Messenger) TrainCancelled(train *types.Train, user *types.User) {
 			fmt.Sprintf("%s cancelled.",
 				m.formatTrainLink(train, "Train")))
 	}
+
+	m.Engine.send(text)
+}
+
+func (m Messenger) EngineerChanged(train *types.Train, user *types.User) {
+	var text = m.Engine.formatBold(
+		fmt.Sprintf("Train %s is claimed by new engineer %s.",
+			m.formatTrainLink(train, "Train"),
+			m.Engine.formatUser(user)))
 
 	m.Engine.send(text)
 }
