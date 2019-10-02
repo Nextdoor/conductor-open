@@ -1,5 +1,6 @@
 all: watch
 
+SHELL := /bin/bash
 ENVFILE = if [ -e envfile ]; then set -a; source envfile; fi;
 install:
 	yarn install
