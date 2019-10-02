@@ -14,6 +14,75 @@ RED='\033[1;31m'
 NC='\033[0m'        # No Color
 
 
+if [ "$1" == "--help" ] ; then
+
+    echo "--frontend : hot swaps only frontend code changes to a running conductor build"
+    echo "--backend : rebuild and deploy conductor backend code on local nginx"
+    echo "--help : shows help menu"
+
+    echo "if any of the above flags fail, just rebuild the environment by running nativeMacSetup without flags."
+
+    exit 0
+fi
+
+
+function restart_nginx {
+    echo -e "${PINK} Stopping nginx server globally...${NC}"
+    sudo -i nginx -s stop
+
+    # use the mac nginx config
+    echo -e "${PINK} Use the mac nginx config...${NC}"
+    mv $HOME/app/nginx-mac.conf $HOME/app/nginx.conf
+ 
+    echo -e "${PINK} Starting nginx..${NC}"
+    sudo nginx -c $HOME/app/nginx.conf -p $HOME/app/
+}
+
+function deploy_frontend {
+    echo -e "${PINK} Creating and coping static resources into webserver...${NC}"
+    make prod-compile -C frontend
+    cp -R resources/ $HOME/app
+
+    echo -e "${PINK} Generating index.html from swagger specs..${NC}"
+    cp -R swagger/ $HOME/app/swagger
+    pretty-swag -c $HOME/app/swagger/config.json
+
+    restart_nginx
+
+}
+
+function deploy_backend {
+    echo -e "${PINK} Building conductor service binary...${NC}"
+    rm -rf .build && mkdir .build && cp -rf  cmd core services shared .build
+    mkdir -p $HOME/go/src/github.com/Nextdoor/conductor
+    cp -R  .build/ $HOME/go/src/github.com/Nextdoor/conductor 
+
+
+    echo -e "${PINK} Removing any existing conductor binary in ~/app folder...${NC}"
+    rm -rf ~/app/conductor
+
+    echo -e "${PINK} Building Conductor Go binary, postgres host is set to localhost since it\'s not accessed over docker network bridge..${NC}"
+    export POSTGRES_HOST=localhost
+    go build -o $HOME/app/conductor $HOME/go/src/github.com/Nextdoor/conductor/cmd/conductor/conductor.go
+
+    echo -e "${PINK} Starting go service..${NC}"
+    exec $HOME/app/conductor
+
+}
+
+if [ "$1" == "--frontend" ] ; then
+    # run only frontend deployment related scripts, assuming we already once had a full local mac install
+    deploy_frontend
+    exit 0
+fi
+
+if [ "$1" == "--backend" ] ; then
+    # run only backend deployment related scripts, assuming we already once had a full local mac install 
+    deploy_backend
+    exit 0
+fi
+
+
 echo -e "${PINK} Checking install of yarn, node, nginx server and swagger..${NC}"
 node -v || echo -e "${RED}ERROR: Please install node using installer: https://nodejs.org/en/download/ ${NC}"
 npm -v || echo -e "${RED}ERROR: Please install node using installer: https://nodejs.org/en/download/ ${NC}"
@@ -21,10 +90,6 @@ nginx -v || echo -e "${PINK}INFO: Intalling nginx ${NC}"
 nginx -v || brew install nginx
 yarn -v || npm install -g yarn;
 npm install -g pretty-swag@0.1.144;
-
-echo -e "${PINK} Creating and coping static resources into webserver...${NC}"
-make prod-compile -C frontend
-cp -R resources/ $HOME/app
 
 echo -e "${PINK} Stopping all existing docker containers to avoid attached port conflicts..${NC}"
 docker container stop $(docker container ls -aq)
@@ -38,22 +103,6 @@ sleep 5
 echo -e "${PINK} Filling postgres instance with test data...${NC}"
 make test-data
 
-echo -e "${PINK} Building conductor service binary...${NC}"
-rm -rf .build && mkdir .build && cp -rf  cmd core services shared .build
-mkdir -p $HOME/go/src/github.com/Nextdoor/conductor
-cp -R  .build/ $HOME/go/src/github.com/Nextdoor/conductor 
-
-echo -e "${PINK} Generating index.html from swagger specs..${NC}"
-cp -R swagger/ $HOME/app/swagger
-pretty-swag -c $HOME/app/swagger/config.json
-
-echo -e "${PINK} Removing any existing conductor binary in ~/app folder...${NC}"
-rm -rf ~/app/conductor
-
-echo -e "${PINK} Building Conductor Go binary, postgres host is set to localhost since it\'s not accessed over docker network bridge..${NC}"
-export POSTGRES_HOST=localhost
-go build -o $HOME/app/conductor $HOME/go/src/github.com/Nextdoor/conductor/cmd/conductor/conductor.go
-
 # Generate SSL certs.
 echo -e "${PINK} Generating SSL certs....${NC}"
 mkdir -p $HOME/app/ssl && cd $HOME/app/ssl && \
@@ -62,15 +111,8 @@ mkdir -p $HOME/app/ssl && cd $HOME/app/ssl && \
                 -days 36500 -subj '/CN=localhost' && \
     openssl dhparam -dsaparam -out dhparam.pem 4096
 
-echo -e "${PINK} Stopping nginx server globally...${NC}"
-sudo nginx -s stop
+# go back to directory with code
+cd $GOPATH/src/conductor/conductor
 
-# use the mac nginx config
-echo -e "${PINK} Use the mac nginx config...${NC}"
-mv $HOME/app/nginx-mac.conf $HOME/app/nginx.conf
- 
-echo -e "${PINK} Starting nginx..${NC}"
-sudo nginx -c $HOME/app/nginx.conf -p $HOME/app/
-
-echo -e "${PINK} Starting go service..${NC}"
-exec $HOME/app/conductor
+deploy_frontend
+deploy_backend
