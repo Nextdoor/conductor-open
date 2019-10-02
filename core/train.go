@@ -325,6 +325,7 @@ func trainEndpoints() []endpoint {
 	return []endpoint{
 		newEp("/api/train", get, fetchTrain),
 		newEp("/api/train/{train_id:[0-9]+}", get, fetchTrain),
+		newEp("/api/train/{train_id:[0-9]+}/changeEngineer", post, changeEngineer),
 		newEp("/api/train/{train_id:[0-9]+}/close", post, closeTrain),
 		newEp("/api/train/{train_id:[0-9]+}/open", post, openTrain),
 		newEp("/api/train/{train_id:[0-9]+}/extend", post, extendTrain),
@@ -449,6 +450,40 @@ func fetchTrain(r *http.Request) response {
  We want to ensure a FIFO order of operations to prevent any duplicate work or notifications.
 */
 var trainCloseModificationLock sync.Mutex
+
+func changeEngineer(r *http.Request) response {
+
+	trainCloseModificationLock.Lock()
+	defer trainCloseModificationLock.Unlock()
+
+	dataClient := data.NewClient()
+	train, resp := parseTrainVars(r, dataClient, false)
+	if resp != nil {
+		return *resp
+	}
+
+	resp = validateMutableTrain(train)
+	if resp != nil {
+		return *resp
+	}
+
+	loggedUser := r.Context().Value("user").(*types.User)
+	if train.Closed {
+		return errorResponse("Train already closed.", http.StatusBadRequest)
+	}
+
+	err := dataClient.ChangeTrainEngineer(train, loggedUser)
+	if err != nil {
+		return errorResponse(
+			fmt.Sprintf("Error changing train engineer: %v", err),
+			http.StatusInternalServerError)
+	}
+
+	messagingService := messaging.GetService()
+	messagingService.EngineerChanged(train, loggedUser)
+
+	return dataResponse(train)
+}
 
 func closeTrain(r *http.Request) response {
 	trainCloseModificationLock.Lock()
