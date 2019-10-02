@@ -10,10 +10,10 @@ import {trainProps, requestProps} from 'types/proptypes';
 class Details extends TrainComponent {
 
   render() {
+    const {train} = this.props;
     return (
       <Card className="details-card" header="Details">
         {this.getComponent()}
-        {this.claimEngineerButton()}
       </Card>
     );
   }
@@ -25,6 +25,7 @@ class Details extends TrainComponent {
     }
 
     const {train} = this.props;
+    const trainEngineer = train.engineer !== null ? train.engineer.name : 'None'
     const headCommit = train.commits[train.commits.length - 1];
     const items = [
       ['Branch:', train.branch],
@@ -34,30 +35,47 @@ class Details extends TrainComponent {
         </a>
       ],
       ['Commits:', train.commits.length],
-      ['Engineer:', train.engineer !== null ? train.engineer.name : 'None'],
+      ['Engineer:', trainEngineer],
       ['Created:', moment(train.created_at).fromNow()],
       ['Deployed:', train.deployed_at !== null ? moment(train.deployed_at).fromNow() : 'Not deployed']
     ];
 
-    return <TitledList items={items}/>;
+    return (
+      <span>
+        <TitledList items={items}/>
+        {this.claimEngineerButton(trainEngineer)}
+      </span>
+    )
   }
 
-  claimEngineerButton() {
+  claimEngineerButton(trainEngineer) {
+    
+   let message = {
+    title: 'Become the engineer for this train',
+    body: (
+      <div>
+        By clicking confirm, you will replace {trainEngineer} as the engineer for this train. 
+        <br/><br/>
+        Thank you for keeping our trains on schedule!
+      </div>
+    )
+  }
+   if (!trainEngineer){
+     message = {
+      title: 'Become the engineer for this train',
+      body: (
+        <div>
+          By clicking confirm, you will become the engineer for this train. 
+          <br/><br/>
+          Thank you for keeping our trains on schedule!
+        </div>
+      )
+    }
+   }
     return (
       <ApiButton
-        modalProps={{
-          title: 'Confirm Claiming Engineer Role',
-          body: (
-            <div>
-              Thanks for volunteering to guide this train.
-              <br/><br/>
-              As train engineer, that all commits have been verified (if needed), and that the build together passes, so that the train can proceed to deploy.
-              <br/><br/>
-              Also please toubleshoot (or reach an admin), to take the train to succesful train deployment and closing.
-            </div>
-          )
-        }}
-        //onClick={() => this.props.restartJob(this.props.train.id, 'deploy')}
+        modalProps={message}
+        onClick={() => this.props.restartJob(this.props.train.id, 'deploy')}
         request={this.props.request}
         className="button-claim">
         Claim Engineer Role
