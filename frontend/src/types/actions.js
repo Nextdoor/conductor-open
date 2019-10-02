@@ -50,4 +50,7 @@ export default {
   RequestRollback: 'RequestRollback',
   ReceiveRollback: 'ReceiveRollback',
   ReceiveRollbackError: 'ReceiveRollbackError',
+  RequestRestart: 'RequestRestart',
+  ReceiveRestart: 'ReceiveRestart',
+  ReceiveRestartError: 'ReceiveRestartError',
 };

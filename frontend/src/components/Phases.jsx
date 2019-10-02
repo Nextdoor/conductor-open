@@ -1,6 +1,8 @@
 import React from 'react';
 import moment from 'moment';
 
+import PropTypes from 'prop-types';
+import ApiButton from 'components/ApiButton';
 import Card from 'components/Card';
 import TrainComponent from 'components/TrainComponent';
 import {trainProps, requestProps} from 'types/proptypes';
@@ -134,6 +136,29 @@ class Phases extends TrainComponent {
     ];
   }
 
+  restartDeployButton() {
+    if(this.props.self.details.is_admin && this.props.train.active_phase == PhaseTypes.Verification){
+      return (
+        <ApiButton
+          modalProps={{
+            title: 'Manually trigger deployment job',
+            body: (
+              <div>
+                Would you like to manually kick off a deployment job? 
+                <br/><br/>
+                Do this if the automatic deployment is not being triggered correctly.
+              </div>
+            )
+          }}
+          onClick={() => this.props.restartJob(this.props.train.id, 'deploy')}
+          request={this.props.request}
+          className="button-wide redploy-button">
+          Restart Deploy
+        </ApiButton>
+      );
+        }
+  }
+
   getComponent() {
     const requestComponent = this.getRequestComponent();
     if (requestComponent !== null) {
@@ -224,18 +249,21 @@ class Phases extends TrainComponent {
 
     return (
       <div>
-      <ul className="jobs-list">
-        {listItems}
-      </ul>
-      <p className="phase-id">Phase ID: {phaseId}</p>
+        <ul className="jobs-list">
+          {listItems}
+        </ul>
+        <p className="phase-id">
+          Phase ID: {phaseId} 
+          {this.restartDeployButton()}
+        </p>
       </div>
     );
   }
 }
 
-Phases.propTypes = {
-  train: trainProps,
-  request: requestProps.isRequired
+Phases.propTypes = {train: trainProps,
+  request: requestProps.isRequired,
+  restartJob: PropTypes.func.isRequired,
 };
 
 export default Phases;
