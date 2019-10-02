@@ -64,6 +64,12 @@ git clone https://github.com/Nextdoor/conductor.git
 4. To create a conductor setup on a docker container , run `chmod +x ./dockerSetup.sh`, followed by `./dockerSetup.sh`
 5. To create a conductor setup on native mac , run `chmod +x ./nativeMacSetup.sh`, followed by `./nativeMacSetup.sh`
 6. In either case, your docker service is now accessible through your browser on `localhost:80`
+7. While development, if you wanted to quickly swap your code into the local mac deployment, you could run the script with frontend/ backend flags. (Note: for frontend, you need to have backend running in a different terminal)
+
+```
+./nativeMacSetup.sh --frontend
+./nativeMacSetup.sh --backend
+```
 
 NOTE: This is without integrations with GitHub, Slack, Jenkins, Jira. These are specific features that you can setup on a need-for basis on your dev environment, by generating real access keys with these systems and setting them into the `envfile`. Otherwise we use mocked simulation of these tools in dev
 
