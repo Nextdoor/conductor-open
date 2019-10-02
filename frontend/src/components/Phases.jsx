@@ -141,15 +141,12 @@ class Phases extends TrainComponent {
       return (
         <ApiButton
           modalProps={{
-            title: 'Confirm Restarting Deploy',
+            title: 'Manually trigger deployment job',
             body: (
               <div>
-                This is a workaround for the rare case when a train gets stuck without kicking off a deploy. 
+                Would you like to manually kick off a deployment job? 
                 <br/><br/>
-                This button is necessary because it can be sometimes difficult to trigger deploy job correctly in UIs such as Jenkins, 
-                if the original deploy request was not recieved there. 
-                <br/><br/>
-                Please confirm that you want to send a new deploy command out.
+                Do this if the automatic deployment is not being triggered correctly.
               </div>
             )
           }}
