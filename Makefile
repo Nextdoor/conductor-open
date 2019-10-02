@@ -17,6 +17,7 @@ imports:
 	@goimports -local github.com/Nextdoor/conductor -w $(GO_DIRS)
 
 test:
+        GO111MODULE=on
 	@./test.sh
 
 glide:
