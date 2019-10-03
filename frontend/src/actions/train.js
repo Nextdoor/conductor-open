@@ -223,7 +223,6 @@ const restart = (trainId, phaseName) => (dispatch) => {
 };
 
 const changeEngineer = (trainId) => (dispatch) => {
-  console.log('hereee', trainId)
   API.changeEngineer(trainId, dispatch);
 };
 
