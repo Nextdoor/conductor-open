@@ -53,4 +53,7 @@ export default {
   RequestRestart: 'RequestRestart',
   ReceiveRestart: 'ReceiveRestart',
   ReceiveRestartError: 'ReceiveRestartError',
+  RequestChangeEngineer: 'RequestChangeEngineer',
+  ReceiveChangeEngineer: 'ReceiveChangeEngineer',
+  ReceiveChangeEngineerError: 'ReceiveChangeEngineerError',
 };
