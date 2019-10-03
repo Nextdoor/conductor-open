@@ -37,7 +37,7 @@ run_tests() {
         parallelism="-p 1"
     fi
 
-    TEST_CMD="GO111MODULE=on;  $parallelism ./... $tags; go test ./..." make docker-test
+    TEST_CMD="$parallelism ./... $tags" make docker-test
 }
 
 test_style() {
