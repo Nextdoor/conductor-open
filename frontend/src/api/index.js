@@ -86,6 +86,9 @@ const search = function(params) {
 const restartJob = function(trainID, phaseName) {
   return baseURI + '/train/' + trainID + '/phase/' + phaseName + '/restart';
 };
+const changeEngineer = function(trainID) {
+  return baseURI + '/train/' + trainID + '/changeEngineer';
+};
 
 
 
@@ -245,6 +248,18 @@ const API = {
           dispatch,
           Actions.Train.receiveRestart,
           Actions.Train.receiveRestartError);
+      });
+  },
+
+  changeEngineer: (trainId, dispatch) => {
+    dispatch(Actions.Train.requestChangeEngineer());
+    post(changeEngineer(trainId))
+      .then((response) => {
+        handleResponse(
+          response,
+          dispatch,
+          Actions.Train.receiveChangeEngineer,
+          Actions.Train.receiveChangeEngineerError);
       });
   },
 
