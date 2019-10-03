@@ -5,11 +5,9 @@ import {newTrain, noRequest, completeRequest} from 'test/TestData';
 import Details from './Details';
 
 describe('Phases', function() {
-  beforeEach(function() {
-    this.train = JSON.parse(JSON.stringify(newTrain));
-  });
 
   it('Waits for train gracefully', function() {
+    this.train = JSON.parse(JSON.stringify(newTrain));
     const wrapper = shallow(
       <Details
         train={null}
@@ -18,6 +16,7 @@ describe('Phases', function() {
   });
 
   it('Renders correctly', function() {
+    this.train = JSON.parse(JSON.stringify(newTrain));
     const wrapper = shallow(
       <Details
         train={this.train}

@@ -8,12 +8,11 @@ import {Phases} from 'types/train';
 
 describe('Summary', function() {
 
-  beforeEach(function() {
+  it('Delivering renders correctly', function() {
+
     this.user = JSON.parse(JSON.stringify(user));
     this.train = JSON.parse(JSON.stringify(newTrain));
-  });
 
-  it('Delivering renders correctly', function() {
     const wrapper = mount(
       <Summary
         train={this.train}
@@ -36,6 +35,10 @@ describe('Summary', function() {
   });
 
   it('Extending renders correctly', function() {
+
+    this.user = JSON.parse(JSON.stringify(user));
+    this.train = JSON.parse(JSON.stringify(newTrain));
+
     this.train.all_phase_groups = [this.train.all_phase_groups[0], this.train.all_phase_groups[0]];
     this.train.all_phase_groups[0].delivery.completed_at = '2000-01-01T00:00:00Z';
     const wrapper = mount(
@@ -56,6 +59,10 @@ describe('Summary', function() {
   });
 
   it('Verifying renders correctly', function() {
+
+    this.user = JSON.parse(JSON.stringify(user));
+    this.train = JSON.parse(JSON.stringify(newTrain));
+
     this.train.active_phase = Phases.Verification;
     this.train.not_deployable_reason = 'test reason';
     const wrapper = mount(
@@ -76,6 +83,10 @@ describe('Summary', function() {
   });
 
   it('Deploying renders correctly', function() {
+
+    this.user = JSON.parse(JSON.stringify(user));
+    this.train = JSON.parse(JSON.stringify(newTrain));
+
     this.train.active_phase = Phases.Deploy;
     const wrapper = mount(
       <Summary
@@ -95,6 +106,10 @@ describe('Summary', function() {
   });
 
   it('Deployed renders correctly', function() {
+
+    this.user = JSON.parse(JSON.stringify(user));
+    this.train = JSON.parse(JSON.stringify(newTrain));
+
     this.train.done = true;
     this.train.active_phase = Phases.Deploy;
     this.train.deployed_at = '2000-01-01T00:00:00Z';
@@ -116,6 +131,10 @@ describe('Summary', function() {
   });
 
   it('Cancelled renders correctly', function() {
+
+    this.user = JSON.parse(JSON.stringify(user));
+    this.train = JSON.parse(JSON.stringify(newTrain));
+
     this.train.done = true;
     this.train.active_phase = Phases.Deploy;
     this.train.deployed_at = null;
@@ -138,6 +157,10 @@ describe('Summary', function() {
   });
 
   it('Never finished renders correctly', function() {
+
+    this.user = JSON.parse(JSON.stringify(user));
+    this.train = JSON.parse(JSON.stringify(newTrain));
+
     this.train.done = true;
     this.train.active_phase = Phases.Deploy;
     this.train.deployed_at = null;
