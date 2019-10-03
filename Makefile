@@ -72,7 +72,6 @@ docker-run: docker-stop
 docker-test:
 	@[ -e testenv ] || touch testenv
 	@[ -e envfile ] || touch envfile
-	export GO111MODULE="on"
 	docker run $$ARGS $$INTERACTIVE_ARGS $$TEST_ARGS $(DOCKER_IMAGE) $(TEST_CMD)
 
 docker-stop:
