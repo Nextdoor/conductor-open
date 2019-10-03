@@ -23,6 +23,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     unblockTrain: (trainId) => {
       dispatch(Actions.Train.unblock(trainId));
+    },
+    changeEngineer: (trainId) => {
+      dispatch(Actions.Train.changeEngineer(trainId));
     }
   };
 };
@@ -31,3 +34,4 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(Component);
+
