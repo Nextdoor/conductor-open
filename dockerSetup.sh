@@ -8,7 +8,7 @@ PINK='\033[0;35m'
 NC='\033[0m'        # No Color
 
 echo -e "${PINK}checking install of package management tools..${NC}"
-if ! brew ls --versions yarn; then brew install yarn; fi; 
+if which brew && ! brew ls --versions yarn; then brew install yarn; fi;
 
 echo -e "${PINK}stop all existing containers to avoid attached port conflicts..${NC}"
 docker container stop $(docker container ls -aq)
@@ -25,8 +25,10 @@ make test-data
 echo -e "${PINK}building react.js and frontend static files webpack into resources/frontend...${NC}"
 make prod-compile -C frontend
 
+if pgrep nginx; then
 echo -e "${PINK} Stop potential running ngnix (from nativeMacSetup) to avoid port conflict...${NC}"
 sudo nginx -s stop
+fi
 
 echo -e "${PINK}building backend conductor service...${NC}"
 export POSTGRES_HOST=conductor-postgres
