@@ -593,6 +593,14 @@ button + button {
   padding-bottom: 16px;
 }
 
+.button-claim {
+  background-color: $green;
+  color: white;
+  width: 130px;
+  margin-left: 80px;
+  margin-top: 20px;
+}
+
 // Queue
 
 .queue-card {
