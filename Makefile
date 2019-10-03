@@ -26,7 +26,6 @@ glide:
 
 define ARGS
 --env LOGLEVEL=DEBUG \
---env GO111MODULE="on" \
 --env-file envfile \
 --volume $(shell pwd)/resources/frontend:/app/frontend \
 --volume $(HOME)/.aws:/root/.aws \
@@ -73,6 +72,7 @@ docker-run: docker-stop
 docker-test:
 	@[ -e testenv ] || touch testenv
 	@[ -e envfile ] || touch envfile
+	export GO111MODULE="on"
 	docker run $$ARGS $$INTERACTIVE_ARGS $$TEST_ARGS $(DOCKER_IMAGE) $(TEST_CMD)
 
 docker-stop:
