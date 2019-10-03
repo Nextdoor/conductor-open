@@ -173,6 +173,27 @@ const receiveRestartError = (error) => {
   };
 };
 
+const requestChangeEngineer = () => {
+  return {
+    type: Actions.RequestChangeEngineer
+  };
+};
+
+const receiveChangeEngineer = () => {
+  return {
+    type: Actions.ReceiveChangeEngineer,
+    receivedAt: Date.now()
+  };
+};
+
+const receiveChangeEngineerError = (error) => {
+  return {
+    type: Actions.ReceiveChangeEngineerError,
+    error: error,
+    receivedAt: Date.now()
+  };
+};
+
 const fetch = (trainId) => (dispatch) => {
   API.getTrain(trainId, dispatch, false);
 };
@@ -201,6 +222,10 @@ const restart = (trainId, phaseName) => (dispatch) => {
   API.restartJob(trainId, phaseName, dispatch);
 };
 
+const changeEngineer = (trainId) => (dispatch) => {
+  API.changeEngineer(trainId, dispatch);
+};
+
 const goToTrain = (trainId) => (dispatch) => {
   API.getTrain(trainId, dispatch, true);
 };
@@ -219,6 +244,7 @@ export default {
   cancel,
   rollbackTo,
   restart,
+  changeEngineer,
   fetch,
   goToTrain,
   request,
@@ -242,6 +268,9 @@ export default {
   requestRestart,
   receiveRestart,
   receiveRestartError,
+  requestChangeEngineer,
+  receiveChangeEngineer,
+  receiveChangeEngineerError,
   requestToggleClose,
   receiveToggleClose,
   receiveToggleCloseError,
