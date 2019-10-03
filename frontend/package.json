@@ -4,6 +4,11 @@
   "description": "Frontend Content",
   "main": "app.js",
   "dependencies": {
+    "@babel/core": "^7.6.2",
+    "@babel/plugin-proposal-class-properties": "^7.5.5",
+    "@babel/plugin-transform-runtime": "^7.6.2",
+    "@babel/preset-env": "^7.6.2",
+    "@babel/preset-react": "^7.0.0",
     "babel-core": "^6.18.2",
     "babel-eslint": "^7.1.1",
     "babel-loader": "^6.2.7",
@@ -51,12 +56,15 @@
     "react-addons-test-utils": "^15.5.1",
     "react-test-renderer": "^15.6.1"
   },
-  "babel": {
+  "babel":{
     "presets": [
-      "react",
-      "es2015"
+        "@babel/react",
+        "@babel/env"
+    ],
+    "plugins": [
+        "@babel/plugin-proposal-class-properties"
     ]
-  },
+ },
   "jest": {
     "modulePaths": [
       "src"
@@ -67,7 +75,7 @@
   },
   "scripts": {
     "test": "jest --colors",
-    "lint": "./node_modules/eslint/bin/eslint.js --ext .js --ext .jsx src/*"
+    "lint": "./node_modules/eslint/bin/eslint.js --fix --ext .js --ext .jsx src/*"
   },
   "repository": {
     "type": "git",

@@ -5,7 +5,7 @@ import Component from 'components/Phases';
 
 const mapStateToProps = (state) => {
   return {
-    self : state.self,
+    self: state.self,
     train: state.train.details,
     request: state.train.request,
     requestRestart: state.train.requestRestart,

@@ -58,11 +58,11 @@ class Header extends React.Component {
           </div>
           <img className="header-avatar" src={self.avatar_url}/>
           <div className="header-search">
-              <input type="text"
-                    placeholder="Search trains by commit sha"
-                    autoFocus="true"
-                    value={this.props.params.commit || ""}
-                    onChange={(event) => this.search(event)}/>
+            <input type="text"
+              placeholder="Search trains by commit sha"
+              autoFocus="true"
+              value={this.props.params.commit || ""}
+              onChange={(event) => this.search(event)}/>
           </div>
         </span>
       );
