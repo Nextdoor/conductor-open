@@ -10,7 +10,6 @@ import {trainProps, requestProps} from 'types/proptypes';
 class Details extends TrainComponent {
 
   render() {
-    const {train} = this.props;
     return (
       <Card className="details-card" header="Details">
         {this.getComponent()}
@@ -25,7 +24,7 @@ class Details extends TrainComponent {
     }
 
     const {train} = this.props;
-    const trainEngineer = train.engineer !== null ? train.engineer.name : 'None'
+    const trainEngineer = train.engineer !== null ? train.engineer.name : 'None';
     const headCommit = train.commits[train.commits.length - 1];
     const items = [
       ['Branch:', train.branch],
@@ -45,34 +44,34 @@ class Details extends TrainComponent {
         <TitledList items={items}/>
         {this.claimEngineerButton(trainEngineer)}
       </span>
-    )
+    );
   }
 
-  claimEngineerButton(trainEngineer) {    
-    
-   let message = {
-    title: 'Become the engineer for this train',
-    body: (
-      <div>
-        By clicking confirm, you will replace {trainEngineer} as the engineer for this train. 
-        <br/><br/>
-        Thank you for keeping our trains on schedule!
-      </div>
-    )
-  }
-   if (!trainEngineer){
-     message = {
+  claimEngineerButton(trainEngineer) {
+
+    let message = {
       title: 'Become the engineer for this train',
       body: (
         <div>
-          By clicking confirm, you will become the engineer for this train. 
+        By clicking confirm, you will replace {trainEngineer} as the engineer for this train.
           <br/><br/>
-          Thank you for keeping our trains on schedule!
+        Thank you for keeping our trains on schedule!
         </div>
       )
+    };
+    if (!trainEngineer) {
+      message = {
+        title: 'Become the engineer for this train',
+        body: (
+          <div>
+          By clicking confirm, you will become the engineer for this train.
+            <br/><br/>
+          Thank you for keeping our trains on schedule!
+          </div>
+        )
+      };
     }
-   }
-   if(!this.props.train.closed)
+    if (!this.props.train.closed)
     {
       return (
         <ApiButton

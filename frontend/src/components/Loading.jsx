@@ -6,11 +6,11 @@ const Loading = () => {
   return (
     <span className="loading">
       <ReactCSSTransitionGroup
-          transitionName="loading"
-          transitionAppear
-          transitionEnterTimeout={20}
-          transitionAppearTimeout={20}
-          transitionLeaveTimeout={20}>
+        transitionName="loading"
+        transitionAppear
+        transitionEnterTimeout={20}
+        transitionAppearTimeout={20}
+        transitionLeaveTimeout={20}>
         <SyncIcon className="spin-octicon" key="animation"/>
       </ReactCSSTransitionGroup>
     </span>

@@ -120,31 +120,31 @@ class Phases extends TrainComponent {
 
     return [
       <div className={'phases-header-tab' + extraClasses}
-           key="tab"
-           onClick={onClick}
-           onMouseEnter={onMouseEnter}
-           onMouseLeave={onMouseLeave}>
+        key="tab"
+        onClick={onClick}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}>
         {text}
       </div>,
       <div className="phases-header-arrow-container"
-           key="arrow"
-           onClick={onClick}
-           onMouseEnter={onMouseEnter}
-           onMouseLeave={onMouseLeave}>
+        key="arrow"
+        onClick={onClick}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}>
         <div className={'phases-header-arrow' + extraClasses}/>
       </div>
     ];
   }
 
   restartDeployButton() {
-    if(this.props.self.details.is_admin && this.props.train.active_phase == PhaseTypes.Verification){
+    if (this.props.self.details.is_admin && this.props.train.active_phase === PhaseTypes.Deploy) {
       return (
         <ApiButton
           modalProps={{
             title: 'Manually trigger deployment job',
             body: (
               <div>
-                Would you like to manually kick off a deployment job? 
+                Would you like to manually kick off a deployment job?
                 <br/><br/>
                 Do this if the automatic deployment is not being triggered correctly.
               </div>
@@ -156,7 +156,7 @@ class Phases extends TrainComponent {
           Restart Deploy
         </ApiButton>
       );
-        }
+    }
   }
 
   getComponent() {
@@ -253,7 +253,7 @@ class Phases extends TrainComponent {
           {listItems}
         </ul>
         <p className="phase-id">
-          Phase ID: {phaseId} 
+          Phase ID: {phaseId}
           {this.restartDeployButton()}
         </p>
       </div>

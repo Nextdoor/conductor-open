@@ -16,7 +16,7 @@ class ApiButton extends React.Component {
     if (this.props.request.fetching === true) {
       return (
         <button className={this.props.className}
-                disabled>
+          disabled>
           <Loading/>
         </button>
       );
@@ -24,8 +24,8 @@ class ApiButton extends React.Component {
 
     return (
       <button className={this.props.className}
-              onClick={this.clicked.bind(this)}
-              disabled={this.props.enabled}>
+        onClick={this.clicked.bind(this)}
+        disabled={this.props.enabled}>
         {this.props.children}
         {this.state.inModal && <ApiButtonModal
           onCancel={this.modalCancel.bind(this)}
@@ -83,9 +83,9 @@ class ApiButtonModal extends React.Component {
   render() {
     return (
       <Modal show
-             containerClassName="modal-container"
-             backdropClassName="modal-backdrop"
-             onHide={this.props.onCancel}>
+        containerClassName="modal-container"
+        backdropClassName="modal-backdrop"
+        onHide={this.props.onCancel}>
         <div className="modal-dialog">
           <div className="modal-header">
             <button className="modal-close" onClick={this.props.onCancel}>×</button>

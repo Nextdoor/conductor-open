@@ -90,8 +90,6 @@ const changeEngineer = function(trainID) {
   return baseURI + '/train/' + trainID + '/changeEngineer';
 };
 
-
-
 const config = baseURI + '/config';
 const mode = baseURI + '/mode';
 
@@ -214,7 +212,7 @@ const API = {
           Actions.Train.receiveUnblockError);
       });
   },
- 
+
   cancelTrain: (trainId, dispatch) => {
     dispatch(Actions.Train.requestCancel());
     post(cancelTrain(trainId))
