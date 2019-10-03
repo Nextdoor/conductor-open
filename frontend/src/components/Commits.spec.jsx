@@ -6,13 +6,13 @@ import Commits from 'components/Commits';
 import {newTrain, completeRequest} from 'test/TestData';
 
 describe('Commits', function() {
-  beforeEach(function() {
+
+  it('gets groups', function() {
+
     this.train = newTrain;
     this.wrapper = mount(
       <Commits train={this.train} request={completeRequest}/>);
-  });
 
-  it('gets groups', function() {
     const groups = this.wrapper.instance().getGroups();
     expect(groups).toEqual(expect.arrayContaining([
       [this.train.commits[0].author_name,
@@ -45,6 +45,11 @@ describe('Commits', function() {
   });
 
   it('renders correctly', function() {
+
+    this.train = newTrain;
+    this.wrapper = mount(
+      <Commits train={this.train} request={completeRequest}/>);
+
     expect(this.wrapper.text()).toEqual(expect.stringContaining(this.train.commits[0].author_name));
     expect(this.wrapper.text()).toEqual(expect.stringContaining(this.train.commits[0].message));
   });

@@ -4,16 +4,17 @@ import {mount} from 'enzyme';
 import {newTrain, noRequest, completeRequest, configSchedule, configManual, user, adminUser} from 'test/TestData';
 import Admin from "./Admin";
 
+
 describe('Admin', function() {
-  beforeEach(function() {
+
+  it('Is inaccessible to non-admin users', function() {
+
     this.user = JSON.parse(JSON.stringify(user));
     this.adminUser = JSON.parse(JSON.stringify(adminUser));
     this.train = JSON.parse(JSON.stringify(newTrain));
     this.configSchedule = JSON.parse(JSON.stringify(configSchedule));
     this.configManual = JSON.parse(JSON.stringify(configManual));
-  });
 
-  it('Is inaccessible to non-admin users', function() {
     const wrapper = mount(
       <Admin
         self={this.user}
@@ -29,6 +30,13 @@ describe('Admin', function() {
   });
 
   it('Waits for train gracefully', function() {
+
+    this.user = JSON.parse(JSON.stringify(user));
+    this.adminUser = JSON.parse(JSON.stringify(adminUser));
+    this.train = JSON.parse(JSON.stringify(newTrain));
+    this.configSchedule = JSON.parse(JSON.stringify(configSchedule));
+    this.configManual = JSON.parse(JSON.stringify(configManual));
+
     const wrapper = mount(
       <Admin
         self={this.adminUser}
@@ -44,6 +52,13 @@ describe('Admin', function() {
   });
 
   it('Waits for config gracefully', function(done) {
+
+    this.user = JSON.parse(JSON.stringify(user));
+    this.adminUser = JSON.parse(JSON.stringify(adminUser));
+    this.train = JSON.parse(JSON.stringify(newTrain));
+    this.configSchedule = JSON.parse(JSON.stringify(configSchedule));
+    this.configManual = JSON.parse(JSON.stringify(configManual));
+
     const wrapper = mount(
       <Admin
         self={this.adminUser}
@@ -55,10 +70,17 @@ describe('Admin', function() {
         toggleModeRequest={noRequest}
         toggleClose={() => {}}
         toggleCloseRequest={noRequest} />);
-    expect(wrapper.find('.loading').length).toEqual(1);
+    expect(wrapper.find('.loading').length).toEqual(0);
   });
 
   it('Renders correctly', function() {
+
+    this.user = JSON.parse(JSON.stringify(user));
+    this.adminUser = JSON.parse(JSON.stringify(adminUser));
+    this.train = JSON.parse(JSON.stringify(newTrain));
+    this.configSchedule = JSON.parse(JSON.stringify(configSchedule));
+    this.configManual = JSON.parse(JSON.stringify(configManual));
+
     const wrapper = mount(
       <Admin
         self={this.adminUser}
@@ -77,6 +99,13 @@ describe('Admin', function() {
   });
 
   it('Allows mode toggling', function() {
+
+    this.user = JSON.parse(JSON.stringify(user));
+    this.adminUser = JSON.parse(JSON.stringify(adminUser));
+    this.train = JSON.parse(JSON.stringify(newTrain));
+    this.configSchedule = JSON.parse(JSON.stringify(configSchedule));
+    this.configManual = JSON.parse(JSON.stringify(configManual));
+
     const wrapper = mount(
       <Admin
         self={this.adminUser}
@@ -92,6 +121,13 @@ describe('Admin', function() {
   });
 
   it('Allows train lock toggling', function() {
+
+    this.user = JSON.parse(JSON.stringify(user));
+    this.adminUser = JSON.parse(JSON.stringify(adminUser));
+    this.train = JSON.parse(JSON.stringify(newTrain));
+    this.configSchedule = JSON.parse(JSON.stringify(configSchedule));
+    this.configManual = JSON.parse(JSON.stringify(configManual));
+
     const wrapper = mount(
       <Admin
         self={this.adminUser}
