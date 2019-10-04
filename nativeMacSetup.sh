@@ -13,6 +13,10 @@ PINK='\033[0;35m'
 RED='\033[1;31m'
 NC='\033[0m'        # No Color
 
+# IMPORTANT - go to https://github.com/settings/developers, and create a new OAuth app for conductor	
+# replace the Client Id and Client Secret in the variable below	
+OAUTH_CLIENT_ID='YOUR_OAUTH_CLIENT_ID'
+
 
 if [ "$1" == "--help" ] ; then
 
@@ -39,6 +43,14 @@ function restart_nginx {
 }
 
 function deploy_frontend {
+
+    $F_ENVFILE='frontend/envfile'
+    if [ ! -f "$F_ENVFILE"]; then
+        echo -e "${PINK}creating frontend/envfile ...${NC}"
+        echo -e "OAUTH_PROVIDER=Github \nOAUTH_ENDPOINT=https://github.com/login/oauth/authorize \nOAUTH_PAYLOAD='{\"client_id\": \"${OAUTH_CLIENT_ID}\", \"redirect_uri\": \"http://localhost/api/auth/login\", \"scope\": \"user repo\"}'" > $F_ENVFILE
+    fi
+
+
     echo -e "${PINK} Creating and coping static resources into webserver...${NC}"
     make prod-compile -C frontend
     cp -R resources/ $HOME/app
