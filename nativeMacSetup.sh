@@ -44,12 +44,10 @@ function restart_nginx {
 
 function deploy_frontend {
 
-    $F_ENVFILE='frontend/envfile'
-    if [ ! -f "$F_ENVFILE"]; then
+    if [ ! -f "frontend/envfile" ]; then
         echo -e "${PINK}creating frontend/envfile ...${NC}"
-        echo -e "OAUTH_PROVIDER=Github \nOAUTH_ENDPOINT=https://github.com/login/oauth/authorize \nOAUTH_PAYLOAD='{\"client_id\": \"${OAUTH_CLIENT_ID}\", \"redirect_uri\": \"http://localhost/api/auth/login\", \"scope\": \"user repo\"}'" > $F_ENVFILE
+        echo -e "OAUTH_PROVIDER=Github \nOAUTH_ENDPOINT=https://github.com/login/oauth/authorize \nOAUTH_PAYLOAD='{\"client_id\": \"${OAUTH_CLIENT_ID}\", \"redirect_uri\": \"http://localhost/api/auth/login\", \"scope\": \"user repo\"}'" > frontend/envfile
     fi
-
 
     echo -e "${PINK} Creating and coping static resources into webserver...${NC}"
     make prod-compile -C frontend
