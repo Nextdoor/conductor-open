@@ -11,10 +11,9 @@ NC='\033[0m'        # No Color
 # replace the Client Id and Client Secret in the variable below	
 OAUTH_CLIENT_ID='YOUR_OAUTH_CLIENT_ID'
 
-$F_ENVFILE='frontend/envfile'
-if [ ! -f "$F_ENVFILE"]; then
+if [ ! -f "frontend/envfile" ]; then
     echo -e "${PINK}creating frontend/envfile ...${NC}"
-    echo -e "OAUTH_PROVIDER=Github \nOAUTH_ENDPOINT=https://github.com/login/oauth/authorize \nOAUTH_PAYLOAD='{\"client_id\": \"${OAUTH_CLIENT_ID}\", \"redirect_uri\": \"http://localhost/api/auth/login\", \"scope\": \"user repo\"}'" > $F_ENVFILE
+    echo -e "OAUTH_PROVIDER=Github \nOAUTH_ENDPOINT=https://github.com/login/oauth/authorize \nOAUTH_PAYLOAD='{\"client_id\": \"${OAUTH_CLIENT_ID}\", \"redirect_uri\": \"http://localhost/api/auth/login\", \"scope\": \"user repo\"}'" > frontend/envfile
 fi
 
 echo -e "${PINK}checking install of package management tools..${NC}"
