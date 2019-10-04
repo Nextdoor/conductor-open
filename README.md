@@ -60,7 +60,7 @@ git clone https://github.com/Nextdoor/conductor.git
 
 1. On your terminal `cd $GOPATH/src/conductor/conductor`
 2. Create a client and OAuth token from you git login by going to `https://github.com/settings/developers`. Create a `New OAuth App`. Set Application Name to `conductor`.  Homepage URL to `https://github.com/Nextdoor/conductor`.  And Authorized callback URL to your local dev URL for now `http://localhost/api/auth/login`
-3. Now, set the client id created in step above, in the `OAUTH_PAYLOAD` variable in `frontend/envfile` of your downloaded source code.
+3. Now, set the client id created in step above, in the `OAUTH_PAYLOAD` variable in `./dockerSetup.sh` and `./nativeMacSetup.sh` of your downloaded source code.
 4. To create a conductor setup on a docker container , run `chmod +x ./dockerSetup.sh`, followed by `./dockerSetup.sh`
 5. To create a conductor setup on native mac , run `chmod +x ./nativeMacSetup.sh`, followed by `./nativeMacSetup.sh`
 6. In either case, your docker service is now accessible through your browser on `localhost:80`
