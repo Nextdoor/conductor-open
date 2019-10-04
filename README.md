@@ -71,7 +71,17 @@ git clone https://github.com/Nextdoor/conductor.git
 ./nativeMacSetup.sh --backend
 ```
 
-NOTE: This is without integrations with GitHub, Slack, Jenkins, Jira. These are specific features that you can setup on a need-for basis on your dev environment, by generating real access keys with these systems and setting them into the `envfile`. Otherwise we use mocked simulation of these tools in dev
+NOTE: This is without integrations with GitHub, Slack, Jenkins, Jira. These are specific features that you can setup on a need-for basis on your dev environment, by generating real access keys with these systems and setting them into the `envfile` as 
+```
+GITHUB_HOST=
+SLACK_TOKEN=
+JENKINS_USERNAME=
+JENKINS_PASSWORD=
+GITHUB_AUTH_CLIENT_ID=
+GITHUB_AUTH_CLIENT_SECRET=
+GITHUB_ADMIN_TOKEN= 
+```
+Otherwise we use mocked simulation of these tools in dev
 
 
 ### Debugging Instructions
