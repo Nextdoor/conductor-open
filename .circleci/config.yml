@@ -32,11 +32,6 @@ jobs:
             echo "export SHA1=$SHA1" >> $BASH_ENV
             echo "export DOCKER_TAG=$DOCKER_TAG" >> $BASH_ENV
             echo "export CACHE_FROM=$CACHE_FROM" >> $BASH_ENV
-      - run:
-          name: Install goimports
-          command: |
-            go get golang.org/x/tools/cmd/goimports
-            go install golang.org/x/tools/cmd/goimports
       # Install yarn
       - run: curl -o- -L https://yarnpkg.com/install.sh | bash
       - run: docker pull $CACHE_FROM || true
