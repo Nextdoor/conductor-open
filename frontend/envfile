@@ -1,3 +1,0 @@
-OAUTH_PROVIDER=Github 
-OAUTH_ENDPOINT=https://github.com/login/oauth/authorize
-OAUTH_PAYLOAD='{"client_id": "your-github-oauth-client-id", "redirect_uri": "http://localhost/api/auth/login", "scope": "user repo"}'
