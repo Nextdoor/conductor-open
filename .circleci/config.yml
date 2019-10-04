@@ -19,8 +19,6 @@ jobs:
       - checkout
       - setup_remote_docker:
           docker_layer_caching: true
-      - run: pwd
-      - run: ls
       - run:
           name: Set environment variables
           command: |
@@ -40,7 +38,6 @@ jobs:
       - run: make -C frontend prod-compile
       - run: make docker-build
       # Check for module files
-      - run: ls
       - run: make test
 
 workflows:
@@ -48,4 +45,3 @@ workflows:
   workflow:
     jobs:
       - build
-
