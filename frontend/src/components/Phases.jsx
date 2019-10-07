@@ -137,7 +137,11 @@ class Phases extends TrainComponent {
   }
 
   restartDeployButton() {
-    if (this.props.self.details.is_admin && this.props.train.active_phase === PhaseTypes.Deploy) {
+    // Only show for admins
+    // If the deployment phase is the active phase
+    // And deployment hasn't completed succesfully
+    // as per backend API, phase can only be restarted on the latest train or the previous train.
+    if (this.props.self.details.is_admin && this.props.train.active_phase === PhaseTypes.Deploy && !this.props.train.active_phases.deploy.completed_at) {
       return (
         <ApiButton
           modalProps={{
@@ -223,9 +227,9 @@ class Phases extends TrainComponent {
       const jobAttributes = (
         <div>
           <span className="job-name">{job.name}</span>
-          <span className="job-id">(ID: {job.id})</span>
           <span className="job-result">{job.result}</span>
           <span className="job-status">{job.status}</span>
+          <span className="job-id">(ID: {job.id})</span>
         </div>
       );
 

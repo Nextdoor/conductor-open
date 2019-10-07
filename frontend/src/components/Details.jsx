@@ -71,7 +71,7 @@ class Details extends TrainComponent {
         )
       };
     }
-    if (!this.props.train.closed)
+    if (this.props.train.active_phases.deploy && !this.props.train.active_phases.deploy.completed_at)
     {
       return (
         <ApiButton
