@@ -22,7 +22,7 @@ Central to Conductor's  workflow is the concept of a train. Trains are our small
 * Train already exists, your commit "waiting on the platform" with other commits for the next train.
 * No train exists, new train created and picks up all of those commits which have been "waiting on the platform".
 
-At the end of the train, it does final pushes out to tools like Jenkins to deploy your code, and also integrates with Jira and Slack to keep your developer in loop.  The train engineer is choose from the pool of people whose commit are in the train, to intervene and direct the train if needed. 
+At the end of the train, it does final pushes out to tools like Jenkins to deploy your code, and also integrates with Jira and Slack to keep your developer in loop.  The train engineer is choosen from the pool of people whose commit are in the train, to intervene and direct the train if needed. 
 
 
 ## Diagrams
