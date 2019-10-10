@@ -113,6 +113,7 @@ sleep 5
 echo -e "${PINK} Filling postgres instance with test data...${NC}"
 make test-data
 
+curr_dir=`pwd`
 # Generate SSL certs.
 echo -e "${PINK} Generating SSL certs....${NC}"
 mkdir -p $HOME/app/ssl && cd $HOME/app/ssl && \
@@ -122,7 +123,7 @@ mkdir -p $HOME/app/ssl && cd $HOME/app/ssl && \
     openssl dhparam -dsaparam -out dhparam.pem 4096
 
 # go back to directory with code
-cd $GOPATH/src/conductor/conductor
+cd $curr_dir
 
 deploy_frontend
 deploy_backend
