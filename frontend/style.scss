@@ -7,11 +7,12 @@ $light-grey-4: #f4f4f4;
 $light-grey-5: #fcfcfc;
 $white: #ffffff;
 $green: #00b246;
+$green-hover: #3e8e41;
 $blue-primary: #5297c6;
 $blue-primary-hover: #4883ab;
 $blue-link: #0075a1;
 $red-primary: #ff4c4c;
-$red-primary-hover: #ff4c42;
+$red-primary-hover: #fb2424;
 
 body {
   background-color: $light-grey-4;
@@ -599,6 +600,10 @@ button + button {
   width: 130px;
   margin-left: 80px;
   margin-top: 20px;
+}
+
+.button-claim:hover:enabled {
+  background-color: $green-hover
 }
 
 // Queue
