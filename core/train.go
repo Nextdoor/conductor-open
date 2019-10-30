@@ -462,15 +462,7 @@ func changeEngineer(r *http.Request) response {
 		return *resp
 	}
 
-	resp = validateMutableTrain(train)
-	if resp != nil {
-		return *resp
-	}
-
 	loggedUser := r.Context().Value("user").(*types.User)
-	if train.Closed {
-		return errorResponse("Train already closed.", http.StatusBadRequest)
-	}
 
 	err := dataClient.ChangeTrainEngineer(train, loggedUser)
 	if err != nil {
