@@ -77,7 +77,7 @@ class Details extends TrainComponent {
         <ApiButton
           modalProps={message}
           onClick={() => this.props.changeEngineer(this.props.train.id)}
-          request={this.props.request}
+          request={this.props}
           className="button-claim">
           Claim Engineer Role
         </ApiButton>
