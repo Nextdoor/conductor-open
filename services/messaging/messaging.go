@@ -254,7 +254,7 @@ func (m Messenger) TrainCancelled(train *types.Train, user *types.User) {
 
 func (m Messenger) EngineerChanged(train *types.Train, user *types.User) {
 	var text = m.Engine.formatBold(
-		fmt.Sprintf("Train %s is claimed by new engineer %s.",
+		fmt.Sprintf("%s is claimed by new engineer %s.",
 			m.formatTrainLink(train, fmt.Sprintf("Train %d", train.ID)),
 			m.Engine.formatUser(user)))
 
