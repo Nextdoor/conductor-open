@@ -175,6 +175,7 @@ class Phases extends TrainComponent {
 
     let jobs = [];
     let phaseId = 0;
+    let restart_deploy_component = null;
     switch (activePhase) {
       default:
       case PhaseTypes.Delivery:
@@ -188,6 +189,7 @@ class Phases extends TrainComponent {
       case PhaseTypes.Deploy:
         jobs = train.active_phases.deploy.jobs;
         phaseId = train.active_phases.deploy.id;
+        restart_deploy_component = this.restartDeployButton()
         break;
     }
 
@@ -229,7 +231,7 @@ class Phases extends TrainComponent {
           <span className="job-name">{job.name}</span>
           <span className="job-result">{job.result}</span>
           <span className="job-status">{job.status}</span>
-          <span className="job-id">(ID: {job.id})</span>
+          <span className="job-id">ID: {job.id}</span>
         </div>
       );
 
@@ -258,7 +260,7 @@ class Phases extends TrainComponent {
         </ul>
         <p className="phase-id">
           Phase ID: {phaseId}
-          {this.restartDeployButton()}
+          {restart_deploy_component}
         </p>
       </div>
     );
