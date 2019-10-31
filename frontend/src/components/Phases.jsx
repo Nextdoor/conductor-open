@@ -51,10 +51,19 @@ class Phases extends TrainComponent {
 
   getHeader() {
     const {train} = this.props;
+    let deliveryPhaseId = null;
+    let verificationPhaseId = null;
+    let deployPhaseId = null;
 
     let activePhase = 0;
     if (train) {
       activePhase = train.active_phase;
+      let activePhases = train.active_phases
+      if (activePhases) {
+        deliveryPhaseId = activePhases.delivery.id
+        verificationPhaseId = activePhases.verification.id
+        deployPhaseId = activePhases.deploy.id
+      }
     }
 
     const focusedPhase = this.state.focusedPhase !== null ? this.state.focusedPhase : activePhase;
@@ -65,15 +74,18 @@ class Phases extends TrainComponent {
         {this.phaseTab(
           PhaseTypes.Delivery,
           focusedPhase,
-          hoveredPhase)}
+          hoveredPhase,
+          deliveryPhaseId)}
         {this.phaseTab(
           PhaseTypes.Verification,
           focusedPhase,
-          hoveredPhase)}
+          hoveredPhase,
+          verificationPhaseId)}
         {this.phaseTab(
           PhaseTypes.Deploy,
           focusedPhase,
-          hoveredPhase)}
+          hoveredPhase,
+          deployPhaseId)}
       </div>
     );
   }
@@ -81,7 +93,7 @@ class Phases extends TrainComponent {
   // This is a separate function rather than a React component
   // because this returns two sibling elements and using
   // a wrapper element would complicate the style.
-  phaseTab(phaseType, focusedPhase, hoveredPhase) {
+  phaseTab(phaseType, focusedPhase, hoveredPhase, phaseId) {
     const focused = phaseType === focusedPhase;
     const hovered = phaseType === hoveredPhase;
     const focusable = !focused;
@@ -124,7 +136,7 @@ class Phases extends TrainComponent {
         onClick={onClick}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}>
-        {text}
+         <br /><span>{text}</span><br /><span className="job-id">ID: {phaseId}</span>
       </div>,
       <div className="phases-header-arrow-container"
         key="arrow"
@@ -227,7 +239,7 @@ class Phases extends TrainComponent {
           <span className="job-name">{job.name}</span>
           <span className="job-result">{job.result}</span>
           <span className="job-status">{job.status}</span>
-          <span className="job-id">(ID: {job.id})</span>
+          <span className="job-id">ID: {job.id}</span>
         </div>
       );
 
