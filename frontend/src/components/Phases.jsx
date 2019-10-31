@@ -2,7 +2,7 @@ import React from 'react';
 import moment from 'moment';
 
 import PropTypes from 'prop-types';
-import ApiButton from 'components/ApiButton';d
+import ApiButton from 'components/ApiButton';
 import Card from 'components/Card';
 import TrainComponent from 'components/TrainComponent';
 import {trainProps, requestProps} from 'types/proptypes';
