@@ -189,7 +189,7 @@ class Phases extends TrainComponent {
       case PhaseTypes.Deploy:
         jobs = train.active_phases.deploy.jobs;
         phaseId = train.active_phases.deploy.id;
-        redeploy_component = this.resdeployButton()
+        redeploy_component = this.redeployButton()
         break;
     }
 
@@ -260,7 +260,7 @@ class Phases extends TrainComponent {
         </ul>
         <p className="phase-id">
           Phase ID: {phaseId}
-          {resdeploy_component}
+          {redeploy_component}
         </p>
       </div>
     );
