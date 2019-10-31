@@ -136,7 +136,7 @@ class Phases extends TrainComponent {
     ];
   }
 
-  restartDeployButton() {
+  redeployButton() {
     // Only show for admins
     // If the deployment phase is the active phase
     // And deployment hasn't completed succesfully
@@ -175,7 +175,7 @@ class Phases extends TrainComponent {
 
     let jobs = [];
     let phaseId = 0;
-    let restart_deploy_component = null;
+    let redeploy_component = null;
     switch (activePhase) {
       default:
       case PhaseTypes.Delivery:
@@ -189,7 +189,7 @@ class Phases extends TrainComponent {
       case PhaseTypes.Deploy:
         jobs = train.active_phases.deploy.jobs;
         phaseId = train.active_phases.deploy.id;
-        restart_deploy_component = this.restartDeployButton()
+        redeploy_component = this.resdeployButton()
         break;
     }
 
@@ -260,7 +260,7 @@ class Phases extends TrainComponent {
         </ul>
         <p className="phase-id">
           Phase ID: {phaseId}
-          {restart_deploy_component}
+          {resdeploy_component}
         </p>
       </div>
     );
