@@ -2,7 +2,7 @@ import React from 'react';
 import moment from 'moment';
 
 import PropTypes from 'prop-types';
-import ApiButton from 'components/ApiButton';
+import ApiButton from 'components/ApiButton';d
 import Card from 'components/Card';
 import TrainComponent from 'components/TrainComponent';
 import {trainProps, requestProps} from 'types/proptypes';
@@ -174,20 +174,18 @@ class Phases extends TrainComponent {
     const activePhase = this.state.focusedPhase !== null ? this.state.focusedPhase : train.active_phase;
 
     let jobs = [];
-    let phaseId = 0;
+    let restart_deploy_componenet = null;
     switch (activePhase) {
       default:
       case PhaseTypes.Delivery:
         jobs = train.active_phases.delivery.jobs;
-        phaseId = train.active_phases.delivery.id;
         break;
       case PhaseTypes.Verification:
         jobs = train.active_phases.verification.jobs;
-        phaseId = train.active_phases.verification.id;
         break;
       case PhaseTypes.Deploy:
         jobs = train.active_phases.deploy.jobs;
-        phaseId = train.active_phases.deploy.id;
+        restart_deploy_componenet = this.restartDeployButton()
         break;
     }
 
@@ -257,8 +255,7 @@ class Phases extends TrainComponent {
           {listItems}
         </ul>
         <p className="phase-id">
-          Phase ID: {phaseId}
-          {this.restartDeployButton()}
+          {restart_deploy_componenet}
         </p>
       </div>
     );
