@@ -75,7 +75,7 @@ func (m Messenger) TrainCreation(train *types.Train, commits []*types.Commit) {
 
 		m.Engine.sendDirect(train.Engineer.Name, train.Engineer.Email, m.Engine.formatBold(
 			fmt.Sprintf("You are the engineer for the %s.",
-				m.formatTrainLink(train, "train"))))
+				m.formatTrainLink(train, fmt.Sprintf("train %d", train.ID)))))
 	}
 
 	commitSets := m.commitSetsFromCommits(commits, true)
@@ -91,7 +91,7 @@ func (m Messenger) TrainExtension(train *types.Train, commits []*types.Commit, u
 	// Even if no commit sets, send train extension message for manual extensions.
 	// If all the changes are no-verify, we still want to notify the staging room.
 
-	trainLink := m.formatTrainLink(train, "Train extended")
+	trainLink := m.formatTrainLink(train, fmt.Sprintf("Train %d extended", train.ID))
 	if user != nil {
 		// Only send this for manual extensions.
 		// Noisy when train is opened.
@@ -115,7 +115,7 @@ func (m Messenger) TrainDelivered(train *types.Train, commits []*types.Commit, t
 
 	if len(ticketedCommitSets) > 0 {
 		m.Engine.send(m.Engine.formatBold(
-			fmt.Sprintf("%s delivered to staging.", m.formatTrainLink(train, "Train"))))
+			fmt.Sprintf("%s delivered to staging.", m.formatTrainLink(train, fmt.Sprintf("Train %d", train.ID)))))
 		m.Engine.send(m.formatCommitSets("Changes with tickets", PlainText, ticketedCommitSets))
 	}
 
@@ -136,7 +136,7 @@ func (m Messenger) TrainVerified(train *types.Train) {
 	}
 
 	m.Engine.send(m.Engine.formatBold(
-		fmt.Sprintf("%s fully verified.", m.formatTrainLink(train, "Train"))))
+		fmt.Sprintf("%s fully verified.", m.formatTrainLink(train, fmt.Sprintf("Train %d", train.ID)))))
 }
 
 func (m Messenger) TrainUnverified(train *types.Train) {
@@ -146,7 +146,7 @@ func (m Messenger) TrainUnverified(train *types.Train) {
 	}
 
 	message := m.Engine.formatBold(
-		fmt.Sprintf("%s no longer fully verified.", m.formatTrainLink(train, "Train")))
+		fmt.Sprintf("%s no longer fully verified.", m.formatTrainLink(train, fmt.Sprintf("Train %d", train.ID))))
 	m.Engine.send(message)
 
 	if train.Engineer != nil {
@@ -177,12 +177,12 @@ func (m Messenger) TrainClosed(train *types.Train, user *types.User) {
 	if user != nil {
 		text = m.Engine.formatBold(
 			fmt.Sprintf("%s closed by %s.",
-				m.formatTrainLink(train, "Train"),
+				m.formatTrainLink(train, fmt.Sprintf("Train %d", train.ID)),
 				m.Engine.formatUser(user)))
 	} else {
 		text = m.Engine.formatBold(
 			fmt.Sprintf("%s closed.",
-				m.formatTrainLink(train, "Train")))
+				m.formatTrainLink(train, fmt.Sprintf("Train %d", train.ID))))
 	}
 
 	m.Engine.send(text)
@@ -193,12 +193,12 @@ func (m Messenger) TrainOpened(train *types.Train, user *types.User) {
 	if user != nil {
 		text = m.Engine.formatBold(
 			fmt.Sprintf("%s opened by %s.",
-				m.formatTrainLink(train, "Train"),
+				m.formatTrainLink(train, fmt.Sprintf("Train %d", train.ID)),
 				m.Engine.formatUser(user)))
 	} else {
 		text = m.Engine.formatBold(
 			fmt.Sprintf("%s opened.",
-				m.formatTrainLink(train, "Train")))
+				m.formatTrainLink(train, fmt.Sprintf("Train %d", train.ID))))
 	}
 
 	m.Engine.send(text)
@@ -209,12 +209,12 @@ func (m Messenger) TrainBlocked(train *types.Train, user *types.User) {
 	if user != nil {
 		text = m.Engine.formatBold(
 			fmt.Sprintf("%s blocked by %s.",
-				m.formatTrainLink(train, "Train"),
+				m.formatTrainLink(train, fmt.Sprintf("Train %d", train.ID)),
 				m.Engine.formatUser(user)))
 	} else {
 		text = m.Engine.formatBold(
 			fmt.Sprintf("%s blocked.",
-				m.formatTrainLink(train, "Train")))
+				m.formatTrainLink(train, fmt.Sprintf("Train %d", train.ID))))
 	}
 
 	m.Engine.send(text)
@@ -225,12 +225,12 @@ func (m Messenger) TrainUnblocked(train *types.Train, user *types.User) {
 	if user != nil {
 		text = m.Engine.formatBold(
 			fmt.Sprintf("%s unblocked by %s.",
-				m.formatTrainLink(train, "Train"),
+				m.formatTrainLink(train, fmt.Sprintf("Train %d", train.ID)),
 				m.Engine.formatUser(user)))
 	} else {
 		text = m.Engine.formatBold(
 			fmt.Sprintf("%s unblocked.",
-				m.formatTrainLink(train, "Train")))
+				m.formatTrainLink(train, fmt.Sprintf("Train %d", train.ID))))
 	}
 
 	m.Engine.send(text)
@@ -241,12 +241,12 @@ func (m Messenger) TrainCancelled(train *types.Train, user *types.User) {
 	if user != nil {
 		text = m.Engine.formatBold(
 			fmt.Sprintf("%s cancelled by %s.",
-				m.formatTrainLink(train, "Train"),
+				m.formatTrainLink(train, fmt.Sprintf("Train %d", train.ID)),
 				m.Engine.formatUser(user)))
 	} else {
 		text = m.Engine.formatBold(
 			fmt.Sprintf("%s cancelled.",
-				m.formatTrainLink(train, "Train")))
+				m.formatTrainLink(train, fmt.Sprintf("Train %d", train.ID))))
 	}
 
 	m.Engine.send(text)
@@ -255,7 +255,7 @@ func (m Messenger) TrainCancelled(train *types.Train, user *types.User) {
 func (m Messenger) EngineerChanged(train *types.Train, user *types.User) {
 	var text = m.Engine.formatBold(
 		fmt.Sprintf("Train %s is claimed by new engineer %s.",
-			m.formatTrainLink(train, "Train"),
+			m.formatTrainLink(train, fmt.Sprintf("Train %d", train.ID)),
 			m.Engine.formatUser(user)))
 
 	m.Engine.send(text)
@@ -266,13 +266,13 @@ func (m Messenger) RollbackInitiated(train *types.Train, user *types.User) {
 	if user != nil {
 		text = m.Engine.formatBold(
 			fmt.Sprintf("Rollback to %s %d initiated by %s.",
-				m.formatTrainLink(train, "Train"),
+				m.formatTrainLink(train, fmt.Sprintf("Train %d", train.ID)),
 				train.ID,
 				m.Engine.formatUser(user)))
 	} else {
 		text = m.Engine.formatBold(
 			fmt.Sprintf("Rollback to %s %d initiated.",
-				m.formatTrainLink(train, "Train"),
+				m.formatTrainLink(train, fmt.Sprintf("Train %d", train.ID)),
 				train.ID))
 	}
 
