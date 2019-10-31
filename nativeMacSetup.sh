@@ -49,15 +49,13 @@ function deploy_frontend {
         echo -e "OAUTH_PROVIDER=Github \nOAUTH_ENDPOINT=https://github.com/login/oauth/authorize \nOAUTH_PAYLOAD='{\"client_id\": \"${OAUTH_CLIENT_ID}\", \"redirect_uri\": \"http://localhost/api/auth/login\", \"scope\": \"user repo\"}'" > frontend/envfile
     fi
 
-    echo -e "${PINK} Creating and coping static resources into webserver...${NC}"
+    echo -e "${PINK} Creating (yarn install, webpack.js) and coping static resources into webserver...${NC}"
     make prod-compile -C frontend
     cp -R resources/ $HOME/app
 
     echo -e "${PINK} Generating index.html from swagger specs..${NC}"
     cp -R swagger/ $HOME/app/swagger
     pretty-swag -c $HOME/app/swagger/config.json
-
-    restart_nginx
 
 }
 
@@ -126,4 +124,5 @@ mkdir -p $HOME/app/ssl && cd $HOME/app/ssl && \
 cd $curr_dir
 
 deploy_frontend
+restart_nginx
 deploy_backend
