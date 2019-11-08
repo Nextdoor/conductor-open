@@ -253,16 +253,11 @@ func (train *Train) SendCommitCountMetrics() {
 
 func DoesCommitNeedTicket(commit *Commit, commitsOnTickets map[string]struct{}) bool {
 	_, found := commitsOnTickets[commit.SHA]
-	// Exclude commits with tickets and commits marked for no verification.
-	if found || commit.IsNoVerify() {
-		return false
+	// Exclude commits that already have tickets. Include Staging tickets.
+	if !found && commit.IsNeedsStaging() {
+		return true
 	}
-	// Exclude users in the no staging pilot program, unless they manually
-	// requested staging.
-	if commit.IsNoStagingVerification() && !commit.IsNeedsStaging() {
-		return false
-	}
-	return true
+	return false
 }
 
 // Should this commit trigger slack notifications to its author regarding staging.
