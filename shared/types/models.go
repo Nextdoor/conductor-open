@@ -251,30 +251,30 @@ func (train *Train) SendCommitCountMetrics() {
 	datadog.Count("commit.no_verify", noVerifyCommits, train.DatadogTags())
 }
 
-func DoesCommitNeedTicket(commit *Commit, commitsOnTickets map[string]struct{}) bool {
+func DoesCommitNeedTicket(commit *Commit, commitsOnTickets map[string]struct{}, noStagingVerify bool) bool {
 	_, found := commitsOnTickets[commit.SHA]
 	// Exclude commits that already have tickets. Include Staging tickets.
-	if !found && commit.IsNeedsStaging() {
+	if !found && commit.IsNeedsStaging(noStagingVerify) {
 		return true
 	}
 	return false
 }
 
 // Should this commit trigger slack notifications to its author regarding staging.
-func (commit *Commit) DoesCommitNeedStagingNotification() bool {
-	return !commit.IsNoStagingVerification() || commit.IsNeedsStaging()
+func (commit *Commit) DoesCommitNeedStagingNotification(noStagingVerify bool) bool {
+	return !commit.IsNoStagingVerification(noStagingVerify) || commit.IsNeedsStaging()
 }
 
 func (commit *Commit) IsNoVerify() bool {
 	return strings.Contains(commit.Message, "[no-verify]")
 }
 
-func (commit *Commit) IsNeedsStaging() bool {
-	return strings.Contains(commit.Message, "[needs-staging]") || !commit.IsNoStagingVerification()
+func (commit *Commit) IsNeedsStaging(noStagingVerify bool) bool {
+	return strings.Contains(commit.Message, "[needs-staging]") || !commit.IsNoStagingVerification(noStagingVerify)
 }
 
-func (commit *Commit) IsNoStagingVerification() bool {
-	if settings.NoStagingVerification {
+func (commit *Commit) IsNoStagingVerification(noStagingVerify bool) bool {
+	if noStagingVerify {
 		return true
 	} else {
 		return settings.IsNoStagingVerificationUser(commit.AuthorEmail)
@@ -314,7 +314,7 @@ func (train *Train) CommitsBetween(headSHA string, tailSHA string) []*Commit {
 	return commits
 }
 
-func (train *Train) NewCommitsNeedingTickets(headSHA string) []*Commit {
+func (train *Train) NewCommitsNeedingTickets(headSHA string, noStagingVerify bool) []*Commit {
 	newCommits := make([]*Commit, 0)
 
 	commitsOnTickets := make(map[string]struct{})
@@ -325,7 +325,7 @@ func (train *Train) NewCommitsNeedingTickets(headSHA string) []*Commit {
 	}
 
 	for _, commit := range train.CommitsSince(headSHA) {
-		if DoesCommitNeedTicket(commit, commitsOnTickets) {
+		if DoesCommitNeedTicket(commit, commitsOnTickets, noStagingVerify) {
 			newCommits = append(newCommits, commit)
 		}
 	}
