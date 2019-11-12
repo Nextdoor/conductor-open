@@ -18,7 +18,7 @@ func TestNewCommitsNeedingTickets(t *testing.T) {
 	commit1 := []*Commit{{SHA: sha1}}
 	commit2 := []*Commit{{SHA: sha2}}
 	bothCommits := append(commit1, commit2...)
-	commit3 := []*Commit{{SHA: sha3, Message: "blahblah [no-verify]"}}
+	commit3 := []*Commit{{SHA: sha3, Message: "[no-verify] this change"}}
 	allCommits := append(bothCommits, commit3...)
 
 	train := &Train{
@@ -33,7 +33,7 @@ func TestNewCommitsNeedingTickets(t *testing.T) {
 	assert.Equal(t, bothCommits, newCommits)
 
 	newCommits = train.NewCommitsNeedingTickets(sha3)
-	assert.Equal(t, bothCommits, newCommits)
+	assert.Equal(t, allCommits, newCommits)
 
 	train = &Train{
 		Commits: allCommits,
