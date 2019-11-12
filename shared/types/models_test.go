@@ -64,9 +64,9 @@ func TestNewCommitsNeedingTickets(t *testing.T) {
 }
 
 func TestNewCommitsNeedingTicketsNoStagingVerify(t *testing.T) {
-	commit1 := []*Commit{{SHA: sha1, "I [needs-staging] for this change"}}
+	commit1 := []*Commit{{SHA: sha1, Message: "I [needs-staging] for this change"}}
 	commit2 := []*Commit{{SHA: sha3, Message: "[no-verify] changed my mind [needs-staging]"}}
-	commit3 := []*Commit{{SHA: sha2, "Cowboy/Cowgirl change!"}}
+	commit3 := []*Commit{{SHA: sha2, Message: "Cowboy/Cowgirl change!"}}
 	bothCommits := append(commit1, commit2...)
 	allCommits := append(bothCommits, commit3...)
 	
