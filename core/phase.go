@@ -166,7 +166,7 @@ func phaseGroupDelivered(
 	ticketModificationLock.Lock()
 	defer ticketModificationLock.Unlock()
 
-	newCommitsNeedingTickets := train.NewCommitsNeedingTickets(phaseGroup.HeadSHA)
+	newCommitsNeedingTickets := train.NewCommitsNeedingTickets(phaseGroup.HeadSHA, settings.NoStagingVerification)
 	var tickets []*types.Ticket
 	var err error
 	if len(newCommitsNeedingTickets) > 0 {
