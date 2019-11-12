@@ -16,6 +16,7 @@ import (
 	"github.com/Nextdoor/conductor/services/ticket"
 	"github.com/Nextdoor/conductor/shared/datadog"
 	"github.com/Nextdoor/conductor/shared/logger"
+	"github.com/Nextdoor/conductor/shared/settings"
 	"github.com/Nextdoor/conductor/shared/types"
 )
 
