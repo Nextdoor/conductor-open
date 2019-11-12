@@ -26,13 +26,13 @@ func TestNewCommitsNeedingTickets(t *testing.T) {
 		Tickets: []*Ticket{},
 	}
 
-	newCommits := train.NewCommitsNeedingTickets(sha1)
+	newCommits := train.NewCommitsNeedingTickets(sha1, false)
 	assert.Equal(t, commit1, newCommits)
 
-	newCommits = train.NewCommitsNeedingTickets(sha2)
+	newCommits = train.NewCommitsNeedingTickets(sha2, false)
 	assert.Equal(t, bothCommits, newCommits)
 
-	newCommits = train.NewCommitsNeedingTickets(sha3)
+	newCommits = train.NewCommitsNeedingTickets(sha3, false)
 	assert.Equal(t, allCommits, newCommits)
 
 	train = &Train{
@@ -41,7 +41,7 @@ func TestNewCommitsNeedingTickets(t *testing.T) {
 			{Commits: commit1},
 		},
 	}
-	newCommits = train.NewCommitsNeedingTickets(sha2)
+	newCommits = train.NewCommitsNeedingTickets(sha2, false)
 	assert.Equal(t, commit2, newCommits)
 
 	train = &Train{
@@ -50,7 +50,7 @@ func TestNewCommitsNeedingTickets(t *testing.T) {
 			{Commits: commit2},
 		},
 	}
-	newCommits = train.NewCommitsNeedingTickets(sha2)
+	newCommits = train.NewCommitsNeedingTickets(sha2, false)
 	assert.Equal(t, commit1, newCommits)
 
 	train = &Train{
@@ -59,7 +59,7 @@ func TestNewCommitsNeedingTickets(t *testing.T) {
 			{Commits: allCommits},
 		},
 	}
-	newCommits = train.NewCommitsNeedingTickets(sha2)
+	newCommits = train.NewCommitsNeedingTickets(sha2, false)
 	assert.Equal(t, []*Commit{}, newCommits)
 }
 
@@ -69,21 +69,19 @@ func TestNewCommitsNeedingTicketsNoStagingVerify(t *testing.T) {
 	commit3 := []*Commit{{SHA: sha2, "Cowboy/Cowgirl change!"}}
 	bothCommits := append(commit1, commit2...)
 	allCommits := append(bothCommits, commit3...)
-
-	settings.NoStagingVerification = true
 	
 	train := &Train{
 		Commits: allCommits,
 		Tickets: []*Ticket{},
 	}
 
-	newCommits := train.NewCommitsNeedingTickets(sha1)
+	newCommits := train.NewCommitsNeedingTickets(sha1, true)
 	assert.Equal(t, commit1, newCommits)
 
-	newCommits = train.NewCommitsNeedingTickets(sha2)
+	newCommits = train.NewCommitsNeedingTickets(sha2, true)
 	assert.Equal(t, bothCommits, newCommits)
 
-	newCommits = train.NewCommitsNeedingTickets(sha3)
+	newCommits = train.NewCommitsNeedingTickets(sha3, true)
 	assert.Equal(t, bothCommits, newCommits)
 
 	train = &Train{
@@ -92,7 +90,7 @@ func TestNewCommitsNeedingTicketsNoStagingVerify(t *testing.T) {
 			{Commits: commit1},
 		},
 	}
-	newCommits = train.NewCommitsNeedingTickets(sha2)
+	newCommits = train.NewCommitsNeedingTickets(sha2, true)
 	assert.Equal(t, commit2, newCommits)
 
 	train = &Train{
@@ -101,7 +99,7 @@ func TestNewCommitsNeedingTicketsNoStagingVerify(t *testing.T) {
 			{Commits: commit2},
 		},
 	}
-	newCommits = train.NewCommitsNeedingTickets(sha2)
+	newCommits = train.NewCommitsNeedingTickets(sha2, true)
 	assert.Equal(t, commit1, newCommits)
 
 	train = &Train{
@@ -110,7 +108,7 @@ func TestNewCommitsNeedingTicketsNoStagingVerify(t *testing.T) {
 			{Commits: allCommits},
 		},
 	}
-	newCommits = train.NewCommitsNeedingTickets(sha2)
+	newCommits = train.NewCommitsNeedingTickets(sha2, true)
 	assert.Equal(t, []*Commit{}, newCommits)
 }
 
