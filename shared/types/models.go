@@ -236,7 +236,7 @@ func (train *Train) SendCommitCountMetrics() {
 			robotCommitCount += 1
 		} else {
 			humanCommitCount += 1
-			if commit.IsNeedsStaging() {
+			if commit.IsNeedsStaging(settings.NoStagingVerification) {
 				needsStagingCommits += 1
 			} else if commit.IsNoVerify() {
 				noVerifyCommits += 1
@@ -262,7 +262,7 @@ func DoesCommitNeedTicket(commit *Commit, commitsOnTickets map[string]struct{}, 
 
 // Should this commit trigger slack notifications to its author regarding staging.
 func (commit *Commit) DoesCommitNeedStagingNotification(noStagingVerify bool) bool {
-	return !commit.IsNoStagingVerification(noStagingVerify) || commit.IsNeedsStaging()
+	return !commit.IsNoStagingVerification(noStagingVerify) || commit.IsNeedsStaging(settings.NoStagingVerification)
 }
 
 func (commit *Commit) IsNoVerify() bool {
