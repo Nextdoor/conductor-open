@@ -16,7 +16,7 @@ const (
 
 func TestNewCommitsNeedingTickets(t *testing.T) {
 	commit1 := []*Commit{{SHA: sha1}}
-	commit2 := []*Commit{{SHA: sha2}}
+	commit2 := []*Commit{{SHA: sha2, Message: "This change [needs-staging] for sure"}}
 	bothCommits := append(commit1, commit2...)
 	commit3 := []*Commit{{SHA: sha3, Message: "[no-verify] this change"}}
 	allCommits := append(bothCommits, commit3...)
@@ -34,6 +34,57 @@ func TestNewCommitsNeedingTickets(t *testing.T) {
 
 	newCommits = train.NewCommitsNeedingTickets(sha3)
 	assert.Equal(t, allCommits, newCommits)
+
+	train = &Train{
+		Commits: allCommits,
+		Tickets: []*Ticket{
+			{Commits: commit1},
+		},
+	}
+	newCommits = train.NewCommitsNeedingTickets(sha2)
+	assert.Equal(t, commit2, newCommits)
+
+	train = &Train{
+		Commits: allCommits,
+		Tickets: []*Ticket{
+			{Commits: commit2},
+		},
+	}
+	newCommits = train.NewCommitsNeedingTickets(sha2)
+	assert.Equal(t, commit1, newCommits)
+
+	train = &Train{
+		Commits: allCommits,
+		Tickets: []*Ticket{
+			{Commits: allCommits},
+		},
+	}
+	newCommits = train.NewCommitsNeedingTickets(sha2)
+	assert.Equal(t, []*Commit{}, newCommits)
+}
+
+func TestNewCommitsNeedingTicketsNoStagingVerify(t *testing.T) {
+	commit1 := []*Commit{{SHA: sha1, "I [needs-staging] for this change"}}
+	commit2 := []*Commit{{SHA: sha3, Message: "[no-verify] changed my mind [needs-staging]"}}
+	commit3 := []*Commit{{SHA: sha2, "Cowboy/Cowgirl change!"}}
+	bothCommits := append(commit1, commit2...)
+	allCommits := append(bothCommits, commit3...)
+
+	settings.NoStagingVerification = true
+	
+	train := &Train{
+		Commits: allCommits,
+		Tickets: []*Ticket{},
+	}
+
+	newCommits := train.NewCommitsNeedingTickets(sha1)
+	assert.Equal(t, commit1, newCommits)
+
+	newCommits = train.NewCommitsNeedingTickets(sha2)
+	assert.Equal(t, bothCommits, newCommits)
+
+	newCommits = train.NewCommitsNeedingTickets(sha3)
+	assert.Equal(t, bothCommits, newCommits)
 
 	train = &Train{
 		Commits: allCommits,
