@@ -270,7 +270,7 @@ func (commit *Commit) IsNoVerify() bool {
 }
 
 func (commit *Commit) IsNeedsStaging() bool {
-	return strings.Contains(commit.Message, "[needs-staging]")
+	return strings.Contains(commit.Message, "[needs-staging]") || !commit.IsNoStagingVerification()
 }
 
 func (commit *Commit) IsNoStagingVerification() bool {
