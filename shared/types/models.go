@@ -273,7 +273,7 @@ func (commit *Commit) IsNeedsStaging(noStagingVerify bool) bool {
 	if strings.Contains(commit.Message, "[needs-staging]") {
 		return true
 	}
-	elif noStagingVerify {
+	if noStagingVerify {
 		return false
 	} else {
 		return !settings.IsNoStagingVerificationUser(commit.AuthorEmail)
