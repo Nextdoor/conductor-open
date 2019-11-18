@@ -262,7 +262,7 @@ func DoesCommitNeedTicket(commit *Commit, commitsOnTickets map[string]struct{}, 
 
 // Should this commit trigger slack notifications to its author regarding staging.
 func (commit *Commit) DoesCommitNeedStagingNotification(noStagingVerify bool) bool {
-	return !commit.IsNoStagingVerification(noStagingVerify) || commit.IsNeedsStaging(settings.NoStagingVerification)
+	return commit.IsNeedsStaging(settings.NoStagingVerification)
 }
 
 func (commit *Commit) IsNoVerify() bool {
@@ -270,14 +270,13 @@ func (commit *Commit) IsNoVerify() bool {
 }
 
 func (commit *Commit) IsNeedsStaging(noStagingVerify bool) bool {
-	return strings.Contains(commit.Message, "[needs-staging]") || !commit.IsNoStagingVerification(noStagingVerify)
-}
-
-func (commit *Commit) IsNoStagingVerification(noStagingVerify bool) bool {
-	if noStagingVerify {
+	if strings.Contains(commit.Message, "[needs-staging]") {
 		return true
+	}
+	elif noStagingVerify {
+		return false
 	} else {
-		return settings.IsNoStagingVerificationUser(commit.AuthorEmail)
+		return !settings.IsNoStagingVerificationUser(commit.AuthorEmail)
 	}
 }
 
