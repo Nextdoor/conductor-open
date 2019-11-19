@@ -378,7 +378,7 @@ func (m Messenger) commitsByAuthorEmail(commits []*types.Commit, forStaging bool
 		if settings.IsRobotUser(commit.AuthorEmail) {
 			continue
 		}
-		if forStaging && !commit.DoesCommitNeedStagingNotification() {
+		if forStaging && !commit.DoesCommitNeedStagingNotification(settings.NoStagingVerification) {
 			continue
 		}
 		if _, found := commitsPerAuthorEmail[commit.AuthorEmail]; !found {

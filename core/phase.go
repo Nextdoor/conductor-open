@@ -16,6 +16,7 @@ import (
 	"github.com/Nextdoor/conductor/services/ticket"
 	"github.com/Nextdoor/conductor/shared/datadog"
 	"github.com/Nextdoor/conductor/shared/logger"
+	"github.com/Nextdoor/conductor/shared/settings"
 	"github.com/Nextdoor/conductor/shared/types"
 )
 
@@ -166,7 +167,7 @@ func phaseGroupDelivered(
 	ticketModificationLock.Lock()
 	defer ticketModificationLock.Unlock()
 
-	newCommitsNeedingTickets := train.NewCommitsNeedingTickets(phaseGroup.HeadSHA)
+	newCommitsNeedingTickets := train.NewCommitsNeedingTickets(phaseGroup.HeadSHA, settings.NoStagingVerification)
 	var tickets []*types.Ticket
 	var err error
 	if len(newCommitsNeedingTickets) > 0 {
