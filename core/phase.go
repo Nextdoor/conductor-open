@@ -108,7 +108,7 @@ func startPhase(
 	// Pre-phase actions
 	switch phaseToStart.Type {
 	case types.Verification:
-		logger.Info("Handling notification and ticket creation for Phase %s", phaseToStart.ID)
+		logger.Info("Handling notification and ticket creation for Phase %v", phaseToStart.ID)
 		err := phaseGroupDelivered(
 			dataClient, messagingService, ticketService, phaseToStart.Train, phaseToStart.PhaseGroup)
 		if err != nil {
