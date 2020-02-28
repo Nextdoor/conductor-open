@@ -171,7 +171,7 @@ func phaseGroupDelivered(
 	newCommitsNeedingTickets := train.NewCommitsNeedingTickets(phaseGroup.HeadSHA, settings.NoStagingVerification)
 	var tickets []*types.Ticket
 	var err error
-	logger.Info("There are %s commits that need tickets", newCommitsNeedingTickets)
+	logger.Info("There are %v commits that need tickets", len(newCommitsNeedingTickets))
 	if len(newCommitsNeedingTickets) > 0 {
 		tickets, err = ticketService.CreateTickets(train, newCommitsNeedingTickets)
 		if err != nil {
