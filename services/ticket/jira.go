@@ -324,7 +324,7 @@ func createParentIssue(train *types.Train) (*jira.Issue, error) {
 }
 
 func getParentIssue(train *types.Train) (*jira.Issue, error) {
-	logger.Info("Looking for parent issue for Train %s", train.ID)
+	logger.Info("Looking for parent issue for Train %v", train.ID)
 	jql := parentIssueQuery(jiraProject, parentSummary(train))
 	issues, resp, err := jiraClient.Issue.Search(jql, nil)
 	if err != nil {
