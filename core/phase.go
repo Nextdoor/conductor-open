@@ -108,6 +108,7 @@ func startPhase(
 	// Pre-phase actions
 	switch phaseToStart.Type {
 	case types.Verification:
+		logger.Info("Handling notification and ticket creation for Phase %v", phaseToStart.ID)
 		err := phaseGroupDelivered(
 			dataClient, messagingService, ticketService, phaseToStart.Train, phaseToStart.PhaseGroup)
 		if err != nil {
@@ -170,6 +171,7 @@ func phaseGroupDelivered(
 	newCommitsNeedingTickets := train.NewCommitsNeedingTickets(phaseGroup.HeadSHA, settings.NoStagingVerification)
 	var tickets []*types.Ticket
 	var err error
+	logger.Info("There are %v commits that need tickets", len(newCommitsNeedingTickets))
 	if len(newCommitsNeedingTickets) > 0 {
 		tickets, err = ticketService.CreateTickets(train, newCommitsNeedingTickets)
 		if err != nil {

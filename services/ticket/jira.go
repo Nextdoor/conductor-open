@@ -61,6 +61,8 @@ func newJIRA() *JIRA {
 		Username: jiraUsername,
 		Password: jiraApiToken,
 	}
+	
+	logger.Info("All JIRA flags are set. Creating the JIRA client...")
 
 	var err error
 	jiraClient, err = jira.NewClient(tp.Client(), jiraURL)
@@ -322,6 +324,7 @@ func createParentIssue(train *types.Train) (*jira.Issue, error) {
 }
 
 func getParentIssue(train *types.Train) (*jira.Issue, error) {
+	logger.Info("Looking for parent issue for Train %v", train.ID)
 	jql := parentIssueQuery(jiraProject, parentSummary(train))
 	issues, resp, err := jiraClient.Issue.Search(jql, nil)
 	if err != nil {
