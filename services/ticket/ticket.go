@@ -33,7 +33,7 @@ type Service interface {
 var (
 	service               Service
 	getOnce               sync.Once
-	DefaultTicketUsername string
+	DefaultAccountID.     string
 )
 
 func GetService() Service {
