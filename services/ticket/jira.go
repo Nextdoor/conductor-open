@@ -297,10 +297,10 @@ func createParentIssue(train *types.Train) (*jira.Issue, error) {
 	i := jira.Issue{
 		Fields: &jira.IssueFields{
 			Assignee: &jira.User{
-				Name: jiraUsername,
+				AccountID: jiraAccountID,
 			},
 			Reporter: &jira.User{
-				Name: jiraUsername,
+				AccountID: jiraAccountID,
 			},
 			Type: jira.IssueType{
 				Name: jiraParentIssueType,
@@ -353,10 +353,11 @@ func createSubIssue(parentIssue *jira.Issue, username string, commits []*types.C
 	issue := &jira.Issue{
 		Fields: &jira.IssueFields{
 			Assignee: &jira.User{
-				Name: username,
+				// TODO: Get user account ID and use it here instead.
+				AccountID: jiraAccountID,
 			},
 			Reporter: &jira.User{
-				Name: jiraUsername,
+				AccountID: jiraAccountID,
 			},
 			Type: jira.IssueType{
 				Name: jiraIssueType,
