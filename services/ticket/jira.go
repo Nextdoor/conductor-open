@@ -19,6 +19,7 @@ import (
 var (
 	jiraURL             = flags.EnvString("JIRA_URL", "")
 	jiraUsername        = flags.EnvString("JIRA_USERNAME", "")
+	jiraAccountID	    = flags.EnvString("JIRA_CONDUCTOR_ACCOUNT_ID", "")
 	jiraApiToken        = flags.EnvString("JIRA_API_TOKEN", "")
 	jiraProject         = flags.EnvString("JIRA_PROJECT", "")
 	jiraParentIssueType = flags.EnvString("JIRA_PARENT_ISSUE_TYPE", "")
@@ -43,6 +44,9 @@ func newJIRA() *JIRA {
 	}
 	if jiraUsername == "" {
 		panic(errors.New("jira_username flag must be set."))
+	}
+	if jiraAccountID == "" {
+		panic(errors.New("jira_conductor_account_id flag must be set."))
 	}
 	if jiraApiToken == "" {
 		panic(errors.New("jira_api_token flag must be set."))
@@ -70,7 +74,7 @@ func newJIRA() *JIRA {
 		panic(err)
 	}
 
-	DefaultTicketUsername = jiraUsername
+	DefaultAccountID = jiraAccountID
 	return &JIRA{}
 }
 
@@ -293,10 +297,10 @@ func createParentIssue(train *types.Train) (*jira.Issue, error) {
 	i := jira.Issue{
 		Fields: &jira.IssueFields{
 			Assignee: &jira.User{
-				Name: jiraUsername,
+				AccountID: jiraAccountID,
 			},
 			Reporter: &jira.User{
-				Name: jiraUsername,
+				AccountID: jiraAccountID,
 			},
 			Type: jira.IssueType{
 				Name: jiraParentIssueType,
@@ -349,10 +353,11 @@ func createSubIssue(parentIssue *jira.Issue, username string, commits []*types.C
 	issue := &jira.Issue{
 		Fields: &jira.IssueFields{
 			Assignee: &jira.User{
-				Name: username,
+				// TODO: Get user account ID and use it here instead.
+				AccountID: jiraAccountID,
 			},
 			Reporter: &jira.User{
-				Name: jiraUsername,
+				AccountID: jiraAccountID,
 			},
 			Type: jira.IssueType{
 				Name: jiraIssueType,
@@ -430,18 +435,18 @@ func commitsByEmail(commits []*types.Commit) map[string][]*types.Commit {
 	return commitsByEmail
 }
 
-// If not found, returns DefaultTicketUsername.
+// If not found, returns DefaultAccountID.
 func emailToUsernameInJIRA(email string) string {
 	users, resp, err := jiraClient.User.Find(email)
 	if err != nil {
 		err = parseBodyError(resp, err)
 		logger.Error("Error finding JIRA user for email %s: %v", email, err)
-		return DefaultTicketUsername
+		return DefaultAccountID
 	}
 
 	if len(users) == 0 || users[0].EmailAddress != email {
 		logger.Error("Could not find JIRA user for email %s", email)
-		return DefaultTicketUsername
+		return DefaultAccountID
 	}
 
 	if len(users) > 1 {

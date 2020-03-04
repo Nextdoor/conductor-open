@@ -34,7 +34,7 @@ func TestSyncTickets(t *testing.T) {
 	phaseService := &phase.PhaseServiceMock{}
 	// This is a real ticketing system (JIRA) test.
 	ticketService := ticket.GetService()
-	authorName := ticket.DefaultTicketUsername
+	authorName := ticket.DefaultAccountID
 	testCommits := []*types.Commit{
 		{AuthorEmail: email1, AuthorName: authorName, SHA: sha1, Message: message1},
 		{AuthorEmail: email1, AuthorName: authorName, SHA: sha2, Message: message2},
