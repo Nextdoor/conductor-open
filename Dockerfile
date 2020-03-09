@@ -3,8 +3,7 @@ ENTRYPOINT [ "/app/entrypoint.sh" ]
 EXPOSE 80 443
 
 # Install packages.
-RUN curl -sL https://deb.nodesource.com/setup_9.x | bash - && \
-    apt-get install -y jq nginx nodejs patch unzip && \
+RUN apt-get update && apt-get install -y jq nginx nodejs patch unzip && \
     apt-get clean
 
 # Generate SSL certs.
