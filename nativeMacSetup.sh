@@ -9,13 +9,14 @@
 
 #!/bin/bash
 
+set -e
+
 PINK='\033[0;35m'
 RED='\033[1;31m'
 NC='\033[0m'        # No Color
 
-# IMPORTANT - go to https://github.com/settings/developers, and create a new OAuth app for conductor	
-# replace the Client Id and Client Secret in the variable below	
-OAUTH_CLIENT_ID='YOUR_OAUTH_CLIENT_ID'
+./checkOAuthEnv.sh
+OAUTH_CLIENT_ID="${CONDUCTOR_OAUTH_CLIENT_ID}"
 
 
 if [ "$1" == "--help" ] ; then
@@ -78,6 +79,14 @@ function deploy_backend {
 
 }
 
+echo -e "${PINK} Checking install of yarn, node, nginx server and swagger..${NC}"
+node -v || echo -e "${RED}ERROR: Please install node using installer: https://nodejs.org/en/download/ ${NC}"
+npm -v || echo -e "${RED}ERROR: Please install node using installer: https://nodejs.org/en/download/ ${NC}"
+nginx -v || echo -e "${PINK}INFO: Intalling nginx ${NC}"
+nginx -v || brew install nginx
+yarn -v || npm install -g yarn;
+npm install -g pretty-swag@0.1.144;
+
 if [ "$1" == "--frontend" ] ; then
     # run only frontend deployment related scripts, assuming we already once had a full local mac install
     deploy_frontend
@@ -89,15 +98,6 @@ if [ "$1" == "--backend" ] ; then
     deploy_backend
     exit 0
 fi
-
-
-echo -e "${PINK} Checking install of yarn, node, nginx server and swagger..${NC}"
-node -v || echo -e "${RED}ERROR: Please install node using installer: https://nodejs.org/en/download/ ${NC}"
-npm -v || echo -e "${RED}ERROR: Please install node using installer: https://nodejs.org/en/download/ ${NC}"
-nginx -v || echo -e "${PINK}INFO: Intalling nginx ${NC}"
-nginx -v || brew install nginx
-yarn -v || npm install -g yarn;
-npm install -g pretty-swag@0.1.144;
 
 echo -e "${PINK} Stopping all existing docker containers to avoid attached port conflicts..${NC}"
 docker container stop $(docker container ls -aq)

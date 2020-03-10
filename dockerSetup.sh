@@ -4,12 +4,13 @@
 
 #!/bin/bash
 
+set -e
+
 PINK='\033[0;35m'
 NC='\033[0m'        # No Color
 
-# IMPORTANT - go to https://github.com/settings/developers, and create a new OAuth app for conductor	
-# replace the Client Id and Client Secret in the variable below	
-OAUTH_CLIENT_ID='YOUR_OAUTH_CLIENT_ID'
+./checkOAuthEnv.sh
+OAUTH_CLIENT_ID="${CONDUCTOR_OAUTH_CLIENT_ID}"
 
 if [ ! -f "frontend/envfile" ]; then
     echo -e "${PINK}creating frontend/envfile ...${NC}"
