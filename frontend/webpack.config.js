@@ -1,6 +1,6 @@
 const webpack = require('webpack');
 const path = require('path');
-const ParallelUglifyPlugin = require('webpack-parallel-uglify-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 const dir = path.join(__dirname, '..', 'resources', 'frontend', 'gen');
 
@@ -22,11 +22,11 @@ const DEFAULT_ENV_VARS = {
 
 // Look for missing env vars.
 let missing_env = false;
-REQUIRED_ENV_VARS.forEach(function(env_var) {
+REQUIRED_ENV_VARS.forEach(function (env_var) {
   if (!(env_var in process.env)) {
     console.error(
-        'Environmental variable ' + env_var +
-        ' must be set for Webpack build.');
+      'Environmental variable ' + env_var +
+      ' must be set for Webpack build.');
     missing_env = true;
   } else {
     console.log(env_var + ':');
@@ -55,7 +55,9 @@ const PLUGIN_CONFIG = [
 let DEV_TOOL = 'source-map';
 
 if (IS_PRODUCTION) {
-  PLUGIN_CONFIG.push(new ParallelUglifyPlugin({uglifyJS: {minimize: true}}));
+  PLUGIN_CONFIG.push(new UglifyJsPlugin({
+    parallel: true,
+  }));
   PLUGIN_CONFIG.push(new webpack.DefinePlugin({
     'process.env': {
       'NODE_ENV': '"production"'
@@ -73,23 +75,62 @@ module.exports = {
     filename: 'bundle.js'
   },
   resolve: {
-    extensions: ['', '.js', '.jsx'],
-    root: [path.resolve('./src')]
+    extensions: ['.js', '.jsx'],
+    modules: [
+      path.join(__dirname, "src"),
+      "node_modules"
+    ]
   },
   module: {
-    loaders: [
+    rules: [
       {
-        test: /\.jsx?$/,
-        loader: 'babel-loader',
+        test: /\.jsx$/,
+        loader: "babel-loader", // Do not use "use" here
         exclude: /(node_modules)/,
         query: {
           presets: ['@babel/react', '@babel/env']
-        },
-        progress: true
+        }
       },
-      {test: /\.css$/, loader: 'style!css'},
-      {test: /\.scss$/, loaders: ['style-loader', 'css-loader', 'sass-loader']},
-      {test: /\.(otf|eot|svg|ttf|woff|woff2).*$/, loader: 'url?limit=8192&name=/[hash].[ext]'}
+      {
+        test: /\.css$/,
+        use: [
+          {
+            loader: "style-loader"
+          },
+          {
+            loader: "css-loader",
+          },
+          {
+            loader: "sass-loader"
+          }
+        ]
+      },
+      {
+        test: /\.scss$/,
+        use: [
+          {
+            loader: "style-loader"
+          },
+          {
+            loader: "css-loader"
+          },
+          {
+            loader: "sass-loader"
+          }
+        ]
+      },
+      {
+        test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: '8192',
+              name: '/[hash].[ext]',
+            }
+          }
+        ]
+      }
     ]
   },
   plugins: PLUGIN_CONFIG,
