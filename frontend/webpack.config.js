@@ -1,6 +1,5 @@
 const webpack = require('webpack');
 const path = require('path');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 const dir = path.join(__dirname, '..', 'resources', 'frontend', 'gen');
 
@@ -55,15 +54,6 @@ const PLUGIN_CONFIG = [
 let DEV_TOOL = 'source-map';
 
 if (IS_PRODUCTION) {
-  PLUGIN_CONFIG.push(new UglifyJsPlugin({
-    parallel: true,
-  }));
-  PLUGIN_CONFIG.push(new webpack.DefinePlugin({
-    'process.env': {
-      'NODE_ENV': '"production"'
-    }
-  }));
-
   DEV_TOOL = 'false';
 }
 
@@ -125,7 +115,7 @@ module.exports = {
           {
             loader: 'url-loader',
             options: {
-              limit: '8192',
+              limit: '10000',
               name: '/[hash].[ext]',
             }
           }
@@ -134,5 +124,8 @@ module.exports = {
     ]
   },
   plugins: PLUGIN_CONFIG,
-  devtool: DEV_TOOL
+  devtool: DEV_TOOL,
+  performance: {
+    hints: false
+  }
 };
