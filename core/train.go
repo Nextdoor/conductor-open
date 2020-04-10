@@ -740,6 +740,10 @@ func cancelTrain(r *http.Request) response {
 	messagingService := messaging.GetService()
 	messagingService.TrainCancelled(train, authedUser)
 
+	for job := range train.ActivePhases.Deploy.Jobs {
+		err = build.Jenkins().CancelJob(job.url)
+	}
+
 	if train.NextID != nil {
 		latestTrain, err := dataClient.LatestTrain()
 		if err != nil {

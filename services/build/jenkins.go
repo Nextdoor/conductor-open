@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/Nextdoor/conductor/shared/datadog"
@@ -71,6 +72,25 @@ func (j jenkins) TestAuth() error {
 	if resp.StatusCode != 200 {
 		return fmt.Errorf("Error connecting to Jenkins: %s", resp.Status)
 	}
+	return nil
+}
+
+func (j jenkins) CancelJob(jobURL string) error {
+
+	jobURL = strings.TrimSuffix(jobURL, "/console")
+	jobURL = jobURL + "/stop"
+
+	req, err := http.NewRequest("POST", jobURL, nil)
+	if err != nil {
+		return err
+	}
+	req.SetBasicAuth(j.Username, j.Password)
+
+	resp, err := j.Do(req)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
