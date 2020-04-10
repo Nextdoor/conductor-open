@@ -240,12 +240,12 @@ func (m Messenger) TrainCancelled(train *types.Train, user *types.User) {
 	var text string
 	if user != nil {
 		text = m.Engine.formatBold(
-			fmt.Sprintf("%s cancelled by %s.",
+			fmt.Sprintf("%s cancelled by %s. All commits will move to the next train.",
 				m.formatTrainLink(train, fmt.Sprintf("Train %d", train.ID)),
 				m.Engine.formatUser(user)))
 	} else {
 		text = m.Engine.formatBold(
-			fmt.Sprintf("%s cancelled.",
+			fmt.Sprintf("%s cancelled. All commits will move to the next train.",
 				m.formatTrainLink(train, fmt.Sprintf("Train %d", train.ID))))
 	}
 
