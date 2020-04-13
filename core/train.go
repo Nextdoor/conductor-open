@@ -740,8 +740,18 @@ func cancelTrain(r *http.Request) response {
 	messagingService := messaging.GetService()
 	messagingService.TrainCancelled(train, authedUser)
 
-	for job := range train.ActivePhases.Deploy.Jobs {
-		err = build.Jenkins().CancelJob(job.url)
+	params := make(map[string]string)
+	params["TRAIN_ID"] = strconv.FormatUint(train.ID, 10)
+	params["BRANCH"] = train.Branch
+	params["SHA"] = train.HeadSHA
+	params["CONDUCTOR_HOSTNAME"] = settings.GetHostname()
+	params["BUILD_USER"] = authedUser.Name
+
+	// close all active deploy jobs in jenkins if train has been cancelled
+	for _, job := range train.ActivePhases.Deploy.Jobs {
+		if job.URL != nil {
+			build.Jenkins().CancelJob(job.Name, *job.URL, params)
+		}
 	}
 
 	if train.NextID != nil {

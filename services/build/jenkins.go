@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"strings"
 	"time"
 
 	"github.com/Nextdoor/conductor/shared/datadog"
@@ -75,12 +74,21 @@ func (j jenkins) TestAuth() error {
 	return nil
 }
 
-func (j jenkins) CancelJob(jobURL string) error {
+func (j jenkins) CancelJob(jobName string, jobURL string, params map[string]string) error {
 
-	jobURL = strings.TrimSuffix(jobURL, "/console")
-	jobURL = jobURL + "/stop"
+	datadog.Info("Cancelling Jenkins Job \"%s\", Params: %s", jobName, params)
+	buildURL, err := url.Parse(fmt.Sprintf("%s/stop", jobURL))
+	if err != nil {
+		return err
+	}
 
-	req, err := http.NewRequest("POST", jobURL, nil)
+	urlParams := url.Values{}
+	for k, v := range params {
+		urlParams.Add(k, v)
+	}
+	buildURL.RawQuery = urlParams.Encode()
+
+	req, err := http.NewRequest("POST", buildURL.String(), nil)
 	if err != nil {
 		return err
 	}
@@ -89,6 +97,10 @@ func (j jenkins) CancelJob(jobURL string) error {
 	resp, err := j.Do(req)
 	if err != nil {
 		return err
+	}
+
+	if resp.StatusCode != 201 {
+		return fmt.Errorf("Error building Jenkins job: %s", resp.Status)
 	}
 
 	return nil
