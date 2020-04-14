@@ -74,6 +74,38 @@ func (j jenkins) TestAuth() error {
 	return nil
 }
 
+func (j jenkins) CancelJob(jobName string, jobURL string, params map[string]string) error {
+
+	datadog.Info("Cancelling Jenkins Job \"%s\", Params: %s", jobName, params)
+	buildURL, err := url.Parse(fmt.Sprintf("%s/stop", jobURL))
+	if err != nil {
+		return err
+	}
+
+	urlParams := url.Values{}
+	for k, v := range params {
+		urlParams.Add(k, v)
+	}
+	buildURL.RawQuery = urlParams.Encode()
+
+	req, err := http.NewRequest("POST", buildURL.String(), nil)
+	if err != nil {
+		return err
+	}
+	req.SetBasicAuth(j.Username, j.Password)
+
+	resp, err := j.Do(req)
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != 201 {
+		return fmt.Errorf("Error building Jenkins job: %s", resp.Status)
+	}
+
+	return nil
+}
+
 func (j jenkins) TriggerJob(jobName string, params map[string]string) error {
 	datadog.Info("Triggering Jenkins Job \"%s\", Params: %s", jobName, params)
 	buildUrl, err := url.Parse(fmt.Sprintf("%s/job/%s/buildWithParameters", j.URL, jobName))
