@@ -936,6 +936,18 @@ func (d *dataClient) WriteCommits(commits []*types.Commit) ([]*types.Commit, err
 	return newCommits, nil
 }
 
+func (d *dataClient) PrependCommits(commits []*types.Commit) ([]*types.Commit, error) {
+	newCommits := make([]*types.Commit, 0)
+	prepended := make([]string, 0)
+	for _, commit := range commits {
+		newCommits = append([]*types.Commit{commit}, newCommits...)
+		prepended = append(prepended, fmt.Sprintf("(ID, SHA, Branch, AuthorName) %v, %v, %v, %v", commit.ID, commit.SHA, commit.Branch, commit.AuthorName))
+
+	}
+	datadog.Info("Prepended commits to queue: %v", strings.Join(prepended, "\n"))
+	return newCommits, nil
+}
+
 func (d *dataClient) LatestCommitForTrain(train *types.Train) (*types.Commit, error) {
 	commit := &types.Commit{}
 	query := d.Client.QueryTable(commit)

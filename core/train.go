@@ -719,6 +719,10 @@ func cancelTrain(r *http.Request) response {
 			http.StatusInternalServerError)
 	}
 
+	// add commits back to the head of the queue when train is cancelled.
+	dataClient.PrependCommits(train.Commits)
+	train.HeadSHA = train.TailSHA
+
 	datadog.Incr("train.cancel", train.DatadogTags())
 
 	duration := train.CancelledAt.Value.Sub(train.CreatedAt.Value)

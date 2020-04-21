@@ -59,6 +59,7 @@ type Client interface {
 	RestartJob(*types.Job, string) error
 
 	WriteCommits([]*types.Commit) ([]*types.Commit, error)
+	PrependCommits([]*types.Commit) ([]*types.Commit, error)
 	LatestCommitForTrain(*types.Train) (*types.Commit, error)
 	TrainsByCommit(*types.Commit) ([]*types.Train, error)
 
